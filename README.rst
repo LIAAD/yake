@@ -39,17 +39,19 @@ Python3
 Installation
 -------------
 
-To install Yake on your terminal ::
+To install Yake using pip ::
 
-	pip install yake
+	pip install git+https://github.com/LIAAD/yake
 
 To upgrade using pip::
 
-	pip install yake –upgrade
+	pip install git+https://github.com/LIAAD/yake –upgrade
 
 Usage
 ---------
 
+Command line usage
+************************
 How to use it on your favorite command line::
 
 	Usage: yake [OPTIONS]
@@ -67,6 +69,8 @@ How to use it on your favorite command line::
 	--help                          Show this message and exit
 
 
+Python
+************************
 How to use it on Python::
 
 	import yake
