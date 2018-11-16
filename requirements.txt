@@ -1,0 +1,7 @@
+pytest
+flake8
+segtok
+jellyfish
+networkx
+numpy
+click
