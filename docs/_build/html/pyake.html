@@ -1,0 +1,278 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>yake package &#8212; yake 0.3.6 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">yake 0.3.6 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="yake-package">
+<h1>yake package<a class="headerlink" href="#yake-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="yake-cli-module">
+<h2>yake.cli module<a class="headerlink" href="#yake-cli-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yake.datarepresentation">
+<span id="yake-datarepresentation-module"></span><h2>yake.datarepresentation module<a class="headerlink" href="#module-yake.datarepresentation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="yake.datarepresentation.DataCore">
+<em class="property">class </em><code class="descclassname">yake.datarepresentation.</code><code class="descname">DataCore</code><span class="sig-paren">(</span><em>text</em>, <em>stopword_set</em>, <em>windowsSize</em>, <em>n</em>, <em>tagsToDiscard={'d'</em>, <em>'u'}</em>, <em>exclude={'!'</em>, <em>'&quot;'</em>, <em>'#'</em>, <em>'$'</em>, <em>'%'</em>, <em>'&amp;'</em>, <em>&quot;'&quot;</em>, <em>'('</em>, <em>')'</em>, <em>'*'</em>, <em>'+'</em>, <em>'</em>, <em>'</em>, <em>'-'</em>, <em>'.'</em>, <em>'/'</em>, <em>':'</em>, <em>';'</em>, <em>'&lt;'</em>, <em>'='</em>, <em>'&gt;'</em>, <em>'?'</em>, <em>'&#64;'</em>, <em>'['</em>, <em>'\'</em>, <em>']'</em>, <em>'^'</em>, <em>'_'</em>, <em>'`'</em>, <em>'{'</em>, <em>'|'</em>, <em>'}'</em>, <em>'~'}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.addCooccur">
+<code class="descname">addCooccur</code><span class="sig-paren">(</span><em>left_term</em>, <em>right_term</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.addCooccur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.addCooccur" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.addOrUpdateComposedWord">
+<code class="descname">addOrUpdateComposedWord</code><span class="sig-paren">(</span><em>cand</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.addOrUpdateComposedWord"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.addOrUpdateComposedWord" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.build_candidate">
+<code class="descname">build_candidate</code><span class="sig-paren">(</span><em>candidate_string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.build_candidate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.build_candidate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.build_mult_terms_features">
+<code class="descname">build_mult_terms_features</code><span class="sig-paren">(</span><em>features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.build_mult_terms_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.build_mult_terms_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.build_single_terms_features">
+<code class="descname">build_single_terms_features</code><span class="sig-paren">(</span><em>features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.build_single_terms_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.build_single_terms_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.getTag">
+<code class="descname">getTag</code><span class="sig-paren">(</span><em>word</em>, <em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.getTag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.getTag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.getTerm">
+<code class="descname">getTerm</code><span class="sig-paren">(</span><em>str_word</em>, <em>save_non_seen=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.getTerm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.getTerm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.DataCore.pre_filter">
+<code class="descname">pre_filter</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#DataCore.pre_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.DataCore.pre_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yake.datarepresentation.composed_word">
+<em class="property">class </em><code class="descclassname">yake.datarepresentation.</code><code class="descname">composed_word</code><span class="sig-paren">(</span><em>terms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.build_features">
+<code class="descname">build_features</code><span class="sig-paren">(</span><em>doc_id=None, keys=None, rel=True, rel_approx=True, isVirtual=False, features=['WFreq', 'WRel', 'tf', 'WCase', 'WPos', 'WSpread'], _stopword=[True, False]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.build_features"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.build_features" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.get_composed_feature">
+<code class="descname">get_composed_feature</code><span class="sig-paren">(</span><em>feature_name</em>, <em>discart_stopword=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.get_composed_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.get_composed_feature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.isValid">
+<code class="descname">isValid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.isValid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.isValid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.updateH">
+<code class="descname">updateH</code><span class="sig-paren">(</span><em>features=None</em>, <em>isVirtual=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.updateH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.updateH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.updateH_old">
+<code class="descname">updateH_old</code><span class="sig-paren">(</span><em>features=None</em>, <em>isVirtual=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.updateH_old"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.updateH_old" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.composed_word.uptadeCand">
+<code class="descname">uptadeCand</code><span class="sig-paren">(</span><em>cand</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#composed_word.uptadeCand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.composed_word.uptadeCand" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="yake.datarepresentation.single_word">
+<em class="property">class </em><code class="descclassname">yake.datarepresentation.</code><code class="descname">single_word</code><span class="sig-paren">(</span><em>unique</em>, <em>idx</em>, <em>graph</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#single_word"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.single_word" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.PWL">
+<code class="descname">PWL</code><a class="headerlink" href="#yake.datarepresentation.single_word.PWL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.PWR">
+<code class="descname">PWR</code><a class="headerlink" href="#yake.datarepresentation.single_word.PWR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.WDL">
+<code class="descname">WDL</code><a class="headerlink" href="#yake.datarepresentation.single_word.WDL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.WDR">
+<code class="descname">WDR</code><a class="headerlink" href="#yake.datarepresentation.single_word.WDR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.WIL">
+<code class="descname">WIL</code><a class="headerlink" href="#yake.datarepresentation.single_word.WIL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="yake.datarepresentation.single_word.WIR">
+<code class="descname">WIR</code><a class="headerlink" href="#yake.datarepresentation.single_word.WIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.single_word.addOccur">
+<code class="descname">addOccur</code><span class="sig-paren">(</span><em>tag</em>, <em>sent_id</em>, <em>pos_sent</em>, <em>pos_text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#single_word.addOccur"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.single_word.addOccur" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.datarepresentation.single_word.updateH">
+<code class="descname">updateH</code><span class="sig-paren">(</span><em>maxTF</em>, <em>avgTF</em>, <em>stdTF</em>, <em>number_of_sentences</em>, <em>features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/datarepresentation.html#single_word.updateH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.datarepresentation.single_word.updateH" title="Permalink to this definition">¶</a></dt>
+<dd><p>if features == None or “WRel” in features:
+self.PL = self.WDL / maxTF
+self.PR = self.WDR / maxTF
+self.WRel = ( (0.5 + (self.PWL * (self.tf / maxTF) + self.PL)) + (0.5 + (self.PWR * (self.tf / maxTF) + self.PR)) )</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="yake-keywordextraction-module">
+<h2>yake.keywordextraction module<a class="headerlink" href="#yake-keywordextraction-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-yake.yake">
+<span id="yake-yake-module"></span><h2>yake.yake module<a class="headerlink" href="#module-yake.yake" title="Permalink to this headline">¶</a></h2>
+<p>Main module.</p>
+<dl class="class">
+<dt id="yake.yake.KeywordExtractor">
+<em class="property">class </em><code class="descclassname">yake.yake.</code><code class="descname">KeywordExtractor</code><span class="sig-paren">(</span><em>lan='en'</em>, <em>n=3</em>, <em>dedupLim=0.9</em>, <em>dedupFunc='seqm'</em>, <em>windowsSize=1</em>, <em>top=20</em>, <em>features=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/yake.html#KeywordExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.yake.KeywordExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="yake.yake.KeywordExtractor.extract_keywords">
+<code class="descname">extract_keywords</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/yake.html#KeywordExtractor.extract_keywords"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.yake.KeywordExtractor.extract_keywords" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.yake.KeywordExtractor.jaro">
+<code class="descname">jaro</code><span class="sig-paren">(</span><em>cand1</em>, <em>cand2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/yake.html#KeywordExtractor.jaro"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.yake.KeywordExtractor.jaro" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.yake.KeywordExtractor.levs">
+<code class="descname">levs</code><span class="sig-paren">(</span><em>cand1</em>, <em>cand2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/yake.html#KeywordExtractor.levs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.yake.KeywordExtractor.levs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="yake.yake.KeywordExtractor.seqm">
+<code class="descname">seqm</code><span class="sig-paren">(</span><em>cand1</em>, <em>cand2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/yake/yake.html#KeywordExtractor.seqm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yake.yake.KeywordExtractor.seqm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-yake">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-yake" title="Permalink to this headline">¶</a></h2>
+<p>Top-level package for yake.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">yake package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#yake-cli-module">yake.cli module</a></li>
+<li><a class="reference internal" href="#module-yake.datarepresentation">yake.datarepresentation module</a></li>
+<li><a class="reference internal" href="#yake-keywordextraction-module">yake.keywordextraction module</a></li>
+<li><a class="reference internal" href="#module-yake.yake">yake.yake module</a></li>
+<li><a class="reference internal" href="#module-yake">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pyake.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">yake 0.3.6 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Arian Pasquali.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.2.
+    </div>
+  </body>
+</html>
