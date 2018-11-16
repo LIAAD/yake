@@ -50,7 +50,7 @@ To upgrade using pip::
 Usage
 ---------
 
-Command line usage
+Command line
 ************************
 How to use it on your favorite command line::
 
