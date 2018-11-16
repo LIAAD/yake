@@ -1,75 +1,35 @@
-from yake import KeywordExtractor
-import glob, os, argparse
+# -*- coding: utf-8 -*-
 
-def readDoc(docpath):
-	with open(docpath, encoding='utf8') as infile:
-		return infile.read()
+"""Console script for yake."""
 
-def getlan(datasetpath):
-	with open(os.path.join(datasetpath,'..','lan.txt'), encoding='utf8') as infile:
-		return infile.read()[:2]
+import click
+import yake
 
-def getdocid(docpath):
-	return os.path.basename(docpath).rsplit('.',1)[0]
+@click.command()
+@click.option("-i",'--input_file', help='Input file', required=True)
+@click.option("-l",'--language', default="en", help='Language', required=False)
 
-def getdatasetid(datasetpath):
-	return os.path.dirname(datasetpath).split(os.path.sep)[-2]
+@click.option('-n','--ngram-size', default=3, help='Max size of the ngram.', required=False, type=int)
+@click.option('-df','--dedup-func', help='Deduplication function.', default='seqm', type=click.Choice(['leve', 'jaro', 'seqm']), required=False)
+@click.option('-dl','--dedup-lim', type=float, help='Deduplication limiar.', default=.9, required=False)
 
-def getname(n, w, dedupLim, dedupFunc, features, allfeats):
-	allfeats = set(allfeats)
-	features = set(features)
-	names = ['NonC']
+@click.option('-ws','--window-size', type=int, help='Window size.', default=1, required=False)
+@click.option('-t','--top', type=int,  help='Number of keyphrases to extract', default=10, required=False)
+@click.option('-v','--verbose', count=True, required=False)
 
-	for feat in allfeats:
-		if feat not in features:
-			names.append('non'+feat)
+def keywords(input_file, language, ngram_size, verbose=False, dedup_func="seqm", dedup_lim=.9, window_size=1, top=10):
+	
+	with open(input_file) as fpath:
+		text_content = fpath.read()
 
-	if len(names) > 0:
-		print(n, w, dedupFunc, dedupLim, '_'.join(names) )
-		return 'n%d_w%d_%s-%.2f_f-%s' % (n, w, dedupFunc, dedupLim, '_'.join(names) )
-		
-	return 'n%d_w%d_%s-%.2f' % (n, w, dedupFunc, dedupLim)
+		myake = yake.KeywordExtractor(lan=language,n=ngram_size, dedupLim=dedup_lim, dedupFunc=dedup_func, windowsSize=window_size, top=top)
+		results = myake.extract_keywords(text_content)
 
-allfeats =["WRel", "WFreq", "WSpread", "WCase", "WPos", "KPF"]
+		for kw in results:
+			if(verbose):
+				print(kw[0], kw[1])
+			else:
+				print(kw[1])
 
-parser = argparse.ArgumentParser()
-required_args = parser.add_argument_group('required arguments')
-required_args.add_argument('-i','--input', type=str, nargs='+', help='Dataset docs directory.', required=True)
-
-parser.add_argument('-df','--dedup-func', type=str, nargs='?', help='Deduplication function.', default='seqm', choices=['leve', 'jaro', 'seqm'])
-parser.add_argument('-dl','--dedup-lim', type=float, nargs='?', help='Deduplication limiar.', default=.9)
-
-parser.add_argument('-ws','--windows-size', type=int, nargs='?', help='Windows size.', default=1)
-parser.add_argument('-n','--ngram-size', type=int, nargs='?', help='Max size of the ngram.', default=3)
-parser.add_argument('-t','--top', type=int, nargs='?', help='Max size of rank.', default=10)
-parser.add_argument('-f','--features', type=str, nargs='+', help='Features to use.', default=allfeats, choices=allfeats)
-
-parser.add_argument('-o','--output', type=str, nargs='?', help='Output directory.', default='../output/Yake/')
-
-args = parser.parse_args()
-print(args)
-#lan="en", n=3, dedupLim=0.8, dedupFunc='levenshtein', windowsSize=2, top=20, features=None
-nameApp = getname(n=args.ngram_size, w=args.windows_size, dedupLim=args.dedup_lim, dedupFunc=args.dedup_func, features=args.features, allfeats=allfeats)
-
-for datasetpath in args.input:
-	datasetname = getdatasetid(datasetpath)
-	lan=getlan(datasetpath)
-	yake = KeywordExtractor(lan=lan, windowsSize=args.windows_size, top=args.top, n=args.ngram_size, dedupLim=args.dedup_lim, dedupFunc=args.dedup_func, features=args.features)
-	outputpath = os.path.join(args.output, nameApp)
-	if not os.path.exists(outputpath):
-		os.mkdir(outputpath) 
-	outputpath = os.path.join(args.output, nameApp, datasetname)
-	if not os.path.exists(outputpath):
-		os.mkdir(outputpath) 
-	docs2read = sorted(glob.glob(os.path.join(datasetpath,'*')))
-	print(datasetname, len(docs2read), nameApp, lan)
-	for (i, docpath) in enumerate(docs2read):
-		docid = getdocid(docpath)
-		outputdoc = os.path.join(outputpath, docid)
-		doccontent = readDoc(docpath)
-		results = yake.extract_keywords_on(doccontent)
-		with open(outputdoc, 'w') as outfile:
-			for (h,kw) in results:
-				outfile.write('%s %f\n' % (kw, h))
-		print("\r%.2f%%" % (100.*i/len(docs2read)), end='... ')
-	print("DONE!")
+if __name__ == "__main__":
+	main()

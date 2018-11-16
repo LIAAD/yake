@@ -52,26 +52,19 @@ Usage
 
 How to use it on your favorite command line::
 
-	usage: yake [-h] -i INPUT [INPUT ...] [-df [{leve,jaro,seqm}]]
-					 [-dl [DEDUP_LIM]] [-ws [WINDOWS_SIZE]] [-n [NGRAM_SIZE]]
-					 [-t [TOP]]
-					[-f {WRel,WFreq,WSpread,WCase,WPos,KPF} [{WRel,WFreq,WSpread,WCase,WPos,KPF} ...]]
-					[-o [OUTPUT]]
+	Usage: yake [OPTIONS]
 
-	optional arguments:
-	-h, 					--help					show this help message and exit
-	-df [{leve,jaro,seqm}], --dedup-func [{leve,jaro,seqm}] Deduplication function.
-	-dl [DEDUP_LIM], 		--dedup-lim [DEDUP_LIM] Deduplication limiar.
-	-ws [WINDOWS_SIZE], 	--windows-size [WINDOWS_SIZE] Windows size.
-	-n [NGRAM_SIZE], 		--ngram-size [NGRAM_SIZE] Max size of the ngram.
-	-t [TOP], 				--top [TOP] Max size of rank.
-	-f {WRel,WFreq,WSpread,WCase,WPos,KPF} [{WRel,WFreq,WSpread,WCase,WPos,KPF} ...], 
-							--features {WRel,WFreq,WSpread,WCase,WPos,KPF} [{WRel,WFreq,WSpread,WCase,WPos,KPF} ...]
-							Features to use.
-	-o [OUTPUT], --output [OUTPUT] Output directory.
-
-	required arguments:
-	-i INPUT [INPUT ...], --input INPUT [INPUT ...] Dataset docs directory.
+	Options:
+	-i, --input_file TEXT           Input file  [required]
+	-l, --language TEXT             Language
+	-n, --ngram-size INTEGER        Max size of the ngram.
+	-df, --dedup-func [leve|jaro|seqm]
+									Deduplication function.
+	-dl, --dedup-lim FLOAT          Deduplication limiar.
+	-ws, --window-size INTEGER      Window size.
+	-t, --top INTEGER               Number of keyphrases to extract
+	-v, --verbose
+	--help                          Show this message and exit
 
 
 How to use it on Python::
