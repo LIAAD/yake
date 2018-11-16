@@ -26,7 +26,7 @@ test_requirements = [
 
 setup(
     name='yake',
-    version='0.3.6',
+    version='0.4.0',
     description="Keyword extraction Python package",
     long_description=readme,
     
