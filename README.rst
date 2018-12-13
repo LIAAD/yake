@@ -54,19 +54,23 @@ Command line
 ************************
 How to use it on your favorite command line::
 
-	Usage: yake [OPTIONS]
 
-	Options:
-	-i, --input_file TEXT           Input file  [required]
-	-l, --language TEXT             Language
-	-n, --ngram-size INTEGER        Max size of the ngram.
-	-df, --dedup-func [leve|jaro|seqm]
-									Deduplication function.
-	-dl, --dedup-lim FLOAT          Deduplication limiar.
-	-ws, --window-size INTEGER      Window size.
-	-t, --top INTEGER               Number of keyphrases to extract
-	-v, --verbose
-	--help                          Show this message and exit
+```bash
+Usage: yake [OPTIONS]
+
+Options:
+  -ti, --text_input TEXT          Input text, SURROUNDED by single quotes(')
+  -i, --input_file TEXT           Input file
+  -l, --language TEXT             Language
+  -n, --ngram-size INTEGER        Max size of the ngram.
+  -df, --dedup-func [leve|jaro|seqm]
+                                  Deduplication function.
+  -dl, --dedup-lim FLOAT          Deduplication limiar.
+  -ws, --window-size INTEGER      Window size.
+  -t, --top INTEGER               Number of keyphrases to extract
+  -v, --verbose
+  --help                          Show this message and exit.
+```
 
 
 Python
