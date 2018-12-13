@@ -55,7 +55,7 @@ Command line
 How to use it on your favorite command line::
 
 
-```bash
+```shell
 Usage: yake [OPTIONS]
 
 Options:
