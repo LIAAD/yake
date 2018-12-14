@@ -5,7 +5,7 @@ Yet Another Keyword Extractor (Yake)
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
 
 We propose a lightweight approach for keyword extraction and ranking based on an unsupervised methodology to select the most important keywords of a single document. To understand the merits of our proposal, we compare it against RAKE, TextRank and SingleRank methods (three well-known unsupervised approaches) and the baseline TF.IDF, over four different collections to illustrate the generality of our approach. The experimental results suggest that extracting keywords from documents using our method results in a superior effectiveness when compared to similar approaches. 
-[paper](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
+See details at https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63
 
 Main Features
 -------------
@@ -26,12 +26,12 @@ Please cite the following works when using YAKE
 Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C., & Jatowt, A. (2018).
 A Text Feature Based Automatic Keyword Extraction Method for Single Documents
 Proceedings of the 40th European Conference on Information Retrieval (ECIR'18), Grenoble, France. March 26 – 29.
-[paper](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
+https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63
 
 Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C., & Jatowt, A. (2018).
 YAKE! Collection-independent Automatic Keyword Extractor
 Proceedings of the 40th European Conference on Information Retrieval (ECIR'18), Grenoble, France. March 26 – 29
-[paper](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
+https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80
 
 Requirements
 -------------
