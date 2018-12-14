@@ -96,3 +96,12 @@ How to use it on Python::
 
 	for kw in keywords:
 		print(kw)
+
+
+Related projects
+************************
+**yake-dockerfile** 
+Dockerized version of this package. https://github.com/feup-infolab/yake-dockerfile
+
+**pke** 
+is an open source python-based keyphrase extraction toolkit. It provides an end-to-end keyphrase extraction pipeline in which each component can be easily modified or extended to develop new models. pke also allows for easy benchmarking of state-of-the-art keyphrase extraction models. https://github.com/boudinfl/pke
