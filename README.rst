@@ -105,13 +105,20 @@ Related projects
 
 yake-dockerfile
 ************************
-Dockerfile for building an image for this package. https://github.com/feup-infolab/yake-dockerfile
+https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package. 
+
+Credits to https://github.com/silvae86
 
 
 `pke` - python keyphrase extraction
 ************************
-`pke` is an **open source** python-based **keyphrase extraction** toolkit. It
+
+
+
+https://github.com/boudinfl/pke - `pke` is an **open source** python-based **keyphrase extraction** toolkit. It
 provides an end-to-end keyphrase extraction pipeline in which each component can
 be easily modified or extended to develop new models. `pke` also allows for 
 easy benchmarking of state-of-the-art keyphrase extraction models, and 
 ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.org/anthology/S10-1004).
+
+Credits to https://github.com/boudinfl
