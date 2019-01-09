@@ -1,4 +1,3 @@
-========================================
 Yet Another Keyword Extractor (Yake)
 ========================================
 
@@ -20,7 +19,7 @@ Benchmark
 
 YAKE!, generically outperforms, statistical methods (tf.idf, kp-miner and rake), state-of-the-art graph-based methods (TextRank, SingleRank, TopicRank, TopicalPageRank, PositionRank, MultipartiteRank and ExpandRank) ans supervised learning methods (KEA) across different datasets, languages and domains. The results listed in the table refer to F1 at 10 scores. Bold face marks the current best results for that specific dataset.
 
-+-----------------------------------------------------------------------------------+----------+-------+---------------+----------------------------------------------------------------------------------------------------------------------------+
+
 | Dataset                                                                           | Language | #Docs | YAKE F1 at 10 | Previous best F1 at 10                                                                                                     |
 | --------------------------------------------------------------------------------- | -------- | ----- | ------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | [__110-PT-BN-KP__](https://github.com/LIAAD/KeywordExtractor-Datasets#110)        | PT       | 110   | **0.500**     | 0.275 [__SingleRank (Wan and Xiao, 2008)__](http://www.aclweb.org/anthology/C08-1122.pdf)                                  |
@@ -43,7 +42,6 @@ YAKE!, generically outperforms, statistical methods (tf.idf, kp-miner and rake),
 | [__wicc__](https://github.com/LIAAD/KeywordExtractor-Datasets#wicc)               | ES       | 1640  | **0.256**     | 0.167 [__KEA (Witten et al., 2005)__](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf)     |
 | [__wiki20__](https://github.com/LIAAD/KeywordExtractor-Datasets#wiki20)           | EN       | 20    | **0.162**     | 0.156 [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                             |
 | [__WikiNews__](https://github.com/LIAAD/KeywordExtractor-Datasets#WKC)            | FR       | 100   | **0.450**     | 0.337 TFIDF                                                                                                                |
-+-----------------------------------------------------------------------------------+----------+-------+---------------+----------------------------------------------------------------------------------------------------------------------------+
 
 Rationale
 -------------
@@ -72,7 +70,7 @@ Python3
 Installation
 -------------
 
-To install Yake using pip ::
+To install Yake using pip
 
 	pip install git+https://github.com/LIAAD/yake
 
@@ -85,7 +83,7 @@ Usage
 
 Command line
 ************************
-How to use it on your favorite command line::
+How to use it on your favorite command line
 
 		Usage: yake [OPTIONS]
 
@@ -104,7 +102,7 @@ How to use it on your favorite command line::
 
 Python
 ************************
-How to use it on Python::
+How to use it on Python
 
 	import yake
 
