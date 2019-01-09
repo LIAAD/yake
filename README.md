@@ -17,7 +17,7 @@ Main Features
 Benchmark
 -------------
 
-YAKE!, generically outperforms, statistical methods (tf.idf, kp-miner and rake), state-of-the-art graph-based methods (TextRank, SingleRank, TopicRank, TopicalPageRank, PositionRank, MultipartiteRank and ExpandRank) ans supervised learning methods (KEA) across different datasets, languages and domains. The results listed in the table refer to F1 at 10 scores. Bold face marks the current best results for that specific dataset.
+YAKE!, generically outperforms, statistical methods (tf.idf, kp-miner and rake), state-of-the-art graph-based methods (TextRank, SingleRank, TopicRank, TopicalPageRank, PositionRank, MultipartiteRank and ExpandRank) and supervised learning methods (KEA) across different datasets, languages and domains. The results listed in the table refer to F1 at 10 scores. Bold face marks the current best results for that specific dataset.
 
 
 | Dataset                                                                           | Language | #Docs | YAKE      | Previous best | Method                                                                                                           |
