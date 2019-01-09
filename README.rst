@@ -22,26 +22,26 @@ YAKE!, generically outperforms, statistical methods (tf.idf, kp-miner and rake),
 
 | Dataset                                                                           | Language | #Docs | YAKE F1@10 | Previous best F1@10 |
 | --------------------------------------------------------------------------------- | -------- | ----- | ---------- | ------------------- |
-| [__110-PT-BN-KP__](https://github.com/LIAAD/KeywordExtractor-Datasets#110)        | PT       | 110   | __0.500__  | 0.275 [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
-| [__500N-KPCrowd-v1.1__](https://github.com/LIAAD/KeywordExtractor-Datasets#500)   | EN       | 500   | __0.173__  | 0.172 [TopicRank (Bougouin et al., 2013)](http://aclweb.org/anthology/I13-1062.pdf) |
-| [__Inspec__](https://github.com/LIAAD/KeywordExtractor-Datasets#Inspec)           | EN       | 2000  | 0.316      | __0.378__ [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
-| [__Krapivin2009__](https://github.com/LIAAD/KeywordExtractor-Datasets#Krapivin)   | EN       | 2304  | 0.170      | __0.227__ [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__Nguyen2007__](https://github.com/LIAAD/KeywordExtractor-Datasets#Nguyen)       | EN       | 209   | 0.256      | __0.314__ [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__PubMed__](https://github.com/LIAAD/KeywordExtractor-Datasets#PubMed)           | EN       | 500   | 0.106      | __0.216__ [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__Schutz2008__](https://github.com/LIAAD/KeywordExtractor-Datasets#Schutz)       | EN       | 1231  | 0.196      | __0.258__ [TopicRank (Bougouin et al., 2013)](http://aclweb.org/anthology/I13-1062.pdf) |
-| [__www__](https://github.com/LIAAD/KeywordExtractor-Datasets#www)                 | EN       | 1330  | __0.172__  | 0.130 TFIDF |
-| [__kdd__](https://github.com/LIAAD/KeywordExtractor-Datasets#kdd)                 | EN       | 755   | __0.156__  | 0.115 TFIDF |
-| [__SemEval2010__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2010) | EN       | 243   | 0.211      | __0.261__ [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__SemEval2017__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2017) | EN       | 493   | 0.329      | __0.449__ [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
-| [__cacic__](https://github.com/LIAAD/KeywordExtractor-Datasets#cacic)             | ES       | 888   | __0.196__  | 0.155 [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__citeulike180__](https://github.com/LIAAD/KeywordExtractor-Datasets#citeulike)  | EN       | 183   | 0.256      | __0.317__ [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__fao30__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao30)             | EN       | 30    | __0.184__  | 0.183 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__fao780__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao780)           | EN       | 779   | __0.187__  | 0.174 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__pak2018__](https://github.com/LIAAD/KeywordExtractor-Datasets#pak)             | PL       | 50    | __0.086__  | 0.059 TFIDF |
-| [__theses100__](https://github.com/LIAAD/KeywordExtractor-Datasets#theses)        | EN       | 100   | 0.111      | __0.158__ [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__wicc__](https://github.com/LIAAD/KeywordExtractor-Datasets#wicc)               | ES       | 1640  | __0.256__  | 0.167 [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__wiki20__](https://github.com/LIAAD/KeywordExtractor-Datasets#wiki20)           | EN       | 20    | __0.162__  | 0.156 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
-| [__WikiNews__](https://github.com/LIAAD/KeywordExtractor-Datasets#WKC)            | FR       | 100   | __0.450__  | 0.337 TFIDF |
+| [__110-PT-BN-KP__](https://github.com/LIAAD/KeywordExtractor-Datasets#110)        | PT       | 110   | **0.500**  | 0.275 [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
+| [__500N-KPCrowd-v1.1__](https://github.com/LIAAD/KeywordExtractor-Datasets#500)   | EN       | 500   | **0.173**  | 0.172 [TopicRank (Bougouin et al., 2013)](http://aclweb.org/anthology/I13-1062.pdf) |
+| [__Inspec__](https://github.com/LIAAD/KeywordExtractor-Datasets#Inspec)           | EN       | 2000  | 0.316      | **0.378** [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
+| [__Krapivin2009__](https://github.com/LIAAD/KeywordExtractor-Datasets#Krapivin)   | EN       | 2304  | 0.170      | **0.227** [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__Nguyen2007__](https://github.com/LIAAD/KeywordExtractor-Datasets#Nguyen)       | EN       | 209   | 0.256      | **0.314** [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__PubMed__](https://github.com/LIAAD/KeywordExtractor-Datasets#PubMed)           | EN       | 500   | 0.106      | **0.216** [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
+| [__Schutz2008__](https://github.com/LIAAD/KeywordExtractor-Datasets#Schutz)       | EN       | 1231  | 0.196      | **0.258** [TopicRank (Bougouin et al., 2013)](http://aclweb.org/anthology/I13-1062.pdf) |
+| [__www__](https://github.com/LIAAD/KeywordExtractor-Datasets#www)                 | EN       | 1330  | **0.172**  | 0.130 TFIDF |
+| [__kdd__](https://github.com/LIAAD/KeywordExtractor-Datasets#kdd)                 | EN       | 755   | **0.156**  | 0.115 TFIDF |
+| [__SemEval2010__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2010) | EN       | 243   | 0.211      | **0.261** [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__SemEval2017__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2017) | EN       | 493   | 0.329      | **0.449** [SingleRank (Wan and Xiao, 2008)](http://www.aclweb.org/anthology/C08-1122.pdf) |
+| [__cacic__](https://github.com/LIAAD/KeywordExtractor-Datasets#cacic)             | ES       | 888   | **0.196**  | 0.155 [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
+| [__citeulike180__](https://github.com/LIAAD/KeywordExtractor-Datasets#citeulike)  | EN       | 183   | 0.256      | **0.317** [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
+| [__fao30__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao30)             | EN       | 30    | **0.184**  | 0.183 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__fao780__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao780)           | EN       | 779   | **0.187**  | 0.174 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__pak2018__](https://github.com/LIAAD/KeywordExtractor-Datasets#pak)             | PL       | 50    | **0.086**  | 0.059 TFIDF |
+| [__theses100__](https://github.com/LIAAD/KeywordExtractor-Datasets#theses)        | EN       | 100   | 0.111      | **0.158** [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__wicc__](https://github.com/LIAAD/KeywordExtractor-Datasets#wicc)               | ES       | 1640  | **0.256**  | 0.167 [KEA (Witten et al., 2005)](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
+| [__wiki20__](https://github.com/LIAAD/KeywordExtractor-Datasets#wiki20)           | EN       | 20    | **0.162**  | 0.156 [KPMiner (El-Beltagy and Rafea, 2010)](http://www.aclweb.org/anthology/S10-1041.pdf) |
+| [__WikiNews__](https://github.com/LIAAD/KeywordExtractor-Datasets#WKC)            | FR       | 100   | **0.450**  | 0.337 TFIDF |
 
 Rationale
 -------------
