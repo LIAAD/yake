@@ -62,11 +62,11 @@ Python3
 
 ## Installation
 
-To install Yake using pip
+To install Yake using pip:
 
 	pip install git+https://github.com/LIAAD/yake
 
-To upgrade using pip::
+To upgrade using pip:
 
 	pip install git+https://github.com/LIAAD/yake –upgrade
 
