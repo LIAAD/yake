@@ -9,13 +9,16 @@ fi
 INITIAL_DIR=$(pwd)
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+# get constants
+source "$DIR/constants.sh"
+
 cd "$DIR/Dockerfiles/yake-server"
-docker build -t feupinfolab/yake-server:$tag .
-docker run -p 5000:5000 feupinfolab/yake-server:$tag
+docker build -t "$YAKE_SERVER_IMAGE:$TAG" .
+docker run -d -p $YAKE_PORT:$YAKE_PORT "$YAKE_SERVER_IMAGE:$TAG"
 
 cd "$DIR/Dockerfiles/yake"
-docker build -t feupinfolab/yake:$tag .
-docker run -d feupinfolab/yake:$tag
+docker build -t "$YAKE_IMAGE:$TAG" .
+docker run -d "$YAKE_IMAGE:$TAG"
 
 docker ps -a
 
