@@ -59,8 +59,8 @@ https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80
 
 There are three installation alternatives.
 
-- To run YAKE! in the command line (say, to integrate in a script), you can use our [simple YAKE! Docker container](#cli-image).
-- To run YAKE! as a RESTful API that *runs in the background*, say to integrate in a web application, you can use our [RESTful API server image](#rest-api-image).
+- To run YAKE! in the command line (say, to integrate in a script), but you do not need an HTTP server on top, you can use our [simple YAKE! Docker image](#cli-image). This container will allow you to run text extraction as a command, and then exit.
+- To run YAKE! as an HTTP server featuring a RESTful API (say to integrate in a web application or host your own YAKE!), you can use our [RESTful API server image](#rest-api-image). This container/server *will run in the background*.
 - To install YAKE! straight "on the metal" or you want to integrate it in your Python app, you can [install it and its dependencies](#standalone-installation).
 
 <a name="cli-image"></a>
