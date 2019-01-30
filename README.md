@@ -55,12 +55,56 @@ YAKE! Collection-independent Automatic Keyword Extractor
 Proceedings of the 40th European Conference on Information Retrieval (ECIR'18), Grenoble, France. March 26 – 29
 https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80
 
-## Requirements
+## Installing YAKE!
+
+There are three installation alternatives.
+
+- To run YAKE! in the command line (say, to integrate in a script), you can use our [simple YAKE! Docker container](#cli-image).
+- To run YAKE! as a RESTful API that *runs in the background*, say to integrate in a web application, you can use our [RESTful API server image](#rest-api-image).
+- To install YAKE! straight "on the metal" or you want to integrate it in your Python app, you can [install it and its dependencies](#standalone-installation).
+
+<a name="cli-image"></a>
+### Option 1. YAKE as a CLI utility inside a Docker container
+
+First, install Docker. Ubuntu users, please see our [script below](#installing-docker) for a complete installation script.
+
+Then, run:
+
+```bash
+docker run feupinfolab/yake:latest -ti "Caffeine is a central nervous system (CNS) stimulant of the methylxanthine class.[10] It is the world's most widely consumed psychoactive drug. Unlike many other psychoactive substances, it is legal and unregulated in nearly all parts of the world. There are several known mechanisms of action to explain the effects of caffeine. The most prominent is that it reversibly blocks the action of adenosine on its receptor and consequently prevents the onset of drowsiness induced by adenosine. Caffeine also stimulates certain portions of the autonomic nervous system."
+```
+*Example text from Wikipedia*
+
+<a name="rest-api-image"></a>
+### Option 2. REST API Server in a Docker container
+
+This install will provide you a mirror of the original REST API of YAKE! available [here](https://boiling-castle-88317.herokuapp.com).
+
+```bash
+docker run -d feupinfolab/yake-rest:latest
+```
+
+After it starts up, the container will run in the background, at http://127.0.0.1:5000. To access the YAKE! API documentation, go to http://127.0.0.1:5000/apidocs/.
+
+You can test the RESTful API using `curl`:
+
+```bash
+curl 'http://127.0.0.1:5000/yake/' \
+-XPOST \
+-H 'Accept: application/json' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+--data 'text=Coffee%20is%20a%20brewed%20drink%20prepared%20from%20roasted%20coffee%20beans%2C%20the%20seeds%20of%20berries%20from%20certain%20Coffea%20species.%20The%20genus%20Coffea%20is%20native%20to%20tropical%20Africa%20(specifically%20having%20its%20origin%20in%20Ethiopia%20and%20Sudan)%20and%20Madagascar%2C%20the%20Comoros%2C%20Mauritius%2C%20and%20R%C3%A9union%20in%20the%20Indian%20Ocean.%5B2%5D%20Coffee%20plants%20are%20now%20cultivated%20in%20over%2070%20countries%2C%20primarily%20in%20the%20equatorial%20regions%20of%20the%20Americas%2C%20Southeast%20Asia%2C%20Indian%20subcontinent%2C%20and%20Africa.%20The%20two%20most%20commonly%20grown%20are%20C.%20arabica%20and%20C.%20robusta.%20Once%20ripe%2C%20coffee%20berries%20are%20picked%2C%20processed%2C%20and%20dried.%20Dried%20coffee%20seeds%20(referred%20to%20as%20%22beans%22)%20are%20roasted%20to%20varying%20degrees%2C%20depending%20on%20the%20desired%20flavor.%20Roasted%20beans%20are%20ground%20and%20then%20brewed%20with%20near-boiling%20water%20to%20produce%20the%20beverage%20known%20as%20coffee.&language=en&max_ngram_size=4&number_of_keywords=10'
+```
+*Example text from Wikipedia*
+
+<a name="standalone-installation"></a>
+### Option 3. Standalone Installation (for development or integration)
+
+#### Requirements
 
 Python3
 
-
-## Installation
+#### Installation
 
 To install Yake using pip:
 
@@ -70,9 +114,7 @@ To upgrade using pip:
 
 	pip install git+https://github.com/LIAAD/yake –upgrade
 
-## Usage
-
-### Command line
+#### Usage (Command line)
 
 How to use it on your favorite command line
 
@@ -91,7 +133,7 @@ How to use it on your favorite command line
 		  -v, --verbose
 		  --help                          Show this message and exit.
 
-### Python
+### Usage (Python)
 
 How to use it on Python
 
@@ -122,19 +164,58 @@ How to use it on Python
 
 ## Related projects
 
-### yake-dockerfile
+### Dockerfiles
 
-https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package. 
-
-Credits to https://github.com/silvae86
-
+https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package.
+https://github.com/feup-infolab/yake-rest-dockerfile - Dockerfile for building an image of the RESTful API version of this package.
 
 ### `pke` - python keyphrase extraction
 
 https://github.com/boudinfl/pke - `pke` is an **open source** python-based **keyphrase extraction** toolkit. It
 provides an end-to-end keyphrase extraction pipeline in which each component can
-be easily modified or extended to develop new models. `pke` also allows for 
-easy benchmarking of state-of-the-art keyphrase extraction models, and 
+be easily modified or extended to develop new models. `pke` also allows for
+easy benchmarking of state-of-the-art keyphrase extraction models, and
 ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.org/anthology/S10-1004).
 
 Credits to https://github.com/boudinfl
+
+<a name="installing-docker"></a>
+## How to install Docker
+
+Here is the "just copy and paste" installations script for Docker in Ubuntu. Enjoy.
+
+```bash
+# Install dependencies
+sudo apt-get update
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+# Add Docker repo
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get update
+
+# Install Docker
+sudo apt-get install -y docker-ce
+
+# Start Docker Daemon
+sudo service docker start
+
+# Add yourself to the Docker user group, otherwise docker will complain that
+# it does not know if the Docker Daemon is running
+sudo usermod -aG docker ${USER}
+
+# Install docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+source ~/.bashrc
+docker-compose --version
+echo "Done!"
+```
