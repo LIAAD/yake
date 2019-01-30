@@ -169,6 +169,8 @@ How to use it on Python
 https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package.
 https://github.com/feup-infolab/yake-rest-dockerfile - Dockerfile for building an image of the RESTful API version of this package.
 
+Credits to https://github.com/silvae86
+
 ### `pke` - python keyphrase extraction
 
 https://github.com/boudinfl/pke - `pke` is an **open source** python-based **keyphrase extraction** toolkit. It
