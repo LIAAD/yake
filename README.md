@@ -81,7 +81,7 @@ docker run feupinfolab/yake:latest -ti "Caffeine is a central nervous system (CN
 This install will provide you a mirror of the original REST API of YAKE! available [here](https://boiling-castle-88317.herokuapp.com).
 
 ```bash
-docker run -d feupinfolab/yake-rest:latest
+docker run -d feupinfolab/yake-server:latest
 ```
 
 After it starts up, the container will run in the background, at http://127.0.0.1:5000. To access the YAKE! API documentation, go to http://127.0.0.1:5000/apidocs/.
@@ -165,9 +165,6 @@ How to use it on Python
 ## Related projects
 
 ### Dockerfiles
-
-https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package.
-https://github.com/feup-infolab/yake-rest-dockerfile - Dockerfile for building an image of the RESTful API version of this package.
 
 Credits to https://github.com/silvae86
 
