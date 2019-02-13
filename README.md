@@ -81,7 +81,7 @@ docker run liaad/yake:latest -ti "Caffeine is a central nervous system (CNS) sti
 This install will provide you a mirror of the original REST API of YAKE! available [here](https://boiling-castle-88317.herokuapp.com).
 
 ```bash
-docker run -d liaad/yake-server:latest
+docker run -p 5000:5000 -d liaad/yake-server:latest
 ```
 
 After it starts up, the container will run in the background, at http://127.0.0.1:5000. To access the YAKE! API documentation, go to http://127.0.0.1:5000/apidocs/.
