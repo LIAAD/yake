@@ -71,7 +71,7 @@ First, install Docker. Ubuntu users, please see our [script below](#installing-d
 Then, run:
 
 ```bash
-docker run feupinfolab/yake:latest -ti "Caffeine is a central nervous system (CNS) stimulant of the methylxanthine class.[10] It is the world's most widely consumed psychoactive drug. Unlike many other psychoactive substances, it is legal and unregulated in nearly all parts of the world. There are several known mechanisms of action to explain the effects of caffeine. The most prominent is that it reversibly blocks the action of adenosine on its receptor and consequently prevents the onset of drowsiness induced by adenosine. Caffeine also stimulates certain portions of the autonomic nervous system."
+docker run liaad/yake:latest -ti "Caffeine is a central nervous system (CNS) stimulant of the methylxanthine class.[10] It is the world's most widely consumed psychoactive drug. Unlike many other psychoactive substances, it is legal and unregulated in nearly all parts of the world. There are several known mechanisms of action to explain the effects of caffeine. The most prominent is that it reversibly blocks the action of adenosine on its receptor and consequently prevents the onset of drowsiness induced by adenosine. Caffeine also stimulates certain portions of the autonomic nervous system."
 ```
 *Example text from Wikipedia*
 
@@ -81,7 +81,7 @@ docker run feupinfolab/yake:latest -ti "Caffeine is a central nervous system (CN
 This install will provide you a mirror of the original REST API of YAKE! available [here](https://boiling-castle-88317.herokuapp.com).
 
 ```bash
-docker run -d feupinfolab/yake-server:latest
+docker run -d liaad/yake-server:latest
 ```
 
 After it starts up, the container will run in the background, at http://127.0.0.1:5000. To access the YAKE! API documentation, go to http://127.0.0.1:5000/apidocs/.
