@@ -89,11 +89,15 @@ After it starts up, the container will run in the background, at http://127.0.0.
 You can test the RESTful API using `curl`:
 
 ```bash
-curl 'http://127.0.0.1:5000/yake/' \
--XPOST \
--H 'Accept: application/json' \
--H 'Content-Type: application/x-www-form-urlencoded' \
---data 'text=Coffee%20is%20a%20brewed%20drink%20prepared%20from%20roasted%20coffee%20beans%2C%20the%20seeds%20of%20berries%20from%20certain%20Coffea%20species.%20The%20genus%20Coffea%20is%20native%20to%20tropical%20Africa%20(specifically%20having%20its%20origin%20in%20Ethiopia%20and%20Sudan)%20and%20Madagascar%2C%20the%20Comoros%2C%20Mauritius%2C%20and%20R%C3%A9union%20in%20the%20Indian%20Ocean.%5B2%5D%20Coffee%20plants%20are%20now%20cultivated%20in%20over%2070%20countries%2C%20primarily%20in%20the%20equatorial%20regions%20of%20the%20Americas%2C%20Southeast%20Asia%2C%20Indian%20subcontinent%2C%20and%20Africa.%20The%20two%20most%20commonly%20grown%20are%20C.%20arabica%20and%20C.%20robusta.%20Once%20ripe%2C%20coffee%20berries%20are%20picked%2C%20processed%2C%20and%20dried.%20Dried%20coffee%20seeds%20(referred%20to%20as%20%22beans%22)%20are%20roasted%20to%20varying%20degrees%2C%20depending%20on%20the%20desired%20flavor.%20Roasted%20beans%20are%20ground%20and%20then%20brewed%20with%20near-boiling%20water%20to%20produce%20the%20beverage%20known%20as%20coffee.&language=en&max_ngram_size=4&number_of_keywords=10'
+curl -X POST "http://localhost:5000/yake/" -H "accept: application/json" -H "Content-Type: application/json" \
+-d @- <<'EOF'
+{
+  "language": "en",
+  "max_ngram_size": 2,
+  "number_of_keywords": 10,
+  "text": "Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague , but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow. Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, was founded by Goldbloom and Ben Hamner in 2010. The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The service is basically the de facto home for running data science and machine learning competitions. With Kaggle, Google is buying one of the largest and most active communities for data scientists ..."
+}
+EOF
 ```
 *Example text from Wikipedia*
 
@@ -165,9 +169,6 @@ How to use it on Python
 ## Related projects
 
 ### Dockerfiles
-
-https://github.com/feup-infolab/yake-dockerfile - Dockerfile for building an image for this package.
-https://github.com/feup-infolab/yake-rest-dockerfile - Dockerfile for building an image of the RESTful API version of this package.
 
 Credits to https://github.com/silvae86
 
