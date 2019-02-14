@@ -31,7 +31,7 @@ import yake
 
 app = Flask(__name__)
 app.config['SWAGGER'] = {
-    'title': 'Yake API sample',
+    'title': 'Yake API Explorer',
     'uiversion': 3
 }
 swagger = Swagger(app)
