@@ -50,6 +50,7 @@ class DataCore(object):
         self.sentences_str = [ [w for w in split_contractions(web_tokenizer(s)) if not (w.startswith("'") and len(w) > 1) and len(w) > 0] for s in list(split_multi(text)) if len(s.strip()) > 0]
         self.number_of_sentences = len(self.sentences_str)
         pos_text = 0
+        block_of_word_obj = []
         for (sentence_id, sentence) in enumerate(self.sentences_str):
             sentence_obj_aux = []
             block_of_word_obj = []
