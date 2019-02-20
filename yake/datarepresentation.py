@@ -51,6 +51,7 @@ class DataCore(object):
         self.number_of_sentences = len(self.sentences_str)
         pos_text = 0
         block_of_word_obj = []
+        sentence_obj_aux = []
         for (sentence_id, sentence) in enumerate(self.sentences_str):
             sentence_obj_aux = []
             block_of_word_obj = []
