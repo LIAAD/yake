@@ -15,7 +15,7 @@ class KeywordExtractor(object):
         self.lan = lan
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        
+
         local_path = os.path.join("StopwordsList", "stopwords_%s.txt" % lan[:2].lower())
         resource_path = os.path.join(dir_path,local_path)
         try:
@@ -46,7 +46,7 @@ class KeywordExtractor(object):
 
     def seqm(self, cand1, cand2):
         return Levenshtein.ratio(cand1, cand2)
-    
+
     def extract_keywords(self, text):
         text = text.replace('\n\t',' ')
         dc = DataCore(text=text, stopword_set=self.stopword_set, windowsSize=self.windowsSize, n=self.n)
@@ -70,4 +70,4 @@ class KeywordExtractor(object):
             if len(resultSet) == self.top:
                 break
 
-        return [ (h,cand.unique_kw) for (h,cand) in resultSet]
+        return [ (cand.unique_kw,h) for (h,cand) in resultSet]
