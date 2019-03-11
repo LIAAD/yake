@@ -4,6 +4,7 @@
 
 import click
 import yake
+from tabulate import tabulate
 
 @click.command()
 @click.option("-ti",'--text_input', help='Input text, SURROUNDED by single quotes(\')', required=False)
@@ -25,11 +26,14 @@ def keywords(text_input, input_file, language, ngram_size, verbose=False, dedup_
 									  windowsSize=window_size, top=top)
 		results = myake.extract_keywords(text_content)
 
+		table = []
 		for kw in results:
 			if (verbose):
-				print(kw[0], kw[1])
+				table.append({"keyword":kw[0], "score":kw[1]})
 			else:
-				print(kw[1])
+				table.append({"keyword":kw[0]})
+
+		print(tabulate(table, headers="keys"))
 
 	if text_input and input_file:
 		print("You should specify either an input file or direct text input, but not both!")
@@ -46,4 +50,4 @@ def keywords(text_input, input_file, language, ngram_size, verbose=False, dedup_
 				run_yake(text_content)
 
 if __name__ == "__main__":
-	main()
+	keywords()
