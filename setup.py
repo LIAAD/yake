@@ -9,6 +9,7 @@ with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
 requirements = [
+    'tabulate',
     'Click>=6.0',
     "numpy",
     "segtok",
