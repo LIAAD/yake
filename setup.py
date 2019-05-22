@@ -10,7 +10,7 @@ with open('README.md', encoding='utf-8') as readme_file:
 
 requirements = [
     'tabulate',
-    'Click>=6.0',
+    'click>=6.0',
     "numpy",
     "segtok",
     "networkx",
