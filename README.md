@@ -160,6 +160,8 @@ How to use it on Python
 
 	# specifying parameters
 	custom_kwextractor = yake.KeywordExtractor(lan="en", n=3, dedupLim=0.8, windowsSize=2, top=20)
+	custom_kwextractor = yake.KeywordExtractor(lan="en", n=3, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None)
+	
 	keywords = custom_kwextractor.extract_keywords(text_content)
 
 	for kw in keywords:
