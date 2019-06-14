@@ -93,7 +93,7 @@ curl -X POST "http://localhost:5000/yake/" -H "accept: application/json" -H "Con
 -d @- <<'EOF'
 {
   "language": "en",
-  "max_ngram_size": 2,
+  "max_ngram_size": 3,
   "number_of_keywords": 10,
   "text": "Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague , but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow. Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, was founded by Goldbloom and Ben Hamner in 2010. The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The service is basically the de facto home for running data science and machine learning competitions. With Kaggle, Google is buying one of the largest and most active communities for data scientists ..."
 }
@@ -166,6 +166,30 @@ How to use it on Python
 	for kw in keywords:
 		print(kw)
 
+### Output
+The lower the score, the more relevant the keyword
+``` bash
+('machine learning competitions', 0.005240218636588412)
+('hosts data science', 0.007231800172852763)
+('learning competitions', 0.02651298908496934)
+('platform that hosts', 0.03633877348319309)
+('hosts data', 0.03633877348319309)
+('data science', 0.03633877348319309)
+('science and machine', 0.03633877348319309)
+('machine learning', 0.03633877348319309)
+('ceo anthony goldbloom', 0.03727546242790534)
+('acquiring kaggle', 0.046501713202057565)
+('kaggle co-founder ceo', 0.05500284979172434)
+('san francisco', 0.05743727907793731)
+('google', 0.06726505100386607)
+('google is acquiring', 0.06754045633911093)
+('anthony goldbloom declined', 0.07472471161713069)
+('co-founder ceo anthony', 0.07489379267114575)
+('francisco this week', 0.09080847547468633)
+('ceo anthony', 0.10396234776227407)
+('anthony goldbloom', 0.10396234776227407)
+('hosting its cloud', 0.11556884354166654)
+```
 
 ## Related projects
 
