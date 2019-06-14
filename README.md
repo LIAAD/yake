@@ -167,7 +167,7 @@ How to use it on Python
 		print(kw)
 
 ### Output
-The lower the score, the more relevant the keyword
+The lower the score, the more relevant the keyword is.
 ``` bash
 ('machine learning competitions', 0.005240218636588412)
 ('hosts data science', 0.007231800172852763)
