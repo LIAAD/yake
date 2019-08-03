@@ -1,18 +1,13 @@
 import re
 
 
-def remove_punctuation(text):
-    return text.translate(str.maketrans('', '', '!,:.;?()"\n'))
-
-
 def format_one_gram_text(text, relevant_words_array):
     text_tokens = text.split(' ')
     try:
         for tk in range(len(text_tokens)):
-            kw = re.sub('[!",:.;?()]$|^[!",:.;?()]', '',  text_tokens[tk]).lower()
-
-            if remove_punctuation(kw) in relevant_words_array:
-                text_tokens[tk] = text_tokens[tk].lower().replace(remove_punctuation(kw), '<kw>' + remove_punctuation(kw) + '</kw>')
+            kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  text_tokens[tk]).lower()
+            if kw in relevant_words_array:
+                text_tokens[tk] = text_tokens[tk].lower().replace(kw, '<kw>' + kw + '</kw>')
     except:
         pass
     new_text = ' '.join(text_tokens)
@@ -82,7 +77,7 @@ def find_more_relevant(y, text_tokens, n_gram, relevant_words_array, kw_list, sp
         temporary_list.append(text_tokens[y:y + i + 1])
         k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\W["!,:.;?()]''', '',  ' '.join(temporary_list[i])).lower()
 
-        if remove_punctuation(k) in relevant_words_array:
+        if k in relevant_words_array:
             temporary_list_two.append(k)
 
     n_gram_word_list = sorted(temporary_list_two, key=lambda x: relevant_words_array.index(x))
