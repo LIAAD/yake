@@ -71,3 +71,16 @@ class KeywordExtractor(object):
                 break
 
         return [ (cand.unique_kw,h) for (h,cand) in resultSet]
+
+
+    def text_normalized(self, text, keywords, n_gram):
+        n_text = ''
+        # extract only the kw
+        kw_list = [x[0] for x in keywords]
+        from yake.textNormalization import format_n_gram_text, format_one_gram_text
+
+        if n_gram == 1:
+            n_text = format_one_gram_text(text, kw_list)
+        elif n_gram > 1:
+            n_text = format_n_gram_text(text, kw_list, n_gram)
+        return n_text
