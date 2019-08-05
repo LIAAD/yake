@@ -82,17 +82,22 @@ class TextHighlighter(object):
                         index_of_more_relevant = splited_n_gram_kw_list[0].index(min_score_word.split()[0])
                         temporal_kw = ' '.join(splited_n_gram_kw_list[0][:index_of_more_relevant])
                         if temporal_kw.lower() in relevant_words_array:
-
-                            if relevant_words_array.index(temporal_kw.lower()) > relevant_words_array.index(final_splited_text[-1].lower() +' '+temporal_kw.lower()) and not re.findall(self.highlight_pre, final_splited_text[-1].lower()):
-                                term_list = [final_splited_text[-1].lower() +' '+temporal_kw.lower()]
-                                del final_splited_text[-1]
-                                y -= 1
-                                y, new_expression = self.replace_token(text_tokens, y, term_list)
-                                final_splited_text.append(new_expression)
-                            else:
+                            try:
+                                if relevant_words_array.index(temporal_kw.lower()) > relevant_words_array.index(final_splited_text[-1].lower() +' '+temporal_kw.lower()) and not re.findall(self.highlight_pre, final_splited_text[-1].lower()):
+                                    term_list = [final_splited_text[-1].lower() +' '+temporal_kw.lower()]
+                                    del final_splited_text[-1]
+                                    y -= 1
+                                    y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                    final_splited_text.append(new_expression)
+                                else:
+                                    term_list = [temporal_kw.lower()]
+                                    y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                    final_splited_text.append(new_expression)
+                            except:
                                 term_list = [temporal_kw.lower()]
                                 y, new_expression = self.replace_token(text_tokens, y, term_list)
                                 final_splited_text.append(new_expression)
+
                         else:
                             for tmp_kw in splited_n_gram_kw_list[0][:index_of_more_relevant]:
                                 if tmp_kw.lower() in relevant_words_array:
