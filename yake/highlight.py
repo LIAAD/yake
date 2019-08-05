@@ -25,12 +25,16 @@ class TextHighlighter(object):
 
         n_text = ''
         # extract only the kw
-        kw_list = [x[0] for x in keywords]
-        
-        if self.max_ngram_size == 1:
-            n_text = self.format_one_gram_text(text, kw_list)
-        elif self.max_ngram_size > 1:
-            n_text = self.format_n_gram_text(text, kw_list, self.max_ngram_size)
+        if(len(keywords) > 0):
+            kw_list = keywords
+
+            if(type(keywords[0]) == tuple):
+                kw_list = [x[0] for x in keywords]
+            
+            if self.max_ngram_size == 1:
+                n_text = self.format_one_gram_text(text, kw_list)
+            elif self.max_ngram_size > 1:
+                n_text = self.format_n_gram_text(text, kw_list, self.max_ngram_size)
 
         return n_text
 
