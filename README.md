@@ -108,61 +108,63 @@ Python3
 
 To install Yake using pip:
 
-	pip install git+https://github.com/LIAAD/yake
+``` bash
+pip install git+https://github.com/LIAAD/yake
+```
 
 To upgrade using pip:
 
-	pip install git+https://github.com/LIAAD/yake –upgrade
-
+``` bash
+pip install git+https://github.com/LIAAD/yake –upgrade
+```
 #### Usage (Command line)
 
 How to use it on your favorite command line
+``` bash
+Usage: yake [OPTIONS]
 
-		Usage: yake [OPTIONS]
-
-		Options:
-		  -ti, --text_input TEXT          Input text, SURROUNDED by single quotes(')
-		  -i, --input_file TEXT           Input file
-		  -l, --language TEXT             Language
-		  -n, --ngram-size INTEGER        Max size of the ngram.
-		  -df, --dedup-func [leve|jaro|seqm]
-		                                  Deduplication function.
-		  -dl, --dedup-lim FLOAT          Deduplication limiar.
-		  -ws, --window-size INTEGER      Window size.
-		  -t, --top INTEGER               Number of keyphrases to extract
-		  -v, --verbose
-		  --help                          Show this message and exit.
-
+Options:
+	-ti, --text_input TEXT          Input text, SURROUNDED by single quotes(')
+	-i, --input_file TEXT           Input file
+	-l, --language TEXT             Language
+	-n, --ngram-size INTEGER        Max size of the ngram.
+	-df, --dedup-func [leve|jaro|seqm]
+									Deduplication function.
+	-dl, --dedup-lim FLOAT          Deduplication limiar.
+	-ws, --window-size INTEGER      Window size.
+	-t, --top INTEGER               Number of keyphrases to extract
+	-v, --verbose
+	--help                          Show this message and exit.
+``` 
 ### Usage (Python)
 
 How to use it on Python
 
-	import yake
+``` python
+import yake
 
-	text_content = """
-		Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning
-		competitions. Details about the transaction remain somewhat vague , but given that Google is hosting
-		its Cloud Next conference in San Francisco this week, the official announcement could come as early
-		as tomorrow.  Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the
-		acquisition is happening. Google itself declined 'to comment on rumors'.
-	"""
+text = """
+Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague , but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow.  Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'.
+"""
 
-	# assuming default parameters
-	simple_kwextractor = yake.KeywordExtractor()
-	keywords = simple_kwextractor.extract_keywords(text_content)
+# assuming default parameters
+simple_kwextractor = yake.KeywordExtractor()
+keywords = simple_kwextractor.extract_keywords(text)
 
-	for kw in keywords:
-		print(kw)
+for kw in keywords:
+	print(kw)
 
-	# specifying parameters
-	custom_kwextractor = yake.KeywordExtractor(lan="en", n=3, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None)
-	
-	keywords = custom_kwextractor.extract_keywords(text_content)
+# specifying parameters
+max_ngram_size = 3
+custom_kwextractor = yake.KeywordExtractor(lan="en", n = max_ngram_size, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None)
 
-	for kw in keywords:
-		print(kw)
+keywords = custom_kwextractor.extract_keywords(text)
 
-### Output
+for kw in keywords:
+	print(kw)
+```
+
+#### Output
 The lower the score, the more relevant the keyword is.
 ``` bash
 ('machine learning competitions', 0.005240218636588412)
@@ -186,6 +188,39 @@ The lower the score, the more relevant the keyword is.
 ('anthony goldbloom', 0.10396234776227407)
 ('hosting its cloud', 0.11556884354166654)
 ```
+
+### Highlighting
+Highlighting feature will tag every keyword in the text. 
+
+``` python
+
+from yake.highlight import TextHighlighter
+
+th = TextHighlighter(max_ngram_size = 3)
+th.highlight(text, keywords)
+
+```
+#### Output
+By default, keywords will be highlighted using the tag 'kw'.
+``` 
+
+Sources tell us that <kw>google</kw> is <kw>acquiring kaggle</kw>, a platform that <kw>hosts data science</kw> and <kw>machine learning</kw> competitions. Details about the transaction remain somewhat vague , but given that <kw>google</kw> is hosting its Cloud Next conference in <kw>san francisco</kw> this week, the official announcement could come as early as tomorrow.  Reached by phone, Kaggle co-founder <kw>ceo anthony goldbloom</kw> declined to deny that the acquisition is happening. <kw>google</kw> itself declined 'to comment on rumors'.
+```
+
+Specify custom highlight.
+
+```python
+
+from yake.highlight import TextHighlighter
+th = TextHighlighter(max_ngram_size = 3, highlight_pre = "<span class='my_class' >", highlight_post= "</span>")
+th.highlight(text, keywords)
+```
+
+```
+self.highlight_postSources tell us that <span class='my_class' >google</span> is <span class='my_class' >acquiring kaggle</span>, a platform that <span class='my_class' >hosts data science</span> and <span class='my_class' >machine learning</span> self.highlight_postcompetitions. Details about the transaction remain somewhat vague , but given that <span class='my_class' >google</span> is hosting self.highlight_postits Cloud Next conference in <span class='my_class' >san francisco</span> this week, the official announcement could come as early self.highlight_postas tomorrow.  Reached by phone, Kaggle co-founder <span class='my_class' >ceo anthony goldbloom</span> declined to deny that the self.highlight_postacquisition is happening. <span class='my_class' >google</span> itself declined 'to comment on rumors'.
+```
+
+
 
 ## Related projects
 
