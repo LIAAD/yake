@@ -238,6 +238,10 @@ ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.
 
 Credits to https://github.com/boudinfl
 
+https://github.com/chartbeat-labs/textacy - `textacy` is a Python library for performing a variety of natural language processing (NLP) tasks, built on the high-performance spaCy library. among other features it supports keyword extration using YAKE.
+
+Credits to https://github.com/chartbeat-labs
+
 <a name="installing-docker"></a>
 ## How to install Docker
 
