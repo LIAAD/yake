@@ -224,10 +224,6 @@ self.highlight_postSources tell us that <span class='my_class' >google</span> is
 
 ## Related projects
 
-### Dockerfiles
-
-Credits to https://github.com/silvae86
-
 ### `pke` - python keyphrase extraction
 
 https://github.com/boudinfl/pke - `pke` is an **open source** python-based **keyphrase extraction** toolkit. It
@@ -237,6 +233,8 @@ easy benchmarking of state-of-the-art keyphrase extraction models, and
 ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.org/anthology/S10-1004).
 
 Credits to https://github.com/boudinfl
+
+### `textacy` - NLP, before and after spaCy
 
 https://github.com/chartbeat-labs/textacy - `textacy` is a Python library for performing a variety of natural language processing (NLP) tasks, built on the high-performance spaCy library. among other features it supports keyword extration using YAKE.
 
@@ -282,3 +280,5 @@ source ~/.bashrc
 docker-compose --version
 echo "Done!"
 ```
+
+Credits to https://github.com/silvae86 for the Docker scripts.
