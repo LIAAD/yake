@@ -45,6 +45,10 @@ Extracting keywords from texts has become a challenge for individuals and organi
 
 ## Please cite the following works when using YAKE
 
+<b>Journal Paper</b>
+
+Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289. [pdf](https://doi.org/10.1016/j.ins.2019.09.013)
+
 <b>ECIR'18 Best Short Paper</b>
 
 Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). A Text Feature Based Automatic Keyword Extraction Method for Single Documents. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
@@ -223,6 +227,9 @@ self.highlight_postSources tell us that <span class='my_class' >google</span> is
 
 
 ## Related projects
+
+### YAKE! APP
+YAKE! is now available on (Google Play)[https://play.google.com/store/apps/details?id=com.yake.yake]
 
 ### `pke` - python keyphrase extraction
 
