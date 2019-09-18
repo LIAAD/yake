@@ -156,15 +156,19 @@ text = "Sources tell us that Google is acquiring Kaggle, a platform that hosts d
 "that part of the service. According to Crunchbase, Kaggle raised $12.5 million (though PitchBook says it's $12.75) "\
 "since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel, Max Levchin, Naval Ravikant, "\
 "Google chief economist Hal Varian, Khosla Ventures and Yuri Milner "
+```
 
 # assuming default parameters
+```bash
 kw_extractor = yake.KeywordExtractor()
 keywords = kw_extractor.extract_keywords(text)
 
 for kw in keywords:
 	print(kw)
+```
 
 # specifying parameters
+```bash
 language = "en"
 max_ngram_size = 3
 deduplication_thresold = 0.9
@@ -249,7 +253,6 @@ text = '''
 A plataforma foi desenvolvida por Ricardo Campos investigador do LIAAD do INESC TEC e docente do Instituto Politécnico de Tomar, Arian Pasquali e Vitor Mangaravite, também investigadores do LIAAD do INESC TEC, Alípio Jorge, coordenador do LIAAD do INESC TEC e docente na Faculdade de Ciências da Universidade do Porto, e Adam Jatwot docente da Universidade de Kyoto.
 '''
 
-from yake import KeywordExtractor as YakeKW
 custom_kw_extractor = yake.KeywordExtractor(lan="pt")
 keywords = custom_kw_extractor.extract_keywords(text)
 
