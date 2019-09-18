@@ -42,19 +42,6 @@ YAKE!, generically outperforms, statistical methods [tf.idf (in 100% of the data
 
 Extracting keywords from texts has become a challenge for individuals and organizations as the information grows in complexity and size. The need to automate this task so that texts can be processed in a timely and adequate manner has led to the emergence of automatic keyword extraction tools. Despite the advances, there is a clear lack of multilingual online tools to automatically extract keywords from single documents. Yake! is a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike other approaches, Yake! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, it follows an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
-
-## Please cite the following works when using YAKE
-
-<b>Journal Paper</b>
-
-Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289. [pdf](https://doi.org/10.1016/j.ins.2019.09.013)
-
-<b>ECIR'18 Best Short Paper</b>
-
-Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). A Text Feature Based Automatic Keyword Extraction Method for Single Documents. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
-
-Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). YAKE! Collection-independent Automatic Keyword Extractor. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
-
 ## Installing YAKE!
 
 There are three installation alternatives.
@@ -147,54 +134,78 @@ How to use it on Python
 ``` python
 import yake
 
-text = """
-Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague , but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow.  Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'.
-"""
+text = "Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning "\
+"competitions. Details about the transaction remain somewhat vague, but given that Google is hosting its Cloud "\
+"Next conference in San Francisco this week, the official announcement could come as early as tomorrow. "\
+"Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. "\
+"Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, "\
+"was founded by Goldbloom  and Ben Hamner in 2010. "\
+"The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, "\
+"it has managed to stay well ahead of them by focusing on its specific niche. "\
+"The service is basically the de facto home for running data science and machine learning competitions. "\
+"With Kaggle, Google is buying one of the largest and most active communities for data scientists - and with that, "\
+"it will get increased mindshare in this community, too (though it already has plenty of that thanks to Tensorflow "\
+"and other projects). Kaggle has a bit of a history with Google, too, but that's pretty recent. Earlier this month, "\
+"Google and Kaggle teamed up to host a $100,000 machine learning competition around classifying YouTube videos. "\
+"That competition had some deep integrations with the Google Cloud Platform, too. Our understanding is that Google "\
+"will keep the service running - likely under its current name. While the acquisition is probably more about "\
+"Kaggle's community than technology, Kaggle did build some interesting tools for hosting its competition "\
+"and 'kernels', too. On Kaggle, kernels are basically the source code for analyzing data sets and developers can "\
+"share this code on the platform (the company previously called them 'scripts'). "\
+"Like similar competition-centric sites, Kaggle also runs a job board, too. It's unclear what Google will do with "\
+"that part of the service. According to Crunchbase, Kaggle raised $12.5 million (though PitchBook says it's $12.75) "\
+"since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel, Max Levchin, Naval Ravikant, "\
+"Google chief economist Hal Varian, Khosla Ventures and Yuri Milner "
 
 # assuming default parameters
-simple_kwextractor = yake.KeywordExtractor()
-keywords = simple_kwextractor.extract_keywords(text)
+kw_extractor = yake.KeywordExtractor()
+keywords = kw_extractor.extract_keywords(text)
 
 for kw in keywords:
 	print(kw)
 
 # specifying parameters
+language = "en"
 max_ngram_size = 3
-custom_kwextractor = yake.KeywordExtractor(lan="en", n = max_ngram_size, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None)
+deduplication_thresold = 0.9
+deduplication_algo = 'seqm'
+windowSize = 1
+numOfKeywords = 20
 
-keywords = custom_kwextractor.extract_keywords(text)
+custom_kw_extractor = yake.KeywordExtractor(lan=language, n=max_ngram_size, dedupLim=deduplication_thresold, dedupFunc=deduplication_algo, windowsSize=windowSize, top=numOfKeywords, features=None)
+keywords = custom_kw_extractor.extract_keywords(text)
 
 for kw in keywords:
-	print(kw)
+    print(kw)
 ```
 
 #### Output
 The lower the score, the more relevant the keyword is.
 ``` bash
-('machine learning competitions', 0.005240218636588412)
-('hosts data science', 0.007231800172852763)
-('learning competitions', 0.02651298908496934)
-('platform that hosts', 0.03633877348319309)
-('hosts data', 0.03633877348319309)
-('data science', 0.03633877348319309)
-('science and machine', 0.03633877348319309)
-('machine learning', 0.03633877348319309)
-('ceo anthony goldbloom', 0.03727546242790534)
-('acquiring kaggle', 0.046501713202057565)
-('kaggle co-founder ceo', 0.05500284979172434)
-('san francisco', 0.05743727907793731)
-('google', 0.06726505100386607)
-('google is acquiring', 0.06754045633911093)
-('anthony goldbloom declined', 0.07472471161713069)
-('co-founder ceo anthony', 0.07489379267114575)
-('francisco this week', 0.09080847547468633)
-('ceo anthony', 0.10396234776227407)
-('anthony goldbloom', 0.10396234776227407)
-('hosting its cloud', 0.11556884354166654)
+('google', 0.026580863364597897)
+('kaggle', 0.0289005976239829)
+('ceo anthony goldbloom', 0.029946071606210194)
+('san francisco', 0.048810837074825336)
+('anthony goldbloom declined', 0.06176910090701819)
+('google cloud platform', 0.06261974476422487)
+('co-founder ceo anthony', 0.07357749587020043)
+('acquiring kaggle', 0.08723571551039863)
+('ceo anthony', 0.08915156857226395)
+('anthony goldbloom', 0.09123482372372106)
+('machine learning', 0.09147989238151344)
+('kaggle co-founder ceo', 0.093805063905847)
+('data', 0.097574333771058)
+('google cloud', 0.10260128641464673)
+('machine learning competitions', 0.10773000650607861)
+('francisco this week', 0.11519915079240485)
+('platform', 0.1183512305596321)
+('conference in san', 0.12392066376108138)
+('service', 0.12546743261462942)
+('goldbloom', 0.14611408778815776)
 ```
 
-### Highlighting
-Highlighting feature will tag every keyword in the text. 
+### Highlighting Feature
+Highlighting feature will tag every keyword in the text with the default tag `<kw>`.
 
 ``` python
 
@@ -207,12 +218,16 @@ th.highlight(text, keywords)
 #### Output
 By default, keywords will be highlighted using the tag 'kw'.
 ``` 
-
 Sources tell us that <kw>google</kw> is <kw>acquiring kaggle</kw>, a platform that <kw>hosts data science</kw> and <kw>machine learning</kw> competitions. Details about the transaction remain somewhat vague , but given that <kw>google</kw> is hosting its Cloud Next conference in <kw>san francisco</kw> this week, the official announcement could come as early as tomorrow.  Reached by phone, Kaggle co-founder <kw>ceo anthony goldbloom</kw> declined to deny that the acquisition is happening. <kw>google</kw> itself declined 'to comment on rumors'.
+.....
+.....
 ```
 
-Specify custom highlight.
 
+### Custom Highlighting Feature
+Besides tagging a text with the default tag, users can also specify their own custom highlight. In the following text, the tag `<span class='my_class' >` makes use of an hyphotetical function `my_class` whose purpose would be to highlight in white colour or the relevant keywords.
+
+#### Output
 ```python
 
 from yake.highlight import TextHighlighter
@@ -222,13 +237,53 @@ th.highlight(text, keywords)
 
 ```
 self.highlight_postSources tell us that <span class='my_class' >google</span> is <span class='my_class' >acquiring kaggle</span>, a platform that <span class='my_class' >hosts data science</span> and <span class='my_class' >machine learning</span> self.highlight_postcompetitions. Details about the transaction remain somewhat vague , but given that <span class='my_class' >google</span> is hosting self.highlight_postits Cloud Next conference in <span class='my_class' >san francisco</span> this week, the official announcement could come as early self.highlight_postas tomorrow.  Reached by phone, Kaggle co-founder <span class='my_class' >ceo anthony goldbloom</span> declined to deny that the self.highlight_postacquisition is happening. <span class='my_class' >google</span> itself declined 'to comment on rumors'.
+.....
+.....
 ```
 
+### Languages others than English
+While English (`en`) is the default language, users can use YAKE! to extract keywords from whatever language they want to by specifying the the corresponding language universal code. The below example shows how to extract keywords from a portuguese text.
+``` bash
+text = '''
+"Conta-me Histórias." Xutos inspiram projeto premiado. A plataforma "Conta-me Histórias" foi distinguida com o Prémio Arquivo.pt, atribuído a trabalhos inovadores de investigação ou aplicação de recursos preservados da Web, através dos serviços de pesquisa e acesso disponibilizados publicamente pelo Arquivo.pt . Nesta plataforma em desenvolvimento, o utilizador pode pesquisar sobre qualquer tema e ainda executar alguns exemplos predefinidos. Como forma de garantir a pluralidade e diversidade de fontes de informação, esta são utilizadas 24 fontes de notícias eletrónicas, incluindo a TSF. Uma versão experimental (beta) do "Conta-me Histórias" está disponível aqui.
+A plataforma foi desenvolvida por Ricardo Campos investigador do LIAAD do INESC TEC e docente do Instituto Politécnico de Tomar, Arian Pasquali e Vitor Mangaravite, também investigadores do LIAAD do INESC TEC, Alípio Jorge, coordenador do LIAAD do INESC TEC e docente na Faculdade de Ciências da Universidade do Porto, e Adam Jatwot docente da Universidade de Kyoto.
+'''
 
+from yake import KeywordExtractor as YakeKW
+custom_kw_extractor = yake.KeywordExtractor(lan="pt")
+keywords = custom_kw_extractor.extract_keywords(text)
+
+for kw in keywords:
+    print(kw)
+```
+
+#### Output
+``` bash
+('conta-me histórias', 0.006225012963810038)
+('liaad do inesc', 0.01899063587015275)
+('inesc tec', 0.01995432290332246)
+('conta-me', 0.04513273690417472)
+('histórias', 0.04513273690417472)
+('prémio arquivo.pt', 0.05749361520927859)
+('liaad', 0.07738867367929901)
+('inesc', 0.07738867367929901)
+('tec', 0.08109398065524037)
+('xutos inspiram projeto', 0.08720742489353424)
+('inspiram projeto premiado', 0.08720742489353424)
+('adam jatwot docente', 0.09407053486771558)
+('arquivo.pt', 0.10261392141666957)
+('alípio jorge', 0.12190479662535166)
+('ciências da universidade', 0.12368384021490342)
+('ricardo campos investigador', 0.12789997272332762)
+('politécnico de tomar', 0.13323587141127738)
+('arian pasquali', 0.13323587141127738)
+('vitor mangaravite', 0.13323587141127738)
+('preservados da web', 0.13596322680882506)
+```
 
 ## Related projects
 
-### YAKE! APP
+### YAKE! Mobile APP
 YAKE! is now available on (Google Play)[https://play.google.com/store/apps/details?id=com.yake.yake]
 
 ### `pke` - python keyphrase extraction
@@ -289,3 +344,19 @@ echo "Done!"
 ```
 
 Credits to https://github.com/silvae86 for the Docker scripts.
+
+
+## Please cite the following works when using YAKE
+
+<b>In-depth journal paper at Information Sciences Journal</b>
+
+Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289. [pdf](https://doi.org/10.1016/j.ins.2019.09.013)
+
+<b>ECIR'18 Best Short Paper</b>
+
+Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). A Text Feature Based Automatic Keyword Extraction Method for Single Documents. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
+
+Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). YAKE! Collection-independent Automatic Keyword Extractor. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
+
+## Awards
+[ECIR'18](http://ecir2018.org) Best Short Paper
