@@ -158,7 +158,7 @@ text = "Sources tell us that Google is acquiring Kaggle, a platform that hosts d
 "Google chief economist Hal Varian, Khosla Ventures and Yuri Milner "
 ```
 
-# assuming default parameters
+#### assuming default parameters
 ```bash
 kw_extractor = yake.KeywordExtractor()
 keywords = kw_extractor.extract_keywords(text)
@@ -167,7 +167,7 @@ for kw in keywords:
 	print(kw)
 ```
 
-# specifying parameters
+#### specifying parameters
 ```bash
 language = "en"
 max_ngram_size = 3
