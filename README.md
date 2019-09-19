@@ -124,7 +124,7 @@ Options:
 	-dl, --dedup-lim FLOAT          Deduplication limiar.
 	-ws, --window-size INTEGER      Window size.
 	-t, --top INTEGER               Number of keyphrases to extract
-	-v, --verbose
+	-v, --verbose			Gets detailed information (such as the score)
 	--help                          Show this message and exit.
 ``` 
 ### Usage (Python)
@@ -348,6 +348,8 @@ echo "Done!"
 
 Credits to https://github.com/silvae86 for the Docker scripts.
 
+##  API
+http://yake.inesctec.pt/apidocs/
 
 ## Please cite the following works when using YAKE
 
