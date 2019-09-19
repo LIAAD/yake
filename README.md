@@ -42,6 +42,9 @@ YAKE!, generically outperforms, statistical methods [tf.idf (in 100% of the data
 
 Extracting keywords from texts has become a challenge for individuals and organizations as the information grows in complexity and size. The need to automate this task so that texts can be processed in a timely and adequate manner has led to the emergence of automatic keyword extraction tools. Despite the advances, there is a clear lack of multilingual online tools to automatically extract keywords from single documents. Yake! is a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike other approaches, Yake! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, it follows an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
+## Where can I find YAKE!?
+YAKE! is available online [http://yake.inesctec.pt], on [Google Play](https://play.google.com/store/apps/details?id=com.yake.yake), as an open source Python package [https://github.com/LIAAD/yake] and as an [API](http://yake.inesctec.pt/apidocs/#/available_methods/post_yake_v2_extract_keywords).
+
 ## Installing YAKE!
 
 There are three installation alternatives.
