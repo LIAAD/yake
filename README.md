@@ -351,9 +351,6 @@ echo "Done!"
 
 Credits to https://github.com/silvae86 for the Docker scripts.
 
-##  API
-http://yake.inesctec.pt/apidocs/
-
 ## Please cite the following works when using YAKE
 
 <b>In-depth journal paper at Information Sciences Journal</b>
