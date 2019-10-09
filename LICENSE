@@ -3,7 +3,7 @@ Copyright (C) 2018, INESC TEC
 YAKE: Unsupervised single-document keyword extraction
 
 This software is authored by:
-Vitor Mangaraviti
+Vitor Mangaravite
 Arian Pasquali
 Ricardo Campos
 
@@ -23,9 +23,8 @@ If you use "YAKE" in a work that leads to a scientific publication, we would app
 it in your manuscript.
 
 Cite original paper:
-A Text Feature Based Automatic Keyword Extraction Method for Single Documents. 
-Ricardo Campos, Vítor Mangaravite, Arian Pasquali, Alípio Mário Jorge, 
-Célia Nunes, Adam Jatowt - European Conference on Information Retrieval, 2018
+- Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289
+- Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). A Text Feature Based Automatic Keyword Extraction Method for Single Documents. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691.
 
 
                     GNU GENERAL PUBLIC LICENSE
