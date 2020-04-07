@@ -114,7 +114,7 @@ pip install git+https://github.com/LIAAD/yake
 To upgrade using pip:
 
 ``` bash
-pip install git+https://github.com/LIAAD/yake –upgrade
+pip install git+https://github.com/LIAAD/yake –-upgrade
 ```
 #### Usage (Command line)
 
