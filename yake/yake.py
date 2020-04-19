@@ -11,20 +11,23 @@ from .datarepresentation import DataCore
 
 class KeywordExtractor(object):
 
-    def __init__(self, lan="en", n=3, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None):
+    def __init__(self, lan="en", n=3, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None, stopwords=None):
         self.lan = lan
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         local_path = os.path.join("StopwordsList", "stopwords_%s.txt" % lan[:2].lower())
         resource_path = os.path.join(dir_path,local_path)
-        try:
-            with open(resource_path, encoding='utf-8') as stop_fil:
-                self.stopword_set = set( stop_fil.read().lower().split("\n") )
-        except:
-            print('Warning, read stopword list as ISO-8859-1')
-            with open(resource_path, encoding='ISO-8859-1') as stop_fil:
-                self.stopword_set = set( stop_fil.read().lower().split("\n") )
+        if stopwords is None:
+            try:
+                with open(resource_path, encoding='utf-8') as stop_fil:
+                    self.stopword_set = set( stop_fil.read().lower().split("\n") )
+            except:
+                print('Warning, read stopword list as ISO-8859-1')
+                with open(resource_path, encoding='ISO-8859-1') as stop_fil:
+                    self.stopword_set = set( stop_fil.read().lower().split("\n") )
+        else:
+            self.stopword_set = set(stopwords)
 
         self.n = n
         self.top = top
