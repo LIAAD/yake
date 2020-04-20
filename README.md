@@ -295,7 +295,7 @@ for kw in keywords:
 ## Related projects
 
 ### YAKE! Mobile APP
-YAKE! is now available on (Google Play)[https://play.google.com/store/apps/details?id=com.yake.yake]
+YAKE! is now available on [Google Play](https://play.google.com/store/apps/details?id=com.yake.yake)
 
 ### `pke` - python keyphrase extraction
 
