@@ -18,11 +18,6 @@ class KeywordExtractor(object):
 
         local_path = os.path.join("StopwordsList", "stopwords_%s.txt" % lan[:2].lower())
         
-        # if can't find language stopword list file        
-        if not os.path.exists(local_path):
-            # load default empty list
-            local_path = os.path.join("StopwordsList", "stopwords_noLang.txt")
-        
         resource_path = os.path.join(dir_path,local_path)
 
         try:
