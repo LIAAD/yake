@@ -57,3 +57,18 @@ def test_simple_interface():
     assert "kaggle" in keywords
     assert "san francisco" in keywords
     assert "machine learning" in keywords
+
+
+def test_simple_interface():
+    text_content = """
+    Sources tell us that Google is acquiring Kaggle, a platform that
+    hosts data science and machine learning competitions."""
+
+    pyake = yake.KeywordExtractor(lan="ca",n=3)
+
+    result = pyake.extract_keywords(text_content)
+
+    print(result)
+
+    assert len(result) > 0
+    

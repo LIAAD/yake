@@ -17,7 +17,12 @@ class KeywordExtractor(object):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
         local_path = os.path.join("StopwordsList", "stopwords_%s.txt" % lan[:2].lower())
+
+        if os.path.exists(os.path.join(dir_path,local_path)) == False:
+            local_path = os.path.join("StopwordsList", "stopwords_noLang.txt")
+        
         resource_path = os.path.join(dir_path,local_path)
+
         if stopwords is None:
             try:
                 with open(resource_path, encoding='utf-8') as stop_fil:
