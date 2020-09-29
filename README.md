@@ -13,35 +13,7 @@ YAKE! is a light-weight unsupervised automatic keyword extraction method which r
 
 ## Benchmark
 
-YAKE!, generically outperforms, statistical methods [tf.idf (in 100% of the datasets), kp-miner (in 55%) and rake (in 100%)], state-of-the-art graph-based methods [TextRank (in 100% of the datasets), SingleRank (in 90%), TopicRank (in 70%), TopicalPageRank (in 90%), PositionRank (in 90%), MultipartiteRank (in 75%) and ExpandRank (in 100%)] and supervised learning methods [KEA (in 70% of the datasets)] across different datasets, languages and domains. The results listed in the table refer to F1 at 10 scores. Bold face marks the current best results for that specific dataset. The column "Method" cites the work of the previous (or current) best method (depending where the bold face is found). The interested reader should refer to [__this table__](https://github.com/LIAAD/yake/blob/master/docs/YAKEvsBaselines.jpg) in order to see a detailed comparison between YAKE and all the state-of-the-art methods.
-
-| Dataset                                                                           | Language | #Docs | YAKE      | Previous best | Best Previous or Current Best Method                                                                                                           |
-| --------------------------------------------------------------------------------- | -------- | ----- | --------- | ------------- | ---------------------------------------------------------------------------------------------------------------- |
-| [__110-PT-BN-KP__](https://github.com/LIAAD/KeywordExtractor-Datasets#110)        | PT       | 110   | **0.500** | 0.275         | [__SingleRank (Wan and Xiao, 2008)__](http://www.aclweb.org/anthology/C08-1122.pdf)                              |
-| [__500N-KPCrowd-v1.1__](https://github.com/LIAAD/KeywordExtractor-Datasets#500)   | EN       | 500   | **0.173** | 0.172         | [__TopicRank (Bougouin et al., 2013)__](http://aclweb.org/anthology/I13-1062.pdf)                                |
-| [__Inspec__](https://github.com/LIAAD/KeywordExtractor-Datasets#Inspec)           | EN       | 2000  | 0.316     | **0.378**     | [__SingleRank (Wan and Xiao, 2008)__](http://www.aclweb.org/anthology/C08-1122.pdf)                              |
-| [__Krapivin2009__](https://github.com/LIAAD/KeywordExtractor-Datasets#Krapivin)   | EN       | 2304  | 0.170     | **0.227**     | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__Nguyen2007__](https://github.com/LIAAD/KeywordExtractor-Datasets#Nguyen)       | EN       | 209   | 0.256     | **0.314**     | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__PubMed__](https://github.com/LIAAD/KeywordExtractor-Datasets#PubMed)           | EN       | 500   | 0.106     | **0.216**     | [__KEA (Witten et al., 2005)__](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__Schutz2008__](https://github.com/LIAAD/KeywordExtractor-Datasets#Schutz)       | EN       | 1231  | 0.196     | **0.258**     | [__TopicRank (Bougouin et al., 2013)__](http://aclweb.org/anthology/I13-1062.pdf)                                |
-| [__www__](https://github.com/LIAAD/KeywordExtractor-Datasets#www)                 | EN       | 1330  | **0.172** | 0.130         | TFIDF                                                                                                            |
-| [__kdd__](https://github.com/LIAAD/KeywordExtractor-Datasets#kdd)                 | EN       | 755   | **0.156** | 0.115         | TFIDF                                                                                                            |
-| [__SemEval2010__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2010) | EN       | 243   | 0.211     | **0.261**     | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__SemEval2017__](https://github.com/LIAAD/KeywordExtractor-Datasets#SemEval2017) | EN       | 493   | 0.329     | **0.449**     | [__SingleRank (Wan and Xiao, 2008)__](http://www.aclweb.org/anthology/C08-1122.pdf)                              |
-| [__cacic__](https://github.com/LIAAD/KeywordExtractor-Datasets#cacic)             | ES       | 888   | **0.196** | 0.155         | [__KEA (Witten et al., 2005)__](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__citeulike180__](https://github.com/LIAAD/KeywordExtractor-Datasets#citeulike)  | EN       | 183   | 0.256     | **0.317**     | [__KEA (Witten et al., 2005)__](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__fao30__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao30)             | EN       | 30    | **0.184** | 0.183         | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__fao780__](https://github.com/LIAAD/KeywordExtractor-Datasets#fao780)           | EN       | 779   | **0.187** | 0.174         | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__pak2018__](https://github.com/LIAAD/KeywordExtractor-Datasets#pak)             | PL       | 50    | **0.086** | 0.059         | TFIDF                                                                                                            |
-| [__theses100__](https://github.com/LIAAD/KeywordExtractor-Datasets#theses)        | EN       | 100   | 0.111     | **0.158**     | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__wicc__](https://github.com/LIAAD/KeywordExtractor-Datasets#wicc)               | ES       | 1640  | **0.256** | 0.167         | [__KEA (Witten et al., 2005)__](https://www.cs.waikato.ac.nz/ml/publications/2005/chap_Witten-et-al_Windows.pdf) |
-| [__wiki20__](https://github.com/LIAAD/KeywordExtractor-Datasets#wiki20)           | EN       | 20    | **0.162** | 0.156         | [__KPMiner (El-Beltagy and Rafea, 2010)__](http://www.aclweb.org/anthology/S10-1041.pdf)                         |
-| [__WikiNews__](https://github.com/LIAAD/KeywordExtractor-Datasets#WKC)            | FR       | 100   | **0.450** | 0.337         | TFIDF                                                                                                            |
-
-
-## Evaluation
-
-To ease the process of evaluating YAKE! against state-of-the-art algorithms, we make available KEEP, a Keyphrase Extraction Evaluation Package, which can be installed either as a [standalone mode](https://github.com/liaad/keep) or as a [docker image](https://hub.docker.com/r/liaad/keep).
+For Benchmark results check out our paper published on Information Science Journal (see the references section). 
 
 ## Rationale
 
@@ -356,7 +328,8 @@ echo "Done!"
 
 Credits to https://github.com/silvae86 for the Docker scripts.
 
-## Please cite the following works when using YAKE
+## References
+Please cite the following works when using YAKE
 
 <b>In-depth journal paper at Information Sciences Journal</b>
 
