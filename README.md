@@ -279,6 +279,9 @@ ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.
 
 Credits to https://github.com/boudinfl
 
+### `SparkNLP` - State of the Art Natural Language Processing framework
+https://github.com/JohnSnowLabs/spark-nlp - `SparkNLP` is an open source framework with full Python, Scala, and Java Support. Check their documentation to learn how to use Yake model with SparkNLP (https://nlp.johnsnowlabs.com/docs/en/annotators#yakemodel-keywords-extraction)
+
 ### `textacy` - NLP, before and after spaCy
 
 https://github.com/chartbeat-labs/textacy - `textacy` is a Python library for performing a variety of natural language processing (NLP) tasks, built on the high-performance spaCy library. among other features it supports keyword extration using YAKE.
