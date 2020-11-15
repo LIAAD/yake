@@ -280,7 +280,7 @@ ships with supervised models trained on the SemEval-2010 dataset (http://aclweb.
 Credits to https://github.com/boudinfl
 
 ### `SparkNLP` - State of the Art Natural Language Processing framework
-https://github.com/JohnSnowLabs/spark-nlp - `SparkNLP` is an open source framework with full Python, Scala, and Java Support. Check [their documentation](https://nlp.johnsnowlabs.com/docs/en/annotators#yakemodel-keywords-extraction) to learn how to use [their own YAKE implementation](https://nlp.johnsnowlabs.com/api/#com.johnsnowlabs.nlp.annotators.keyword.yake.YakeModel). 
+https://github.com/JohnSnowLabs/spark-nlp - `SparkNLP` from [John Snow Labs](https://www.johnsnowlabs.com/) is an open source framework with full Python, Scala, and Java Support. Check [their documentation](https://nlp.johnsnowlabs.com/docs/en/annotators#yakemodel-keywords-extraction) to learn how to use [their own YAKE implementation](https://nlp.johnsnowlabs.com/api/#com.johnsnowlabs.nlp.annotators.keyword.yake.YakeModel). You might also want to have a look at their demo and google colab  here: https://nlp.johnsnowlabs.com/demo (look for the "Detect key phrases" item). A video on how to use spark nlp with yake can also be found here: https://events.johnsnowlabs.com/john-snow-labs-nlu-become-a-data-science-superhero-with-one-line-of-python-code
 
 ### `textacy` - NLP, before and after spaCy
 
