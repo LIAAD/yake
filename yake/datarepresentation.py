@@ -103,6 +103,10 @@ class DataCore(object):
     def build_single_terms_features(self, features=None):
         validTerms = [ term for term in self.terms.values() if not term.stopword ]
         validTFs = (np.array([ x.tf for x in validTerms ]))
+
+        if len(validTFs) == 0:
+            return
+
         avgTF = validTFs.mean()
         stdTF = validTFs.std()
         maxTF = max([ x.tf for x in self.terms.values()])
