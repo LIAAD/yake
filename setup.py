@@ -38,19 +38,25 @@ setup(
             'yake=yake.cli:keywords'
         ]
     },
+    license="LGPLv3",
     include_package_data=True,
     install_requires=requirements,
     zip_safe=False,
     keywords='yake',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-    
-        'Natural Language :: English',
+classifiers=[
+        'Development Status :: 3 - Alpha',
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Text Processing',
+        'Topic :: Text Processing :: Linguistic',
+    ]
     ],
     test_suite='tests',
     tests_require=test_requirements,
