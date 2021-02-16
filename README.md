@@ -289,6 +289,11 @@ https://github.com/chartbeat-labs/textacy - `textacy` is a Python library for pe
 Credits to https://github.com/chartbeat-labs
 
 <a name="installing-docker"></a>
+
+### `Annif` - Tool for automated subject indexing and classification
+https://github.com/NatLibFi/Annif/ - `Annif` is a multi-algorithm automated subject indexing tool for libraries, archives and museums. This repository is used for developing a production version of the system, based on ideas from the initial prototype. Official website http://annif.org/.
+
+
 ## How to install Docker
 
 Here is the "just copy and paste" installations script for Docker in Ubuntu. Enjoy.
