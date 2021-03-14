@@ -56,6 +56,9 @@ class KeywordExtractor(object):
         return Levenshtein.ratio(cand1, cand2)
 
     def extract_keywords(self, text):
+        if not(len(text) > 0):
+            return []
+        
         text = text.replace('\n\t',' ')
         dc = DataCore(text=text, stopword_set=self.stopword_set, windowsSize=self.windowsSize, n=self.n)
         dc.build_single_terms_features(features=self.features)
