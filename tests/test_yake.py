@@ -72,16 +72,21 @@ def test_simple_interface():
 
     assert len(result) > 0
 
-@pytest.mark.filterwarnings("error")
 def test_phraseless_example():
     text_content = "- not yet"
 
     pyake = yake.KeywordExtractor()
 
-    try:
-        result = pyake.extract_keywords(text_content)
-        assert len(result) == 0
-    except:
-        pytest.fail("Failed to handle small strings")
+    result = pyake.extract_keywords(text_content)
+    assert len(result) == 0
+
+def test_null_and_blank_example():
+    pyake = yake.KeywordExtractor()
+    
+    result = pyake.extract_keywords("")
+    assert len(result) == 0
+
+    result = pyake.extract_keywords(None)
+    assert len(result) == 0
 
 
