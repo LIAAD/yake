@@ -42,9 +42,9 @@ class TextHighlighter(object):
         text_tokens = text.replace('\n',' ').split(' ')
         try:
             for tk in range(len(text_tokens)):
-                kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  text_tokens[tk]).lower()
+                kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  text_tokens[tk])
                 if kw in relevant_words_array:
-                    text_tokens[tk] = text_tokens[tk].lower().replace(kw, self.highlight_pre + kw + self.highlight_post)
+                    text_tokens[tk] = text_tokens[tk].replace(kw, self.highlight_pre + kw + self.highlight_post)
         except:
             pass
         new_text = ' '.join(text_tokens)
@@ -81,27 +81,27 @@ class TextHighlighter(object):
                     elif kw_list.index(min_score_word) >= 1:
                         index_of_more_relevant = splited_n_gram_kw_list[0].index(min_score_word.split()[0])
                         temporal_kw = ' '.join(splited_n_gram_kw_list[0][:index_of_more_relevant])
-                        if temporal_kw.lower() in relevant_words_array:
+                        if temporal_kw in relevant_words_array:
                             try:
-                                if relevant_words_array.index(temporal_kw.lower()) > relevant_words_array.index(final_splited_text[-1].lower() +' '+temporal_kw.lower()) and not re.findall(self.highlight_pre, final_splited_text[-1].lower()):
-                                    term_list = [final_splited_text[-1].lower() +' '+temporal_kw.lower()]
+                                if relevant_words_array.index(temporal_kw) > relevant_words_array.index(final_splited_text[-1] +' '+temporal_kw) and not re.findall(self.highlight_pre, final_splited_text[-1]):
+                                    term_list = [final_splited_text[-1] +' '+temporal_kw]
                                     del final_splited_text[-1]
                                     y -= 1
                                     y, new_expression = self.replace_token(text_tokens, y, term_list)
                                     final_splited_text.append(new_expression)
                                 else:
-                                    term_list = [temporal_kw.lower()]
+                                    term_list = [temporal_kw]
                                     y, new_expression = self.replace_token(text_tokens, y, term_list)
                                     final_splited_text.append(new_expression)
                             except:
-                                term_list = [temporal_kw.lower()]
+                                term_list = [temporal_kw]
                                 y, new_expression = self.replace_token(text_tokens, y, term_list)
                                 final_splited_text.append(new_expression)
 
                         else:
                             for tmp_kw in splited_n_gram_kw_list[0][:index_of_more_relevant]:
-                                if tmp_kw.lower() in relevant_words_array:
-                                        term_list = [tmp_kw.lower()]
+                                if tmp_kw in relevant_words_array:
+                                        term_list = [tmp_kw]
                                         y, new_expression = self.replace_token(text_tokens, y, term_list)
                                         final_splited_text.append(new_expression)
                                 else:
@@ -122,9 +122,9 @@ class TextHighlighter(object):
         for i in range(n_gram):
 
             temporary_list.append(text_tokens[y:y + i + 1])
-            k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\W["!,:.;?()]''', '',  ' '.join(temporary_list[i])).lower()
+            k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\W["!,:.;?()]''', '',  ' '.join(temporary_list[i]))
 
-            if k.lower() in relevant_words_array:
+            if k in relevant_words_array:
                 temporary_list_two.append(k)
 
         n_gram_word_list = sorted(temporary_list_two, key=lambda x: relevant_words_array.index(x))

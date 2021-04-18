@@ -188,7 +188,8 @@ class composed_word(object):
              self.tags = set()
              return
         self.tags = set([''.join([ w[0] for w in terms ])])
-        self.unique_kw = ' '.join( [ w[1].lower() for w in terms ] )
+        self.kw = ' '.join( [ w[1] for w in terms ] )
+        self.unique_kw = self.kw.lower()
         self.size = len(terms)
         self.terms = [ w[2] for w in terms if w[2] != None ]
         self.tf = 0.
