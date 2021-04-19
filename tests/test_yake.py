@@ -68,5 +68,3 @@ def test_highlighter():
     assert "<kw>Kaggle</kw>" in textHighlighted
     assert "<kw>San Francisco</kw>" in textHighlighted
     assert "<kw>machine learning</kw>" in textHighlighted
-
-test_highlighter()

@@ -30,7 +30,8 @@ class TextHighlighter(object):
 
             if(type(keywords[0]) == tuple):
                 kw_list = [x[0] for x in keywords]
-            
+
+            text = text.strip()
             if self.max_ngram_size == 1:
                 n_text = self.format_one_gram_text(text, kw_list)
             elif self.max_ngram_size > 1:
