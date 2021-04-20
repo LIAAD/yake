@@ -41,10 +41,11 @@ class TextHighlighter(object):
 
     def format_one_gram_text(self, text, relevant_words_array):
         text_tokens = text.replace('\n',' ').split(' ')
+        relevant_words_array = [kw.lower() for kw in relevant_words_array]
         try:
             for tk in range(len(text_tokens)):
                 kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  text_tokens[tk])
-                if kw in relevant_words_array:
+                if kw.lower() in relevant_words_array:
                     text_tokens[tk] = text_tokens[tk].replace(kw, self.highlight_pre + kw + self.highlight_post)
         except:
             pass
@@ -53,6 +54,8 @@ class TextHighlighter(object):
 
     def format_n_gram_text(self, text, relevant_words_array, n_gram):
         text_tokens = text.replace('\n',' ').split(' ')
+        relevant_words_array = [kw.lower() for kw in relevant_words_array]
+
         y = 0
         final_splited_text = []
         while y < len(text_tokens):
@@ -72,7 +75,7 @@ class TextHighlighter(object):
 
                     for len_kw in range(0, len(splited_one)):
                         kw_list, splited_n_gram_kw_list = self.find_more_relevant(y+len_kw, text_tokens, n_gram, relevant_words_array, kw_list, splited_n_gram_kw_list)
-                    min_score_word = min(kw_list, key=lambda x: relevant_words_array.index(x))
+                    min_score_word = min(kw_list, key=lambda x: relevant_words_array.index(x.lower()))
 
                     if kw_list.index(min_score_word) == 0:
                         term_list = [min_score_word]
@@ -125,10 +128,10 @@ class TextHighlighter(object):
             temporary_list.append(text_tokens[y:y + i + 1])
             k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\W["!,:.;?()]''', '',  ' '.join(temporary_list[i]))
 
-            if k in relevant_words_array:
+            if k.lower() in relevant_words_array:
                 temporary_list_two.append(k)
 
-        n_gram_word_list = sorted(temporary_list_two, key=lambda x: relevant_words_array.index(x))
+        n_gram_word_list = sorted(temporary_list_two, key=lambda x: relevant_words_array.index(x.lower()))
 
         try:
             kw_list.append(n_gram_word_list[0])
