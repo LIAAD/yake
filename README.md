@@ -293,6 +293,8 @@ Credits to https://github.com/chartbeat-labs
 ### `Annif` - Tool for automated subject indexing and classification
 https://github.com/NatLibFi/Annif/ - `Annif` is a multi-algorithm automated subject indexing tool for libraries, archives and museums. This repository is used for developing a production version of the system, based on ideas from the initial prototype. Official website http://annif.org/.
 
+### `Portulan Clarin` - Services and data for researchers, innovators, students and language professionals
+https://portulanclarin.net/workbench/liaad-yake/ - `Portulan Clarin` is a Research Infrastructure for the Science and Technology of Language, belonging to the Portuguese National Roadmap of  Research Infrastructures of Strategic Relevance, and part of the international research infrastructure CLARIN ERIC. It includes a demo of YAKE! among many other language technologies. Official website https://portulanclarin.net/.
 
 ## How to install Docker
 
