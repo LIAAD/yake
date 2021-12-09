@@ -282,8 +282,8 @@ Credits to https://github.com/boudinfl
 ### `SparkNLP` - State of the Art Natural Language Processing framework
 https://github.com/JohnSnowLabs/spark-nlp - `SparkNLP` from [John Snow Labs](https://www.johnsnowlabs.com/) is an open source framework with full Python, Scala, and Java Support. Check [their documentation](https://nlp.johnsnowlabs.com/docs/en/annotators#yakekeywordextraction), [demo](https://demo.johnsnowlabs.com/public/KEYPHRASE_EXTRACTION/) and [google colab](https://colab.research.google.com/github/JohnSnowLabs/spark-nlp-workshop/blob/master/tutorials/streamlit_notebooks/KEYPHRASE_EXTRACTION.ipynb). A video on how to use spark nlp with yake can also be found here: https://events.johnsnowlabs.com/john-snow-labs-nlu-become-a-data-science-superhero-with-one-line-of-python-code
 
-### General Index by Archive.org
-https://archive.org/details/GeneralIndex - A catalogue of 19 billions of YAKE keywords extracted from 107 million papers that can be found on [Archive.org](https://archive.org/details/GeneralIndex). An article about the General Index project can also be found in [Nature](https://www.nature.com/articles/d41586-021-02895-8).
+### `General Index` by Archive.org
+https://archive.org/details/GeneralIndex - A catalogue of 19 billions of YAKE keywords extracted from 107 million papers. An article about the General Index project can also be found in [Nature](https://www.nature.com/articles/d41586-021-02895-8).
 
 ### `textacy` - NLP, before and after spaCy
 
