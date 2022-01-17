@@ -46,16 +46,6 @@ it in your manuscript.
 - Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). YAKE! Collection-independent Automatic Keyword Extractor. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
 
 
-## Credits
-
-This software is authored by the following INESC TEC researchers:
-- Ricardo Campos
-- Vítor Mangaravite
-- Arian Pasquali
-- Alípio Jorge
-- Célia Nunes
-- Adam Jatowt
-
 ### License
 Copyright (C) 2018, INESC TEC [license](https://github.com/LIAAD/yake/blob/master/LICENSE).
 
