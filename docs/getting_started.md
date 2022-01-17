@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Getting started
+title: Quick Start
 nav_order: 2
 ---
 
-# Getting started
+# Quick Start
 {: .no_toc }
 
 ## Installing YAKE!
