@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Used by
+title: Related projects
 nav_order: 2
 ---
 
-# Used by
+# Related projects
 {: .no_toc }
 
 List of relevant projects using YAKE:
