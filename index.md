@@ -1,6 +1,20 @@
+---
+layout: default
+title: Home
+nav_order: 1
+description: "Unsupervised Approach for Automatic Keyword Extraction using Text Features."
+permalink: /
+---
+
 # Yet Another Keyword Extractor (Yake)
+{: .fs-9 }
 
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
+{: .fs-6 .fw-300 }
+
+[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/LIAAD/yake){: .btn .fs-5 .mb-4 .mb-md-0 }
+
+---
 
 YAKE! is a light-weight unsupervised automatic keyword extraction method which rests on text statistical features extracted from single documents to select the most important keywords of a text. Our system does not need to be trained on a particular set of documents, neither it depends on dictionaries, external-corpus, size of the text, language or domain. To demonstrate the merits and the significance of our proposal, we compare it against ten state-of-the-art unsupervised approaches (TF.IDF, KP-Miner, RAKE, TextRank, SingleRank, ExpandRank, TopicRank, TopicalPageRank, PositionRank and MultipartiteRank), and one supervised method (KEA). Experimental results carried out on top of twenty datasets (see Benchmark section below) show that our methods significantly outperform state-of-the-art methods under a number of collections of different sizes, languages or domains. 
 
@@ -13,15 +27,14 @@ An interactive demo is also available [here](http://yake.inesctec.pt).
 * Domain and Language Independent
 * Single-Document
 
-## Benchmark
-
-For Benchmark results check out our paper published on Information Science Journal (see the references section). 
 
 ## Rationale
 
 Extracting keywords from texts has become a challenge for individuals and organizations as the information grows in complexity and size. The need to automate this task so that texts can be processed in a timely and adequate manner has led to the emergence of automatic keyword extraction tools. Despite the advances, there is a clear lack of multilingual online tools to automatically extract keywords from single documents. Yake! is a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike other approaches, Yake! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, it follows an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
-## Installing YAKE!
+## Getting started
+
+### Installing YAKE!
 
 To install Yake using pip:
 
@@ -187,31 +200,21 @@ This software is authored by the following INESC TEC researchers:
 - Célia Nunes
 - Adam Jatowt
 
-## License Agreement
+### License
+Copyright (C) 2018, INESC TEC [license](https://github.com/LIAAD/yake/blob/master/LICENSE).
 
-Copyright (C) 2018, INESC TEC
 
-YAKE! Collection-independent Automatic Keyword Extractor: a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike most of the systems, YAKE! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, we follow an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
+### Contributing
 
-This software is authored by the following INESC TEC researchers:
-Ricardo Campos,
-Vítor Mangaravite,
-Arian Pasquali,
-Alípio Jorge,
-Célia Nunes, and 
-Adam Jatowt
+When contributing to this repository, please first discuss the change you wish to make via issue,
+email, or any other method with the owners of this repository before making a change. Read more about becoming a contributor in [our GitHub repo](https://github.com/LIAAD/yake/blob/master/CONTRIBUTING.rst).
 
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+#### Thank you to the contributors of Just the Docs!
 
-A commercial license is also available for use in industrial projects and collaborations that do not wish to use the GPL 3 license.
-
-You can reach INESC TEC at info@inesctec.pt, or
-Campus da Faculdade de Engenharia da Universidade do Porto
-Rua Dr. Roberto Frias
-4200-465 Porto
-Portugal
-
-----
-You can find the full license agreement available [here](https://github.com/LIAAD/yake/blob/master/LICENSE).
+<ul class="list-style-none">
+{% for contributor in site.github.contributors %}
+  <li class="d-inline-block mr-1">
+     <a href="{{ contributor.html_url }}"><img src="{{ contributor.avatar_url }}" width="32" height="32" alt="{{ contributor.login }}"/></a>
+  </li>
+{% endfor %}
+</ul>
