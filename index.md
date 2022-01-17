@@ -13,7 +13,7 @@ Unsupervised Approach for Automatic Keyword Extraction using Text Features.
 {: .fs-6 .fw-300 }
 
 [Get started](docs/getting_started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } 
-[View demo](https://yake.inesctec.pt){: .btn .fs-5 .mb-4 .mb-md-0 }
+[View demo](http://yake.inesctec.pt){: .btn .fs-5 .mb-4 .mb-md-0 }
 [GitHub](https://github.com/LIAAD/yake){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
