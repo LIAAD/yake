@@ -1,7 +1,7 @@
 ---
 layout: default
 title: About
-nav_order: 2
+nav_order: 4
 ---
 
 ## Authors
@@ -12,7 +12,7 @@ nav_order: 2
 
 * **Arian Pasquali** is a researcher associated to University of Porto and the Artificial Intelligence and Decision Support Laboratory at INESC TEC - INESC Technology. He has MSc in Computer Science by University of Porto with specialization in data mining.
 
-* **Alípio M. Jorge** is an associate professor at the Department of Computer Science of the Faculty of Science of the U. Porto and the coordinator of LIAAD/INESC TEC - INESC Technology and cid:8DEFB44D-C005-43C9-8B8C-4FB2D7BB0C54@homeScience, the Artificial Intelligence and Decision Support Lab of U. Porto since 2012. He is PhD in Computer Science by U. Porto. 
+* **Alípio M. Jorge** is an associate professor at the Department of Computer Science of the Faculty of Science of the U. Porto and the coordinator of LIAAD/INESC TEC - INESC Technology and Science, the Artificial Intelligence and Decision Support Lab of U. Porto since 2012. He is PhD in Computer Science by U. Porto. 
 
 * **Célia Nunes** is an Assistant Professor at the Department of Mathematics of the University of Beira Interior (UBI) and member of CMA - Center of Mathematics and Aplications, UBI. She is PhD in Mathematics by UBI, MSc. on Applied Mathematics by the University of Évora (UE) and BSc. in Mathematics - Probability and Statistics (UE).
 
