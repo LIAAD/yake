@@ -6,7 +6,7 @@ description: "Unsupervised Approach for Automatic Keyword Extraction using Text 
 permalink: /
 ---
 
-# Yet Another Keyword Extractor (Yake)
+# Yet Another Keyword Extractor (YAKE)
 {: .fs-9 }
 
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
