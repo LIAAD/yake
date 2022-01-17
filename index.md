@@ -192,11 +192,11 @@ Copyright (C) 2018, INESC TEC
 YAKE! Collection-independent Automatic Keyword Extractor: a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike most of the systems, YAKE! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, we follow an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
 This software is authored by the following INESC TEC researchers:
-Ricardo Campos
-Vítor Mangaravite
-Arian Pasquali
-Alípio Jorge
-Célia Nunes
+Ricardo Campos,
+Vítor Mangaravite,
+Arian Pasquali,
+Alípio Jorge,
+Célia Nunes, and 
 Adam Jatowt
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
