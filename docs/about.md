@@ -4,6 +4,7 @@ title: About
 nav_order: 4
 ---
 
+![Logo LIAAD](assets/images/logo_inesctec.png)
 
 This project was developed by LIAAD - Laboratory of Artificial Intelligence and Decision Support. LIAAD is an R&D laboratory at [INESCTEC](http://www.inesctec.pt/en). It is one of the associated units of INESC Tec which is funded by Fundação para a Ciência e a Tecnologia (FCT, Portugal).
 
