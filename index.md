@@ -152,4 +152,33 @@ Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (201
 
 
 
+## [YAKE! License Agreement](https://github.com/LIAAD/yake/blob/master/LICENSE)
 
+Copyright (C) 2018, INESC TEC
+
+YAKE! Collection-independent Automatic Keyword Extractor: a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike most of the systems, YAKE! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, we follow an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
+
+This software is authored by the following INESC TEC researchers:
+Ricardo Campos
+Vítor Mangaravite
+Arian Pasquali
+Alípio Jorge
+Célia Nunes
+Adam Jatowt
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+A commercial license is also available for use in industrial projects and collaborations that do not wish to use the GPL 3 license.
+
+You can reach INESC TEC at info@inesctec.pt, or
+Campus da Faculdade de Engenharia da Universidade do Porto
+Rua Dr. Roberto Frias
+4200-465 Porto
+Portugal
+
+If you use "YAKE" in a work that leads to a scientific publication, we would appreciate it if you would kindly cite
+it in your manuscript.
+
+Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C. and Jatowt, A. (2020).YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289, ISSN 0020-0255.
