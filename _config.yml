@@ -58,3 +58,5 @@ search:
   # Supports true or false (default)
   button: false
 
+footer_content: "Copyright &copy; 2018-2022 INESC TEC. Distributed by an <a href=\"https://github.com/LIAAD/yake/tree/master/LICENSE\">INESCTEC license.</a>"
+
