@@ -154,25 +154,33 @@ Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (201
 
 List of relevant projects using YAKE:
 
-[SparkNLP](https://github.com/JohnSnowLabs/spark-nlp) by [John Snow Labs](https://www.johnsnowlabs.com/). 
+- [SparkNLP](https://github.com/JohnSnowLabs/spark-nlp) by [John Snow Labs](https://www.johnsnowlabs.com/). 
 Open source framework with full Python, Scala, and Java Support. Check [their documentation](https://nlp.johnsnowlabs.com/docs/en/annotators#yakekeywordextraction), [demo](https://demo.johnsnowlabs.com/public/KEYPHRASE_EXTRACTION/) and [google colab](https://colab.research.google.com/github/JohnSnowLabs/spark-nlp-workshop/blob/master/tutorials/streamlit_notebooks/KEYPHRASE_EXTRACTION.ipynb). A video on how to use spark nlp with yake can also be found [here](https://events.johnsnowlabs.com/john-snow-labs-nlu-become-a-data-science-superhero-with-one-line-of-python-code): 
 
-[General Index](https://archive.org/details/GeneralIndex) by Archive.org. 
-A catalogue of 19 billions of YAKE keywords extracted from 107 million papers. An article about the General Index project can also be found in [Nature](https://www.nature.com/articles/d41586-021-02895-8).
-
-[textacy](https://github.com/chartbeat-labs/textacy) - NLP, before and after spaCy.
+- [pke](https://github.com/boudinfl/pke) - Python Keyphrase Extraction module.
+IT is Is an open source python-based keyphrase extraction toolkit. It provides an end-to-end keyphrase extraction pipeline in which each component can be easily modified or extended to develop new models. Credits to Florian Boudin.
+ 
+- [Textacy](https://github.com/chartbeat-labs/textacy) - NLP, before and after spaCy.
 Python library for performing a variety of natural language processing (NLP) tasks, built on the high-performance spaCy library. among other features it supports keyword extration using YAKE.
 
-[Annif](https://github.com/NatLibFi/Annif) - Tool for automated subject indexing and classification
+- [General Index](https://archive.org/details/GeneralIndex) by Archive.org. 
+A catalogue of 19 billions of YAKE keywords extracted from 107 million papers. An article about the General Index project can also be found in [Nature](https://www.nature.com/articles/d41586-021-02895-8).
+
+- [Annif](https://github.com/NatLibFi/Annif) - Tool for automated subject indexing and classification
 Multi-algorithm automated subject indexing tool for libraries, archives and museums. This repository is used for developing a production version of the system, based on ideas from the initial prototype. Official [website](http://annif.org/).
 
-[Portulan Clarin](https://portulanclarin.net/workbench/liaad-yake/) - Services and data for researchers, innovators, students and language professionals
-Research Infrastructure for the Science and Technology of Language, belonging to the Portuguese National Roadmap of  Research Infrastructures of Strategic Relevance, and part of the international research infrastructure CLARIN ERIC. It includes a demo of YAKE! among many other language technologies. Official [website](https://portulanclarin.net/) .
+- [Portulan Clarin](https://portulanclarin.net/workbench/liaad-yake/) - Services and data for researchers, innovators, students and language professionals
+Research Infrastructure for the Science and Technology of Language, belonging to the Portuguese National Roadmap of  Research Infrastructures of Strategic Relevance, and part of the international research infrastructure CLARIN ERIC. It includes a demo of YAKE! among many other language technologies. Official [website](https://portulanclarin.net/).
+
+- [Tell me stories](https://contamehistorias.pt/arquivopt)
+Tell me stories is a research project that allows users to automatically build news narratives based on news preserved by the [Portuguese Web Archive](https://arquivo.pt). 
 
 
-## [License Agreement](https://github.com/LIAAD/yake/blob/master/LICENSE)
+## License Agreement
 
-Copyright (C) 2018, INESC TEC
+Full license agreement available [here](https://github.com/LIAAD/yake/blob/master/LICENSE).
+
+```Copyright (C) 2018, INESC TEC
 
 YAKE! Collection-independent Automatic Keyword Extractor: a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike most of the systems, YAKE! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, we follow an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
@@ -199,4 +207,4 @@ Portugal
 If you use "YAKE" in a work that leads to a scientific publication, we would appreciate it if you would kindly cite
 it in your manuscript.
 
-Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C. and Jatowt, A. (2020).YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289, ISSN 0020-0255.
+Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C. and Jatowt, A. (2020).YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289, ISSN 0020-0255.```
