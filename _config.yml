@@ -7,10 +7,11 @@ heading_anchors: true
 aux_links:
   "Home":
     - "https://liaad.github.io/yake/"
-  "Github":
-    - "https://github.com/LIAAD/yake"
   "Demo":
     - "http://yake.inesctec.pt"
+  "Github":
+    - "https://github.com/LIAAD/yake"
+  
     
 # Makes Aux links open in a new tab. Default is false
 aux_links_new_tab: true
