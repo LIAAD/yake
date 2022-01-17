@@ -21,7 +21,7 @@ Unsupervised Approach for Automatic Keyword Extraction using Text Features.
 
 YAKE! is a light-weight unsupervised automatic keyword extraction method which rests on text statistical features extracted from single documents to select the most important keywords of a text. Our system does not need to be trained on a particular set of documents, neither it depends on dictionaries, external-corpus, size of the text, language or domain. 
 
-Interactive demo is available [here](http://yake.inesctec.pt).
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/LIAAD/yake/blob/gh-pages/notebooks/YAKE_tutorial.ipynb)
 
 ## Background
 
