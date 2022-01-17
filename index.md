@@ -30,10 +30,6 @@ An interactive demo is also available [here](http://yake.inesctec.pt).
 * Single-Document
 
 
-## Rationale
-
-Extracting keywords from texts has become a challenge for individuals and organizations as the information grows in complexity and size. The need to automate this task so that texts can be processed in a timely and adequate manner has led to the emergence of automatic keyword extraction tools. Despite the advances, there is a clear lack of multilingual online tools to automatically extract keywords from single documents. Yake! is a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike other approaches, Yake! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, it follows an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
-
 ## Getting started
 
 ### Installing YAKE!
@@ -49,7 +45,7 @@ To upgrade using pip:
 ``` bash
 pip install git+https://github.com/LIAAD/yake –-upgrade
 ```
-#### Usage (Command line)
+### Usage (Command line)
 
 How to use it on your favorite command line
 ``` bash
@@ -99,7 +95,7 @@ since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel
 Google chief economist Hal Varian, Khosla Ventures and Yuri Milner """
 ```
 
-#### assuming default parameters
+#### Simple usage with default parameters
 ```bash
 kw_extractor = yake.KeywordExtractor()
 keywords = kw_extractor.extract_keywords(text)
@@ -108,7 +104,7 @@ for kw in keywords:
     print(kw)
 ```
 
-#### specifying parameters
+#### Specifying custom parameters
 ```bash
 language = "en"
 max_ngram_size = 3
