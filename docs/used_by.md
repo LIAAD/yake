@@ -1,4 +1,11 @@
-## Used by
+---
+layout: default
+title: Used by
+nav_order: 2
+---
+
+# Used by
+{: .no_toc }
 
 List of relevant projects using YAKE:
 
