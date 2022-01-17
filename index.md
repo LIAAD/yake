@@ -175,6 +175,15 @@ Research Infrastructure for the Science and Technology of Language, belonging to
 - [Tell me stories](https://contamehistorias.pt/arquivopt)
 Tell me stories is a research project that allows users to automatically build news narratives based on news preserved by the [Portuguese Web Archive](https://arquivo.pt). 
 
+## Credits
+
+This software is authored by the following INESC TEC researchers:
+- Ricardo Campos
+- Vítor Mangaravite
+- Arian Pasquali
+- Alípio Jorge
+- Célia Nunes
+- Adam Jatowt
 
 ## License Agreement
 
