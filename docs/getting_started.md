@@ -7,6 +7,8 @@ nav_order: 2
 # Quick Start
 {: .no_toc }
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/LIAAD/yake/blob/gh-pages/notebooks/YAKE_tutorial.ipynb)
+
 ## Installing YAKE!
 
 Installing Yake using pip:
