@@ -152,7 +152,7 @@ Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (201
 
 
 
-## [YAKE! License Agreement](https://github.com/LIAAD/yake/blob/master/LICENSE)
+## [License Agreement](https://github.com/LIAAD/yake/blob/master/LICENSE)
 
 Copyright (C) 2018, INESC TEC
 
