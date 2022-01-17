@@ -2,6 +2,10 @@
 
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
 
+[Get started](http://www.google.com){: .btn}
+[Demo](http://yake.inesctec.pt){: .btn}
+[Github](https://github.com/LIAAD/yake){: .btn}
+
 YAKE! is a light-weight unsupervised automatic keyword extraction method which rests on text statistical features extracted from single documents to select the most important keywords of a text. Our system does not need to be trained on a particular set of documents, neither it depends on dictionaries, external-corpus, size of the text, language or domain. To demonstrate the merits and the significance of our proposal, we compare it against ten state-of-the-art unsupervised approaches (TF.IDF, KP-Miner, RAKE, TextRank, SingleRank, ExpandRank, TopicRank, TopicalPageRank, PositionRank and MultipartiteRank), and one supervised method (KEA). Experimental results carried out on top of twenty datasets (see Benchmark section below) show that our methods significantly outperform state-of-the-art methods under a number of collections of different sizes, languages or domains. 
 
 An interactive demo is also available [here](http://yake.inesctec.pt).
