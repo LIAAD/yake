@@ -150,6 +150,25 @@ Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (201
 Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). YAKE! Collection-independent Automatic Keyword Extractor. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
 
 
+## Used by
+
+List of relevant projects using YAKE:
+
+[SparkNLP](https://github.com/JohnSnowLabs/spark-nlp) by [John Snow Labs](https://www.johnsnowlabs.com/). 
+Open source framework with full Python, Scala, and Java Support. Check [their documentation](https://nlp.johnsnowlabs.com/docs/en/annotators#yakekeywordextraction), [demo](https://demo.johnsnowlabs.com/public/KEYPHRASE_EXTRACTION/) and [google colab](https://colab.research.google.com/github/JohnSnowLabs/spark-nlp-workshop/blob/master/tutorials/streamlit_notebooks/KEYPHRASE_EXTRACTION.ipynb). A video on how to use spark nlp with yake can also be found [here](https://events.johnsnowlabs.com/john-snow-labs-nlu-become-a-data-science-superhero-with-one-line-of-python-code): 
+
+[General Index](https://archive.org/details/GeneralIndex) by Archive.org. 
+A catalogue of 19 billions of YAKE keywords extracted from 107 million papers. An article about the General Index project can also be found in [Nature](https://www.nature.com/articles/d41586-021-02895-8).
+
+[textacy](https://github.com/chartbeat-labs/textacy) - NLP, before and after spaCy.
+Python library for performing a variety of natural language processing (NLP) tasks, built on the high-performance spaCy library. among other features it supports keyword extration using YAKE.
+
+[Annif](https://github.com/NatLibFi/Annif) - Tool for automated subject indexing and classification
+Multi-algorithm automated subject indexing tool for libraries, archives and museums. This repository is used for developing a production version of the system, based on ideas from the initial prototype. Official [website](http://annif.org/).
+
+[Portulan Clarin](https://portulanclarin.net/workbench/liaad-yake/) - Services and data for researchers, innovators, students and language professionals
+Research Infrastructure for the Science and Technology of Language, belonging to the Portuguese National Roadmap of  Research Infrastructures of Strategic Relevance, and part of the international research infrastructure CLARIN ERIC. It includes a demo of YAKE! among many other language technologies. Official [website](https://portulanclarin.net/) .
+
 
 ## [License Agreement](https://github.com/LIAAD/yake/blob/master/LICENSE)
 
