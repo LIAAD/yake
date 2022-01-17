@@ -178,9 +178,7 @@ Tell me stories is a research project that allows users to automatically build n
 
 ## License Agreement
 
-Full license agreement available [here](https://github.com/LIAAD/yake/blob/master/LICENSE).
-
-```Copyright (C) 2018, INESC TEC
+Copyright (C) 2018, INESC TEC
 
 YAKE! Collection-independent Automatic Keyword Extractor: a novel feature-based system for multi-lingual keyword extraction, which supports texts of different sizes, domain or languages. Unlike most of the systems, YAKE! does not rely on dictionaries nor thesauri, neither is trained against any corpora. Instead, we follow an unsupervised approach which builds upon features extracted from the text, making it thus applicable to documents written in different languages without the need for further knowledge. This can be beneficial for a large number of tasks and a plethora of situations where the access to training corpora is either limited or restricted.
 
@@ -207,4 +205,7 @@ Portugal
 If you use "YAKE" in a work that leads to a scientific publication, we would appreciate it if you would kindly cite
 it in your manuscript.
 
-Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C. and Jatowt, A. (2020).YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289, ISSN 0020-0255.```
+Campos, R., Mangaravite, V., Pasquali, A., Jorge, A., Nunes, C. and Jatowt, A. (2020).YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289, ISSN 0020-0255.
+
+----
+You can find the full license agreement available [here](https://github.com/LIAAD/yake/blob/master/LICENSE).
