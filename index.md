@@ -34,20 +34,16 @@ An interactive demo is also available [here](http://yake.inesctec.pt).
 
 ### Installing YAKE!
 
-To install Yake using pip:
+Installing Yake using pip:
 
 ``` bash
 pip install git+https://github.com/LIAAD/yake
 ```
 
-To upgrade using pip:
-
-``` bash
-pip install git+https://github.com/LIAAD/yake –-upgrade
-```
 ### Usage (Command line)
 
-How to use it on your favorite command line
+How to use it on your using the command line:
+
 ``` bash
 Usage: yake [OPTIONS]
 
@@ -66,7 +62,7 @@ Options:
 ``` 
 ### Usage (Python)
 
-How to use it on Python
+How to use it using Python:
 
 ``` python
 import yake
@@ -95,7 +91,7 @@ since its   launch in 2010. Investors in Kaggle include Index Ventures, SV Angel
 Google chief economist Hal Varian, Khosla Ventures and Yuri Milner """
 ```
 
-#### Simple usage with default parameters
+#### Simple usage using default parameters
 ```bash
 kw_extractor = yake.KeywordExtractor()
 keywords = kw_extractor.extract_keywords(text)
