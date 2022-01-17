@@ -12,7 +12,9 @@ permalink: /
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
 {: .fs-6 .fw-300 }
 
-[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/LIAAD/yake){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } 
+[GitHub](https://github.com/LIAAD/yake){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Demo](https://yake.inesctec.pt){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -209,7 +211,7 @@ Copyright (C) 2018, INESC TEC [license](https://github.com/LIAAD/yake/blob/maste
 When contributing to this repository, please first discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change. Read more about becoming a contributor in [our GitHub repo](https://github.com/LIAAD/yake/blob/master/CONTRIBUTING.rst).
 
-#### Thank you to the contributors of Just the Docs!
+#### Thank you to the contributors of YAKE!
 
 <ul class="list-style-none">
 {% for contributor in site.github.contributors %}
