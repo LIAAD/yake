@@ -5,6 +5,10 @@ heading_anchors: true
 
 # Aux links for the upper right navigation
 aux_links:
+  "Home":
+    - "https://liaad.github.io/yake/"
+  "Github":
+    - "https://github.com/LIAAD/yake"
   "Demo":
     - "http://yake.inesctec.pt"
     
