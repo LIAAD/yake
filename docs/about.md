@@ -4,6 +4,9 @@ title: About
 nav_order: 4
 ---
 
+This project was developed by LIAAD - Laboratory of Artificial Intelligence and Decision Support. LIAAD is an R&D laboratory at [INESCTEC](http://www.inesctec.pt/en). It is one of the associated units of INESC Tec which is funded by Fundação para a Ciência e a Tecnologia (FCT, Portugal).
+
+
 ## Authors
 
 * **Ricardo Campos** is an assistant professor at the ICT Departmental Unit of the Polytechnic Institute of Tomar (IPT) and member of LIAAD-INESC TEC, the Artificial Intelligence and Decision Support Lab of U. Porto. He is PhD in Computer Science by the University of Porto (U. Porto). 
