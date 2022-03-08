@@ -107,8 +107,26 @@ def test_n1_EN():
 
     assert textHighlighted == "<kw>Google</kw> is <kw>acquiring</kw> <kw>data</kw> <kw>science</kw> <kw>community</kw> <kw>Kaggle</kw>. Sources tell us that <kw>Google</kw> is <kw>acquiring</kw> <kw>Kaggle</kw>, a <kw>platform</kw> that hosts <kw>data</kw> <kw>science</kw> and <kw>machine</kw> <kw>learning</kw> competitions. Details about the transaction remain somewhat vague, but given that <kw>Google</kw> is hosting its <kw>Cloud</kw> Next conference in <kw>San</kw> <kw>Francisco</kw> this week, the official announcement could come as <kw>early</kw> as tomorrow. Reached by phone, <kw>Kaggle</kw> co-founder CEO Anthony <kw>Goldbloom</kw> <kw>declined</kw> to deny that the <kw>acquisition</kw> is happening. <kw>Google</kw> itself <kw>declined</kw> 'to comment on rumors'. <kw>Kaggle</kw>, which has about half a million <kw>data</kw> <kw>scientists</kw> on its <kw>platform</kw>, was founded by <kw>Goldbloom</kw> and Ben Hamner in 2010. The <kw>service</kw> got an <kw>early</kw> start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The <kw>service</kw> is basically the de facto home for running <kw>data</kw> <kw>science</kw>  and <kw>machine</kw> <kw>learning</kw> competitions. With <kw>Kaggle</kw>, <kw>Google</kw> is buying one of the largest and most active communities for <kw>data</kw> <kw>scientists</kw> - and with that, it will get increased mindshare in this <kw>community</kw>, too (though it already has plenty of that thanks to Tensorflow and other projects). <kw>Kaggle</kw> has a bit of a history with <kw>Google</kw>, too, but that's pretty recent. Earlier this month, <kw>Google</kw> and <kw>Kaggle</kw> teamed up to host a $100,000 <kw>machine</kw> <kw>learning</kw> <kw>competition</kw> around classifying YouTube videos. That <kw>competition</kw> had some deep integrations with the <kw>Google</kw> <kw>Cloud</kw> <kw>Platform</kw>, too. Our understanding is that <kw>Google</kw> will keep the <kw>service</kw> running - likely under its current name. While the <kw>acquisition</kw> is probably more about Kaggle's <kw>community</kw> than technology, <kw>Kaggle</kw> did build some interesting tools for hosting its <kw>competition</kw> and 'kernels', too. On <kw>Kaggle</kw>, kernels are basically the source code for analyzing <kw>data</kw> sets and developers can share this code on the <kw>platform</kw> (the company previously called them 'scripts'). Like similar competition-centric sites, <kw>Kaggle</kw> also runs a job board, too. It's unclear what <kw>Google</kw> will do with that part of the <kw>service</kw>. According to Crunchbase, <kw>Kaggle</kw> raised $12.5 million (though PitchBook says it's $12.75) since its launch in 2010. Investors in <kw>Kaggle</kw> include Index <kw>Ventures</kw>, SV Angel, Max Levchin, Naval Ravikant, <kw>Google</kw> chief economist Hal Varian, Khosla <kw>Ventures</kw> and Yuri Milner"
 
+def test_n1_EL():
+    text_content = '''
+    Ανώτατος διοικητής του ρωσικού στρατού φέρεται να σκοτώθηκε κοντά στο Χάρκοβο, σύμφωνα με την υπηρεσία πληροφοριών του υπουργείου Άμυνας της Ουκρανίας. Σύμφωνα με δήλωση του υπουργείου Άμυνας της Ουκρανίας, πρόκειται για τον Vitaly Gerasimov, υποστράτηγο και υποδιοικητή από την Κεντρική Στρατιωτική Περιφέρεια της Ρωσίας.'''
+
+    pyake = yake.KeywordExtractor(lan="el",n=1)
+    result = pyake.extract_keywords(text_content)
+    print(result)
+    res = [('Ουκρανίας', 0.04685829498124156), ('Χάρκοβο', 0.0630891548728466), ('Άμυνας', 0.06395408991254226), ('σύμφωνα', 0.07419311338418161), ('υπουργείου', 0.1069960715371627), ('Ανώτατος', 0.12696931063105557), ('διοικητής', 0.18516501832552387), ('ρωσικού', 0.18516501832552387), ('στρατού', 0.18516501832552387), ('φέρεται', 0.18516501832552387), ('σκοτώθηκε', 0.18516501832552387), ('κοντά', 0.18516501832552387), ('υπηρεσία', 0.18516501832552387), ('πληροφοριών', 0.18516501832552387), ('Gerasimov', 0.1895400421770795), ('Ρωσίας', 0.1895400421770795), ('Vitaly', 0.24366598777562623), ('Κεντρική', 0.24366598777562623), ('Στρατιωτική', 0.24366598777562623), ('Περιφέρεια', 0.24366598777562623)]
+    assert result == res
+
+    keywords = [kw[0] for kw in result]
+    th = TextHighlighter(max_ngram_size=1)
+    textHighlighted = th.highlight(text_content, keywords)
+    print(textHighlighted)
+
+    assert textHighlighted == "<kw>Ανώτατος</kw> <kw>διοικητής</kw> του <kw>ρωσικού</kw> <kw>στρατού</kw> <kw>φέρεται</kw> να <kw>σκοτώθηκε</kw> <kw>κοντά</kw> στο <kw>Χάρκοβο</kw>, <kw>σύμφωνα</kw> με την <kw>υπηρεσία</kw> <kw>πληροφοριών</kw> του <kw>υπουργείου</kw> <kw>Άμυνας</kw> της <kw>Ουκρανίας</kw>. <kw>Σύμφωνα</kw> με δήλωση του <kw>υπουργείου</kw> <kw>Άμυνας</kw> της <kw>Ουκρανίας</kw>, πρόκειται για τον <kw>Vitaly</kw> <kw>Gerasimov</kw>, υποστράτηγο και υποδιοικητή από την <kw>Κεντρική</kw> <kw>Στρατιωτική</kw> <kw>Περιφέρεια</kw> της <kw>Ρωσίας</kw>."
+
 test_phraseless_example()
 test_null_and_blank_example()
 test_n1_EN()
 test_n3_EN()
 test_n3_PT()
+test_n1_EL()
