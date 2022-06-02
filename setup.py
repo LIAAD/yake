@@ -62,6 +62,10 @@ setup(
     long_description=readme,
     long_description_content_type='text/markdown',    
     url='https://pypi.python.org/pypi/yake',
+    project_urls={
+        'Documentation': 'https://liaad.github.io/yake/',
+        'Source': 'https://github.com/LIAAD/yake',
+    },
     packages=find_packages(include=['yake','StopwordsList']),
     entry_points={
         'console_scripts': [
