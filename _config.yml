@@ -8,7 +8,7 @@ aux_links:
   "Home":
     - "https://liaad.github.io/yake/"
   "Demo":
-    - "https://share.streamlit.io/arianpasquali/yake/demo"
+    - "https://share.streamlit.io/arianpasquali/yake/demo/streamlit_app.py"
   "Github":
     - "https://github.com/LIAAD/yake"
   
