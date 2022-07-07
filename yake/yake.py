@@ -68,7 +68,7 @@ class KeywordExtractor(object):
             todedup = sorted([cc for cc in dc.candidates.values() if cc.isValid()], key=lambda c: c.H)
 
             if self.dedupLim >= 1.:
-                return ([ (cand.H, cand.unique_kw) for cand in todedup])[:self.top]
+                return ([ (cand.unique_kw, cand.H) for cand in todedup])[:self.top]
 
             for cand in todedup:
                 toadd = True
