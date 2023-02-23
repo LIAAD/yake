@@ -67,6 +67,12 @@ class KeywordExtractor(object):
             resultSet = []
             todedup = sorted([cc for cc in dc.candidates.values() if cc.isValid()], key=lambda c: c.H)
 
+            if self.dedupLim < 0.:
+                results = []
+                for i, cand in zip(range(self.top), todedup):
+                    results.append((cand.kw, cand.H))
+                return results
+
             if self.dedupLim >= 1.:
                 return ([ (cand.unique_kw, cand.H) for cand in todedup])[:self.top]
 

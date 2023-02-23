@@ -122,7 +122,7 @@ def handle_yake():
         my_yake = yake.KeywordExtractor(lan=language,
                                         n=max_ngram_size,
                                         top=number_of_keywords,
-                                        dedupLim=0.8,
+                                        dedupLim=-1,
                                         windowsSize=2
                                         )
 
