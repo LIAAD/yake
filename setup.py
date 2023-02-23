@@ -47,7 +47,7 @@ requirements = [
     "jellyfish"]
 
 setup_requirements = [
-    'pytest-runner'    
+    'pytest-runner'
 ]
 
 test_requirements = [
@@ -60,13 +60,13 @@ setup(
     version='0.4.8',
     description="Keyword extraction Python package",
     long_description=readme,
-    long_description_content_type='text/markdown',    
+    long_description_content_type='text/markdown',
     url='https://pypi.python.org/pypi/yake',
     project_urls={
         'Documentation': 'https://liaad.github.io/yake/',
         'Source': 'https://github.com/LIAAD/yake',
     },
-    packages=find_packages(include=['yake','StopwordsList']),
+    packages=find_packages(include=['yake', 'StopwordsList']),
     entry_points={
         'console_scripts': [
             'yake=yake.cli:keywords'
@@ -77,7 +77,7 @@ setup(
     install_requires=requirements,
     zip_safe=False,
     keywords='yake',
-classifiers=[
+    classifiers=[
         'Development Status :: 3 - Alpha',
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         'Programming Language :: Python :: 3',

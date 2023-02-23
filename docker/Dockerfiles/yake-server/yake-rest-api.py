@@ -14,9 +14,8 @@ instructions:
 open http://127.0.0.1:5000/apidocs/
 """
 
-from flask import Flask, jsonify, request
-
 from flasgger import Swagger
+from flask import Flask, jsonify, request
 
 try:
     import simplejson as json
@@ -36,8 +35,9 @@ app.config['SWAGGER'] = {
 }
 swagger = Swagger(app)
 
+
 @swagger.validate('content')
-@app.route('/yake/',methods=['POST'])
+@app.route('/yake/', methods=['POST'])
 def handle_yake():
     """Example endpoint return a list of keywords using YAKE
     ---
@@ -109,31 +109,34 @@ def handle_yake():
     """
 
     try:
-        assert request.json["text"] , "Invalid text"
+        assert request.json["text"], "Invalid text"
         assert len(request.json["language"]) == 2, "Invalid language code"
-        assert int(request.json["max_ngram_size"]) , "Invalid max_ngram_size"
-        assert int(request.json["number_of_keywords"]) , "Invalid number_of_keywords"
+        assert int(request.json["max_ngram_size"]), "Invalid max_ngram_size"
+        assert int(request.json["number_of_keywords"]), "Invalid number_of_keywords"
+        assert int(request.json["window_size"]), "Invalid windows_size, windows_size set 1 or 2"
 
         text = request.json["text"]
         language = request.json["language"]
         max_ngram_size = int(request.json["max_ngram_size"])
         number_of_keywords = int(request.json["number_of_keywords"])
+        windows_size = int(request.json["windows_size"])
 
         my_yake = yake.KeywordExtractor(lan=language,
                                         n=max_ngram_size,
                                         top=number_of_keywords,
                                         dedupLim=-1,
-                                        windowsSize=2
+                                        windowsSize=windows_size
                                         )
 
         keywords = my_yake.extract_keywords(text)
-        result  = [{"ngram":x[1] ,"score":x[0]} for x in keywords]
+        result = [{"ngram": x[1], "score": x[0]} for x in keywords]
 
         return jsonify(result), HTTPStatus.OK
     except IOError as e:
         return jsonify("Language not supported"), HTTPStatus.BAD_REQUEST
     except Exception as e:
         return jsonify(str(e)), HTTPStatus.BAD_REQUEST
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

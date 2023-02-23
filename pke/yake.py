@@ -17,14 +17,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import math
 import re
 import string
 from collections import defaultdict
 
+import math
 import numpy
 from nltk.metrics import edit_distance
-
 from pke.base import LoadFile
 
 
@@ -174,7 +173,6 @@ class YAKE(LoadFile):
             if use_stems:
                 words = sentence.stems
 
-            
             buffer = []
             # loop through words in sentence
             for j, word in enumerate(words):
@@ -185,7 +183,7 @@ class YAKE(LoadFile):
                     continue
 
                 # add the right context
-                for w in [ w for w in buffer[max(0, len(buffer) - window):len(buffer)] ]:
+                for w in [w for w in buffer[max(0, len(buffer) - window):len(buffer)]]:
                     self.contexts[word][0].append(w)
                     self.contexts[w][1].append(word)
 
@@ -298,8 +296,8 @@ class YAKE(LoadFile):
             self.features[word]['PR'] = len(set(self.contexts[word][1])) / max_TF
 
             self.features[word]['RELATEDNESS'] = 1
-            #self.features[word]['RELATEDNESS'] += self.features[word]['PL']
-            #self.features[word]['RELATEDNESS'] += self.features[word]['PR']
+            # self.features[word]['RELATEDNESS'] += self.features[word]['PL']
+            # self.features[word]['RELATEDNESS'] += self.features[word]['PR']
             self.features[word]['RELATEDNESS'] += (self.features[word]['WR'] +
                                                    self.features[word]['WL']) * \
                                                   (self.features[word]['TF'] / max_TF)
@@ -354,27 +352,27 @@ class YAKE(LoadFile):
                     TF = lowercase_forms.count(candidate)
                     words_cand = [t.lower() for t in v.surface_forms[i]]
                     prod_ = 1.
-                    sum_  = 0.
+                    sum_ = 0.
                     for j, word_cand in enumerate(words_cand):
                         if self.features[word_cand]['isstop']:
                             """
                                 self.contexts[word][0].append(w) # left
                                 self.contexts[w][1].append(word) # right
                             """
-                            term_left  = words_cand[j-1]
-                            term_right = words_cand[j+1]
-                            term_stop  = word_cand
+                            term_left = words_cand[j - 1]
+                            term_right = words_cand[j + 1]
+                            term_stop = word_cand
 
                             prob_t1 = self.contexts[term_left][1].count(term_stop) / self.features[term_left]['TF']
 
                             prob_t2 = self.contexts[term_stop][0].count(term_right) / self.features[term_right]['TF']
 
                             prob = prob_t1 * prob_t2
-                            prod_ *= (1 + (1 - prob ) )
+                            prod_ *= (1 + (1 - prob))
                             sum_ -= (1 - prob)
                         else:
                             prod_ *= self.features[word_cand]['weight']
-                            sum_  += self.features[word_cand]['weight']
+                            sum_ += self.features[word_cand]['weight']
                     self.weights[candidate] = prod_
                     self.weights[candidate] /= TF * (1 + sum_)
                     self.surface_to_lexical[candidate] = k
