@@ -1,0 +1,17 @@
+Analysis produced the following diagnostic data:
+
+|             Diagnostic              |  Summary   |
++-------------------------------------+------------+
+| Successfully extracted Python files | 13 results |
+
+Analysis produced the following metric data:
+
+|                         Metric                          | Value  |
++---------------------------------------------------------+--------+
+| Total lines of Python code in the database              | 141635 |
+| Total lines of user written Python code in the database |   1323 |
+
+
+/opt/hostedtoolcache/CodeQL/2.12.2-20230207/x64/codeql/codeql database print-baseline /home/runner/work/_temp/codeql_databases/python
+Counted a baseline of 1567 lines of code for python.
+Counted a baseline of 1567 lines of code for python.
