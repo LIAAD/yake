@@ -129,7 +129,7 @@ def handle_yake():
                                         )
 
         keywords = my_yake.extract_keywords(text)
-        result = [{"ngram": x[1], "score": x[0]} for x in keywords]
+        result = [{"keyword": x[0], "score": x[1]} for x in keywords]
 
         return jsonify(result), HTTPStatus.OK
     except IOError as e:
