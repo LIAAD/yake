@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 YAKE_PORT=5000
-YAKE_IMAGE="liaad/yake"
-YAKE_SERVER_IMAGE="liaad/yake-server"
+YAKE_IMAGE="multi-keywords/yake"
+YAKE_SERVER_IMAGE="multi-keywords/yake-server"
 TAG="latest"
