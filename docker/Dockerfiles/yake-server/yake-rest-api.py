@@ -111,9 +111,9 @@ def handle_yake():
     try:
         assert request.json["text"], "Invalid text"
         assert len(request.json["language"]) == 2, "Invalid language code"
-        assert int(request.json["max_ngram_size"]), "Invalid max_ngram_size"
+        assert int(request.json["max_ngram_size"]), "Invalid max_ngram_size, Suggested max_ngram_size setting of 1 or 2 or 3"
         assert int(request.json["number_of_keywords"]), "Invalid number_of_keywords"
-        assert int(request.json["window_size"]), "Invalid windows_size, windows_size set 1 or 2"
+        assert int(request.json["windows_size"]), "Invalid windows_size, Suggested windows_size setting of 1 or 2"
 
         text = request.json["text"]
         language = request.json["language"]

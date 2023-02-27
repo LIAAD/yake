@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
-if [ $# -eq 0 ]
-  then
-    tag='latest'
-  else
-    tag=$1
+if [ $# -eq 0 ]; then
+  tag='latest'
+else
+  tag=$1
 fi
 
 INITIAL_DIR=$(pwd)
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # get constants
 source "$DIR/constants.sh"

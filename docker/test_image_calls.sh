@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
 YAKE_PORT="5000"
 
-function wait_for_server_to_boot_on_port()
-{
-    local ip=$1
-    local port=$2
-    local text_to_find=$3
+function wait_for_server_to_boot_on_port() {
+  local ip=$1
+  local port=$2
+  local text_to_find=$3
 
-    if [[ $ip == "" ]]; then
-      ip="127.0.0.1"
-    fi
-    local attempts=0
-    local max_attempts=60
+  if [[ $ip == "" ]]; then
+    ip="127.0.0.1"
+  fi
+  local attempts=0
+  local max_attempts=60
 
-    echo "Waiting for server on $ip:$port to boot up..."
+  echo "Waiting for server on $ip:$port to boot up..."
+  response=$(curl -s $ip:$port)
+
+  until $(curl --output /dev/null --silent --head --fail http://$ip:$port) || [[ $response == *$text_to_find* ]] || (($attempts > $max_attempts)); do
+    ((attempts = attempts + 1))
+    echo "Waiting... ${attempts}/${max_attempts}"
+    sleep 1
     response=$(curl -s $ip:$port)
+  done
 
-	  until $(curl --output /dev/null --silent --head --fail http://$ip:$port) || [[ $response == *$text_to_find* ]] || (( $attempts > $max_attempts )) ; do
-        ((attempts=attempts+1))
-        echo "Waiting... ${attempts}/${max_attempts}"
-        sleep 1;
-        response=$(curl -s $ip:$port)
-	  done
-
-    if (( $attempts == $max_attempts ));
-    then
-        echo "Server on $ip:$port failed to start after $max_attempts"
-    elif (( $attempts < $max_attempts ));
-    then
-        echo "Server on $ip:$port started successfully at attempt (${attempts}/${max_attempts})"
-    fi
+  if (($attempts == $max_attempts)); then
+    echo "Server on $ip:$port failed to start after $max_attempts"
+  elif (($attempts < $max_attempts)); then
+    echo "Server on $ip:$port started successfully at attempt (${attempts}/${max_attempts})"
+  fi
 }
 
 # get directory of this script
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 # get constants
 source "$DIR/constants.sh"
@@ -42,7 +39,7 @@ docker run -d -p $YAKE_PORT:$YAKE_PORT "$YAKE_SERVER_IMAGE:$TAG"
 wait_for_server_to_boot_on_port "127.0.0.1" "$YAKE_PORT" "<title>404 Not Found</title>"
 
 curl -X POST "http://127.0.0.1:5000/yake/" -H "accept: application/json" -H "Content-Type: application/json" \
--d @- <<'EOF'
+  -d @- <<'EOF'
 {
   "language": "en",
   "max_ngram_size": 2,
