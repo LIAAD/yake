@@ -19,7 +19,7 @@ RUN pip install flasgger
 
 # install requirements first to engage docker cache
 # RUN wget https://raw.githubusercontent.com/LIAAD/yake/master/requirements.txt -O requirements.txt
-RUN wget https://github.com/Crazy-LittleBoy/yake/blob/master/requirements.txt -O requirements.txt
+RUN wget https://raw.githubusercontent.com/Crazy-LittleBoy/yake/master/requirements.txt -O requirements.txt
 RUN pip install -r requirements.txt
 
 # install yake via pip
