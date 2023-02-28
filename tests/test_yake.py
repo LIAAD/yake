@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """Tests for yake package."""
+import tqdm
 
 import yake
 from yake.highlight import TextHighlighter
@@ -160,32 +161,31 @@ def test_n1_AR():
 
 def test_n2_EN():
     text_content = '''
-    Sources tell us that Google is acquiring Kaggle, a platform that hosts data science and machine learning competitions. Details about the transaction remain somewhat vague , but given that Google is hosting its Cloud Next conference in San Francisco this week, the official announcement could come as early as tomorrow. Reached by phone, Kaggle co-founder CEO Anthony Goldbloom declined to deny that the acquisition is happening. Google itself declined 'to comment on rumors'. Kaggle, which has about half a million data scientists on its platform, was founded by Goldbloom and Ben Hamner in 2010. The service got an early start and even though it has a few competitors like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its specific niche. The service is basically the de facto home for running data science and machine learning competitions. With Kaggle, Google is buying one of the largest and most active communities for data scientists ...'''
+    Kaggle has a bit of a history with Google, too, but that's pretty recent. Earlier this month, Google and Kaggle teamed up to host a $100,000 machine learning competition around classifying YouTube videos. That competition had some deep integrations with the Google Cloud Platform, too. Our understanding is that Google will keep the service running - likely under its current name. While the acquisition is probably more about Kaggle's community than technology, Kaggle did build some interesting tools for hosting its competition and 'kernels', too. On Kaggle, kernels are basically the source code for analyzing data sets and developers can share this code on the platform (the company previously called them 'scripts'). Like similar competition centric sites, Kaggle also runs a job board, too. It's unclear what Google will do with that part of the service. According to Crunchbase, Kaggle raised $12.5 million (though PitchBook says it's $12.75) since its launch in 2010. Investors in Kaggle include Index Ventures, SV Angel, Max Levchin, Naval Ravikant, Google chief economist Hal Varian, Khosla Ventures and Yuri Milner'''
 
-    pyake = yake.KeywordExtractor(lan="en", n=3, top=20, dedupLim=-1, windowsSize=2)
+    pyake = yake.KeywordExtractor(lan="en", n=2, top=15, dedupLim=-1, windowsSize=1, dedupFunc='lev')
 
     result = pyake.extract_keywords(text_content)
-    print(result)
-    for r in result:
-        print(r)
-    res = [('Google', 0.02509259635302287), ('Kaggle', 0.027297150442917317),
-           ('CEO Anthony Goldbloom', 0.04834891465259988), ('data science', 0.05499112888517541),
-           ('acquiring data science', 0.06029572445726576), ('Google Cloud Platform', 0.07461585862381104),
-           ('data', 0.07999958986489127), ('San Francisco', 0.0913829662674319),
-           ('Anthony Goldbloom declined', 0.09740885820462175), ('science', 0.09834167930168546),
-           ('science community Kaggle', 0.1014394718805728), ('machine learning', 0.10754988562466912),
-           ('Google Cloud', 0.1136787749431024), ('Google is acquiring', 0.114683257931042),
-           ('acquiring Kaggle', 0.12012386507741751), ('Anthony Goldbloom', 0.1213027418574554),
-           ('platform', 0.12404419723925647), ('co-founder CEO Anthony', 0.12411964553586782),
-           ('CEO Anthony', 0.12462950727635251), ('service', 0.1316357590449064)]
+    # print(result)
+    # for r in result:
+    #     print(r)
+    # res = [('Google', 0.02509259635302287), ('Kaggle', 0.027297150442917317),
+    #        ('CEO Anthony Goldbloom', 0.04834891465259988), ('data science', 0.05499112888517541),
+    #        ('acquiring data science', 0.06029572445726576), ('Google Cloud Platform', 0.07461585862381104),
+    #        ('data', 0.07999958986489127), ('San Francisco', 0.0913829662674319),
+    #        ('Anthony Goldbloom declined', 0.09740885820462175), ('science', 0.09834167930168546),
+    #        ('science community Kaggle', 0.1014394718805728), ('machine learning', 0.10754988562466912),
+    #        ('Google Cloud', 0.1136787749431024), ('Google is acquiring', 0.114683257931042),
+    #        ('acquiring Kaggle', 0.12012386507741751), ('Anthony Goldbloom', 0.1213027418574554),
+    #        ('platform', 0.12404419723925647), ('co-founder CEO Anthony', 0.12411964553586782),
+    #        ('CEO Anthony', 0.12462950727635251), ('service', 0.1316357590449064)]
     # assert result == res
 
-    keywords = [kw[0] for kw in result]
-    th = TextHighlighter(max_ngram_size=3)
-    textHighlighted = th.highlight(text_content, keywords)
-    print(textHighlighted)
+    # keywords = [kw[0] for kw in result]
+    # th = TextHighlighter(max_ngram_size=3)
+    # textHighlighted = th.highlight(text_content, keywords)
+    # print(textHighlighted)
     # assert textHighlighted == "<kw>Google</kw> is acquiring <kw>data science</kw> community <kw>Kaggle</kw>. Sources tell us that <kw>Google</kw> is acquiring <kw>Kaggle</kw>, a <kw>platform</kw> that hosts <kw>data science</kw> and <kw>machine learning</kw>   competitions. Details about the transaction remain somewhat vague , but given that <kw>Google</kw> is hosting   its Cloud Next conference in <kw>San Francisco</kw> this week, the official announcement could come as early   as tomorrow.  Reached by phone, <kw>Kaggle</kw> co-founder <kw>CEO Anthony Goldbloom</kw> declined to deny that the   acquisition is happening. <kw>Google</kw> itself declined 'to comment on rumors'.   <kw>Kaggle</kw>, which has about half a million <kw>data</kw> scientists on its <kw>platform</kw>, was founded by Goldbloom   and Ben Hamner in 2010. The <kw>service</kw> got an early start and even though it has a few competitors   like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its   specific niche. The <kw>service</kw> is basically the de facto home for running <kw>data science</kw>  and <kw>machine learning</kw>   competitions.  With <kw>Kaggle</kw>, <kw>Google</kw> is buying one of the largest and most active communities for   <kw>data</kw> scientists - and with that, it will get increased mindshare in this community, too   (though it already has plenty of that thanks to Tensorflow and other projects).   <kw>Kaggle</kw> has a bit of a history with <kw>Google</kw>, too, but that's pretty recent. Earlier this month,   <kw>Google</kw> and <kw>Kaggle</kw> teamed up to host a $100,000 <kw>machine learning</kw> competition around classifying   YouTube videos. That competition had some deep integrations with the <kw>Google</kw> Cloud <kw>Platform</kw>, too.   Our understanding is that <kw>Google</kw> will keep the <kw>service</kw> running - likely under its current name.   While the acquisition is probably more about Kaggle's community than technology, <kw>Kaggle</kw> did build   some interesting tools for hosting its competition and 'kernels', too. On <kw>Kaggle</kw>, kernels are   basically the source code for analyzing <kw>data</kw> sets and developers can share this code on the   <kw>platform</kw> (the company previously called them 'scripts').  Like similar competition-centric sites,   <kw>Kaggle</kw> also runs a job board, too. It's unclear what <kw>Google</kw> will do with that part of the <kw>service</kw>.   According to Crunchbase, <kw>Kaggle</kw> raised $12.5 million (though PitchBook says it's $12.75) since its   launch in 2010. Investors in <kw>Kaggle</kw> include Index Ventures, SV Angel, Max Levchin, Naval Ravikant,   <kw>Google</kw> chief economist Hal Varian, Khosla Ventures and Yuri Milner"
-
 
 # test_phraseless_example()
 # test_null_and_blank_example()
@@ -193,5 +193,6 @@ def test_n2_EN():
 # test_n3_EN()
 # test_n3_PT()
 # test_n1_EL()
-test_n1_AR()
-test_n2_EN()
+# test_n1_AR()
+for _ in tqdm.trange(1000):
+    test_n2_EN()

@@ -1,4 +1,4 @@
-FROM library/python:3.8-alpine
+FROM library/python:3.11-alpine
 
 # 换为国内源
 #RUN echo -e http://mirrors.tuna.tsinghua.edu.cn/alpine/v3.17/main/ > /etc/apk/repositories
@@ -14,10 +14,12 @@ RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh && \
     apk add build-base
 
+RUN python -m pip install --upgrade pip
 RUN pip install flasgger
 
 # install requirements first to engage docker cache
-RUN wget https://raw.githubusercontent.com/LIAAD/yake/master/requirements.txt -O requirements.txt
+# RUN wget https://raw.githubusercontent.com/LIAAD/yake/master/requirements.txt -O requirements.txt
+RUN wget https://github.com/Crazy-LittleBoy/yake/blob/master/requirements.txt -O requirements.txt
 RUN pip install -r requirements.txt
 
 # install yake via pip
