@@ -19,8 +19,11 @@ RUN pip install flasgger
 
 # install requirements first to engage docker cache
 # RUN wget https://raw.githubusercontent.com/LIAAD/yake/master/requirements.txt -O requirements.txt
-# RUN pip install git+https://github.moeyy.xyz/https://github.com/mopemope/meinheld.git
-RUN pip install git+https://github.moeyy.xyz/https://github.com/python-greenlet/greenlet.git
+#RUN #pip install greenlet==0.4.5
+#RUN pip install git+https://github.moeyy.xyz/https://github.com/python-greenlet/greenlet.git
+#RUN pip install meinheld
+#RUN pip install git+https://github.moeyy.xyz/https://github.com/mopemope/meinheld.git@1.0.2
+RUN pip install git+https://github.moeyy.xyz/https://github.com/idot/meinheld.git@2bfe452d6608c92688d92337c87b1dd6448f4ccb
 RUN wget https://raw.githubusercontent.com/Crazy-LittleBoy/yake/master/requirements.txt -O requirements.txt
 RUN pip install -r requirements.txt
 
