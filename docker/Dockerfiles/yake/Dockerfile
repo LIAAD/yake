@@ -17,7 +17,7 @@ RUN apk update && apk upgrade && \
 # install yake via pip
 RUN python -m pip install --upgrade pip
 #RUN pip install git+https://github.com/liaad/yake.git
-RUN pip install git+https://github.com/Crazy-LittleBoy/yake.git
+RUN pip install git+https://github.moeyy.xyz/https://github.com/Crazy-LittleBoy/yake.git
 
 # set default command
 ENTRYPOINT ["yake"]

@@ -24,7 +24,7 @@ RUN pip install -r requirements.txt
 
 # install yake via pip
 #RUN pip install git+https://github.com/liaad/yake.git
-RUN pip install git+https://github.com/Crazy-LittleBoy/yake.git
+RUN pip install git+https://github.moeyy.xyz/https://github.com/Crazy-LittleBoy/yake.git
 
 # Copy server startup script
 COPY ./yake-rest-api.py /temp

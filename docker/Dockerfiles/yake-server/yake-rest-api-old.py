@@ -13,7 +13,7 @@ instructions:
 
 open http://127.0.0.1:5000/apidocs/
 """
-import meinheld
+
 from flasgger import Swagger
 from flask import Flask, jsonify, request
 
@@ -138,7 +138,8 @@ def handle_yake():
         return jsonify(str(e)), HTTPStatus.BAD_REQUEST
 
 
+
+
+
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', debug=True)
-    meinheld.listen(("0.0.0.0", 5000))
-    meinheld.run(app)
+    app.run(host='0.0.0.0', debug=True)
