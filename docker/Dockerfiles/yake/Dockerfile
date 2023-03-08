@@ -16,6 +16,7 @@ RUN apk update && apk upgrade && \
 
 # install yake via pip
 RUN python -m pip install --upgrade pip
+RUN pip install git+https://github.moeyy.xyz/https://github.com/python-greenlet/greenlet.git
 #RUN pip install git+https://github.com/liaad/yake.git
 RUN pip install git+https://github.moeyy.xyz/https://github.com/Crazy-LittleBoy/yake.git
 
