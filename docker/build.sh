@@ -17,7 +17,7 @@ docker build -t "$YAKE_SERVER_IMAGE:$TAG" .
 #docker run -d -p 5000:5000 "multi-keywords/yake-server:fast"
 
 cd "$DIR/Dockerfiles/yake"
-docker build -t "$YAKE_IMAGE:$TAG" .
+docker build -t "$YAKE_IMAGE:$TAG"  .
 #docker run -d "$YAKE_IMAGE:$TAG"
 
 docker ps -a

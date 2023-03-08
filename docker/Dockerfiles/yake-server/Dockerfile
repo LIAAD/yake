@@ -18,6 +18,7 @@ RUN python -m pip install --upgrade pip
 RUN pip install flasgger
 
 # install requirements first to engage docker cache
+RUN pip install -U gunicorn
 # RUN wget https://raw.githubusercontent.com/LIAAD/yake/master/requirements.txt -O requirements.txt
 #RUN #pip install greenlet==0.4.5
 #RUN pip install git+https://github.moeyy.xyz/https://github.com/python-greenlet/greenlet.git
@@ -39,4 +40,5 @@ ENV SERVER_PORT 5000
 EXPOSE "$SERVER_PORT"
 
 # set default command
-CMD [ "python", "yake-rest-api.py" ]
+#CMD [ "python", "yake-rest-api.py" ]
+CMD ["gunicorn --workers=2 --worker-class='egg:meinheld#gunicorn_worker' yake-rest-api:app" ]
