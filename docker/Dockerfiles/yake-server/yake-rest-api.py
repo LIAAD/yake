@@ -138,7 +138,7 @@ def handle_yake():
         return jsonify(str(e)), HTTPStatus.BAD_REQUEST
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 #     # app.run(host='0.0.0.0', debug=True)
-#     meinheld.listen(("0.0.0.0", 5000))
-#     meinheld.run(app)
+    meinheld.listen(("0.0.0.0", 5000))
+    meinheld.run(app, threaded=True)

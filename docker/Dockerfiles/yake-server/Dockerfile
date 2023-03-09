@@ -41,4 +41,4 @@ EXPOSE "$SERVER_PORT"
 
 # set default command
 #CMD [ "python", "yake-rest-api.py" ]
-CMD ["gunicorn --workers=2 --worker-class='egg:meinheld#gunicorn_worker' yake-rest-api:app" ]
+CMD ["gunicorn --workers=2 --worker-class='meinheld.gmeinheld.MeinheldWorker' yake-rest-api:app"]
