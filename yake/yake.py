@@ -1,88 +1,139 @@
-# -*- coding: utf-8 -*-
+"""Module for keyword extraction from text documents."""
 
-"""Main module."""
-
-import string
 import os
+import string
 import jellyfish
 from .Levenshtein import Levenshtein
-
 from .datarepresentation import DataCore
 
-class KeywordExtractor(object):
 
-    def __init__(self, lan="en", n=3, dedupLim=0.9, dedupFunc='seqm', windowsSize=1, top=20, features=None, stopwords=None):
+class KeywordExtractor:
+    """Class to extract and process keywords from text."""
+    
+    def __init__(
+        self,
+        lan="en",
+        n=3,
+        dedup_lim=0.9,
+        dedup_func='seqm',
+        window_size=1,
+        top=20,
+        features=None,
+        stopwords=None
+    ):
+        """Initialize the KeywordExtractor with the given parameters.
+        
+        Args:
+            lan (str): Language code for stopwords
+            n (int): N-gram size
+            dedup_lim (float): Deduplication threshold
+            dedup_func (str): Deduplication function to use
+            window_size (int): Size of text window
+            top (int): Number of top keywords to return
+            features (list): Features to consider
+            stopwords (set): Custom stopwords set
+        """
         self.lan = lan
+        self.n = n
+        self.top = top
+        self.dedup_lim = dedup_lim
+        self.features = features
+        self.window_size = window_size
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
+        local_path = os.path.join(
+            "StopwordsList",
+            f"stopwords_{lan[:2].lower()}.txt"
+        )
 
-        local_path = os.path.join("StopwordsList", "stopwords_%s.txt" % lan[:2].lower())
-
-        if os.path.exists(os.path.join(dir_path,local_path)) == False:
+        if not os.path.exists(os.path.join(dir_path, local_path)):
             local_path = os.path.join("StopwordsList", "stopwords_noLang.txt")
         
-        resource_path = os.path.join(dir_path,local_path)
+        resource_path = os.path.join(dir_path, local_path)
 
         if stopwords is None:
             try:
-                with open(resource_path, encoding='utf-8') as stop_fil:
-                    self.stopword_set = set( stop_fil.read().lower().split("\n") )
-            except:
-                print('Warning, read stopword list as ISO-8859-1')
-                with open(resource_path, encoding='ISO-8859-1') as stop_fil:
-                    self.stopword_set = set( stop_fil.read().lower().split("\n") )
+                with open(resource_path, encoding='utf-8') as stop_file:
+                    self.stopword_set = set(stop_file.read().lower().split("\n"))
+            except UnicodeDecodeError:
+                print('Warning: reading stopword list as ISO-8859-1')
+                with open(resource_path, encoding='ISO-8859-1') as stop_file:
+                    self.stopword_set = set(stop_file.read().lower().split("\n"))
         else:
             self.stopword_set = set(stopwords)
 
-        self.n = n
-        self.top = top
-        self.dedupLim = dedupLim
-        self.features = features
-        self.windowsSize = windowsSize
-        if dedupFunc == 'jaro_winkler' or dedupFunc == 'jaro':
-            self.dedu_function = self.jaro
-        elif dedupFunc.lower() == 'sequencematcher' or dedupFunc.lower() == 'seqm':
-            self.dedu_function = self.seqm
+        # Set deduplication function
+        if dedup_func in ('jaro_winkler', 'jaro'):
+            self.dedup_function = self.jaro
+        elif dedup_func.lower() in ('sequencematcher', 'seqm'):
+            self.dedup_function = self.seqm
         else:
-            self.dedu_function = self.levs
+            self.dedup_function = self.levs
 
     def jaro(self, cand1, cand2):
-        return jellyfish.jaro_winkler(cand1, cand2 )
+        """Calculate Jaro-Winkler distance between candidates."""
+        return jellyfish.jaro_winkler(cand1, cand2)
 
     def levs(self, cand1, cand2):
-        return 1.-jellyfish.levenshtein_distance(cand1, cand2 ) / max(len(cand1),len(cand2))
+        """Calculate normalized Levenshtein distance."""
+        distance = jellyfish.levenshtein_distance(cand1, cand2)
+        return 1 - distance / max(len(cand1), len(cand2))
 
     def seqm(self, cand1, cand2):
+        """Calculate sequence matcher ratio."""
         return Levenshtein.ratio(cand1, cand2)
 
     def extract_keywords(self, text):
+        """Extract keywords from the given text.
+        
+        Args:
+            text (str): Input text to extract keywords from
+            
+        Returns:
+            list: List of tuples containing (keyword, score)
+        """
         try:
-            if not(len(text) > 0):
+            if not text:
                 return []
 
-            text = text.replace('\n\t',' ')
-            dc = DataCore(text=text, stopword_set=self.stopword_set, windowsSize=self.windowsSize, n=self.n)
+            text = text.replace('\n\t', ' ')
+            dc = DataCore(
+                text=text,
+                stopword_set=self.stopword_set,
+                windowsSize=self.window_size,
+                n=self.n
+            )
+            
             dc.build_single_terms_features(features=self.features)
             dc.build_mult_terms_features(features=self.features)
-            resultSet = []
-            todedup = sorted([cc for cc in dc.candidates.values() if cc.isValid()], key=lambda c: c.H)
+            
+            result_set = []
+            candidates_sorted = sorted(
+                [cc for cc in dc.candidates.values() if cc.isValid()],
+                key=lambda c: c.H
+            )
 
-            if self.dedupLim >= 1.:
-                return ([ (cand.unique_kw, cand.H) for cand in todedup])[:self.top]
+            if self.dedup_lim >= 1.0:
+                return [(cand.unique_kw, cand.H) for cand in candidates_sorted][:self.top]
 
-            for cand in todedup:
-                toadd = True
-                for (h, candResult) in resultSet:
-                    dist = self.dedu_function(cand.unique_kw, candResult.unique_kw)
-                    if dist > self.dedupLim:
-                        toadd = False
+            for cand in candidates_sorted:
+                should_add = True
+                for (h, cand_result) in result_set:
+                    dist = self.dedup_function(
+                        cand.unique_kw,
+                        cand_result.unique_kw
+                    )
+                    if dist > self.dedup_lim:
+                        should_add = False
                         break
-                if toadd:
-                    resultSet.append( (cand.H, cand) )
-                if len(resultSet) == self.top:
+                
+                if should_add:
+                    result_set.append((cand.H, cand))
+                if len(result_set) == self.top:
                     break
 
-            return [ (cand.kw,h) for (h,cand) in resultSet]
+            return [(cand.kw, h) for (h, cand) in result_set]
+            
         except Exception as e:
-            print(f"Warning! Exception: {e} generated by the following text: '{text}' ")
+            print(f"Warning! Exception: {e} generated by text: '{text}'")
             return []
