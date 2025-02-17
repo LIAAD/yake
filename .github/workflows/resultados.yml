@@ -40,6 +40,7 @@ jobs:
           else
             echo "❌ Alguns testes falharam! Verifique o log para mais detalhes."
             exit 1
+          fi
 
       - name: Upload test results (em caso de falha)
         if: failure()
