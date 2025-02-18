@@ -74,3 +74,7 @@ Status semana 14/02/2025   //////Refactoring score (3.21)
 Planos próxima semana
 
 - Avançar com refatorização e tratamento de problemas identificados pelo pylint.
+
+
+
+////// Refactoring score (3.57)
