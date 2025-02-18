@@ -30,14 +30,14 @@ import yake
 )
 @click.option(
     "-df", "--dedup_func", 
-    help="Deduplication function", 
-    default="seqm", 
+    help="Deduplication function",
+    default="seqm",
     type=click.Choice(["leve", "jaro", "seqm"]),
 )
 @click.option(
-    "-dl", "--dedup_lim", 
-    help="Deduplication limiar", 
-    default=0.9, 
+    "-dl", "--dedup_lim",
+    help="Deduplication limiar",
+    default=0.9,
     type=float,
 )
 @click.option(
@@ -64,7 +64,7 @@ def keywords(
 
     def run_yake(text_content):
         extractor = yake.KeywordExtractor(
-            lan=language, n=ngram_size, dedupLim=dedup_lim, 
+            lan=language, n=ngram_size, dedupLim=dedup_lim,
             dedupFunc=dedup_func, windowSize=window_size, top=top
         )
         results = extractor.extract_keywords(text_content)

@@ -20,7 +20,7 @@ def test_phraseless_example():
 
 def test_null_and_blank_example():
     pyake = yake.KeywordExtractor()
-    
+
     result = pyake.extract_keywords("")
     assert len(result) == 0
 

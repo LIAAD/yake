@@ -174,7 +174,6 @@ class YAKE(LoadFile):
             if use_stems:
                 words = sentence.stems
 
-            
             buffer = []
             # loop through words in sentence
             for j, word in enumerate(words):

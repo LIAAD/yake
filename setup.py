@@ -60,7 +60,7 @@ setup(
     version='0.4.8',
     description="Keyword extraction Python package",
     long_description=readme,
-    long_description_content_type='text/markdown',    
+    long_description_content_type='text/markdown', 
     url='https://pypi.python.org/pypi/yake',
     project_urls={
         'Documentation': 'https://liaad.github.io/yake/',

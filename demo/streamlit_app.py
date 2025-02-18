@@ -61,17 +61,17 @@ ents = []
 text_lower = text.lower()
 
 keywords_list = str(keywords[0][0])
-for m in re.finditer(keywords_list, text_lower): 
+for m in re.finditer(keywords_list, text_lower):
     d = dict(start = m.start(), end = m.end(), label = "")
     ents.append(d)
-    
+
 for i in range(1, len(keywords)):
     kwords = str(keywords[i][0])
     keywords_list += (', ' + kwords)
-    for m in re.finditer(kwords, text_lower): 
+    for m in re.finditer(kwords, text_lower):
         d = dict(start = m.start(), end = m.end(), label = "")
         ents.append(d)
-        
+      
 #sort the result by ents, as ent rule suggests
 sort_ents = sorted(ents, key=lambda x: x["start"])
 
@@ -91,15 +91,15 @@ elif result_view == "Table":
     #tabular data (columns: keywords, score)
     df = pd.DataFrame(keywords, columns=("keywords","score"))
     st.table(df)
-    
+  
 else:
     #create and generate a word cloud image
-    wordcloud = WordCloud(width = 1000, height = 600, max_font_size = 80, 
-                min_font_size=10, prefer_horizontal=1, 
+    wordcloud = WordCloud(width = 1000, height = 600, max_font_size = 80,
+                min_font_size=10, prefer_horizontal=1,
                 max_words=numOfKeywords,
-                background_color="white", 
-                collocations=False, 
-                regexp = r"\w[\w ']+").generate(keywords_list)
+                background_color="white",
+                collocations=False,
+                regexp = r"\w[\w ']+").generate(keywords_list),
 
     #display the generated image
     plt.imshow(wordcloud, interpolation='bilinear')
