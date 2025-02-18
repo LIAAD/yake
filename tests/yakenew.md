@@ -51,9 +51,26 @@ Nomes mais descritivos para variáveis temporárias
 
 
 
-Status 06/02/2025
+Status semanda 07/02/2025
 
 - Exploração das mencionadas ferramentas puppet e cheff.
-(Ferramentas que acabam por ser extremamente parecidas ao git actions, não considero que usá-las seja algo que vala a pena; visto que o github actions será mais intuitivo.)
+(Ferramentas que acabam por ser extremamente parecidas ao git actions, não considero que usá-las seja algo que vala a pena; visto que o github actions será mais intuitivo.) (04 e 05 /02/2025)
 
-- Criação de dataset para criar mais testes e poder aprofundar refatorização 
+- finalização da configuração do pylint (Git Action), que me deu uma série de "code smells" em vários ficheiros. (07/02/2025)
+
+pylint: Action capaz de avaliar um commit, analizando todos os ficheiros .py, num sistema de pontos de 0 a 10 realçando melhoramentos.
+
+Planos próxima semana:
+
+- Criação de novos testes e possivel automatização dos mesmos para puder aprofundar refatorização.
+  (de 9 a 11 pretendo acabar esta etapa), visto que viajo dia 14 e 15
+
+- Caso consigo tempo, começar a tratar de problemas identificados pelo pylint
+
+Status semana 14/02/2025
+
+- Automatização dos testes de resultados
+
+Planos próxima semana
+
+- Avançar com refatorização e tratamento de problemas identificados pelo pylint.
