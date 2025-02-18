@@ -14,11 +14,11 @@ class KeywordExtractor:
         lan="en",
         n=3,
         dedup_lim=0.9,
-        dedup_func='seqm',
+        dedup_func="seqm",
         window_size=1,
         top=20,
         features=None,
-        stopwords=None
+        stopwords=None,
     ):
         """Initialize the KeywordExtractor with the given parameters.
 
@@ -52,19 +52,19 @@ class KeywordExtractor:
 
         if stopwords is None:
             try:
-                with open(resource_path, encoding='utf-8') as stop_file:
+                with open(resource_path, encoding="utf-8") as stop_file:
                     self.stopword_set = set(stop_file.read().lower().split("\n"))
             except UnicodeDecodeError:
-                print('Warning: reading stopword list as ISO-8859-1')
-                with open(resource_path, encoding='ISO-8859-1') as stop_file:
+                print("Warning: reading stopword list as ISO-8859-1")
+                with open(resource_path, encoding="ISO-8859-1") as stop_file:
                     self.stopword_set = set(stop_file.read().lower().split("\n"))
         else:
             self.stopword_set = set(stopwords)
 
         # Set deduplication function
-        if dedup_func in ('jaro_winkler', 'jaro'):
+        if dedup_func in ("jaro_winkler", "jaro"):
             self.dedup_function = self.jaro
-        elif dedup_func.lower() in ('sequencematcher', 'seqm'):
+        elif dedup_func.lower() in ("sequencematcher", "seqm"):
             self.dedup_function = self.seqm
         else:
             self.dedup_function = self.levs
@@ -95,12 +95,12 @@ class KeywordExtractor:
             if not text:
                 return []
 
-            text = text.replace('\n\t', ' ')
+            text = text.replace("\n", " ")
             dc = DataCore(
                 text=text,
                 stopword_set=self.stopword_set,
                 windowsSize=self.window_size,
-                n=self.n
+                n=self.n,
             )
 
             dc.build_single_terms_features(features=self.features)
@@ -113,7 +113,9 @@ class KeywordExtractor:
             )
 
             if self.dedup_lim >= 1.0:
-                return [(cand.unique_kw, cand.H) for cand in candidates_sorted][:self.top]
+                return [(cand.unique_kw, cand.H) for cand in candidates_sorted][
+                    :self.top
+                    ]
 
             for cand in candidates_sorted:
                 should_add = True

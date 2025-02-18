@@ -51,7 +51,7 @@ Nomes mais descritivos para variáveis temporárias
 
 
 
-Status semanda 07/02/2025
+Status semanda 07/02/2025   //////Refactoring score (3.21)
 
 - Exploração das mencionadas ferramentas puppet e cheff.
 (Ferramentas que acabam por ser extremamente parecidas ao git actions, não considero que usá-las seja algo que vala a pena; visto que o github actions será mais intuitivo.) (04 e 05 /02/2025)
@@ -67,7 +67,7 @@ Planos próxima semana:
 
 - Caso consigo tempo, começar a tratar de problemas identificados pelo pylint
 
-Status semana 14/02/2025
+Status semana 14/02/2025   //////Refactoring score (3.21)
 
 - Automatização dos testes de resultados
 
