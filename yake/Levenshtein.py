@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 class Levenshtein:
     """Class for computing Levenshtein distance and similarity ratio."""
 
@@ -63,7 +64,7 @@ class Levenshtein:
                 matrix[x, y] = min(
                     matrix[x - 1, y] + 1,     # Deletion
                     matrix[x, y - 1] + 1,     # Insertion
-                    matrix[x - 1, y - 1] + cost  # Substitution
+                    matrix[x - 1, y - 1] + cost,  # Substitution
                 )
 
         return int(matrix[size_x - 1, size_y - 1])
