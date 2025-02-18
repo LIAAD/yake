@@ -3,15 +3,20 @@ import re
 DEFAULT_HIGHLIGHT_PRE = "<kw>"
 DEFAULT_HIGHLIGHT_POST = "</kw>"
 
-class TextHighlighter(object):
+class TextHighlighter():
 
-    def __init__(self, max_ngram_size, highlight_pre = DEFAULT_HIGHLIGHT_PRE, highlight_post = DEFAULT_HIGHLIGHT_POST):
+    def __init__(self, max_ngram_size,
+                highlight_pre = DEFAULT_HIGHLIGHT_PRE, highlight_post = DEFAULT_HIGHLIGHT_POST):
         """
         TextHighlighter constructor. Define highlight text snippets
 
-        :max_ngram_size - Specifies the maximum ngram size in the keywords.   
-        :highlight_pre – Specifies the text that should appear before a highlighted term.(e.g. <span>). It defaults to <kw>
-        :highlight_post –  Specifies the text that should appear after a highlighted term. (e.g. </span>). It defaults to </kw>
+        :max_ngram_size - Specifies the maximum ngram size in the keywords.
+           
+        :highlight_pre – Specifies the text that should appear before a highlighted term.(e.g. <span>).
+        It defaults to <kw>
+
+        :highlight_post –  Specifies the text that should appear after a highlighted term. (e.g. </span>).
+        It defaults to </kw>
         """
 
         self.highlight_pre = highlight_pre
@@ -25,10 +30,10 @@ class TextHighlighter(object):
 
         n_text = ''
         # extract only the kw
-        if(len(keywords) > 0):
+        if len(keywords) > 0:
             kw_list = keywords
 
-            if(type(keywords[0]) == tuple):
+            if isinstance(keywords[0], tuple):
                 kw_list = [x[0] for x in keywords]
 
             text = text.strip()
@@ -44,7 +49,7 @@ class TextHighlighter(object):
         relevant_words_array = [kw.lower() for kw in relevant_words_array]
         try:
             for tk in range(len(text_tokens)):
-                kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  text_tokens[tk])
+                kw = re.sub('[!",:.;?()]$|^[!",:.;?()]|\\W["!,:.;?()]', '',  text_tokens[tk])
                 if kw.lower() in relevant_words_array:
                     text_tokens[tk] = text_tokens[tk].replace(kw, self.highlight_pre + kw + self.highlight_post)
         except:
@@ -126,7 +131,7 @@ class TextHighlighter(object):
         for i in range(n_gram):
 
             temporary_list.append(text_tokens[y:y + i + 1])
-            k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\W["!,:.;?()]''', '',  ' '.join(temporary_list[i]))
+            k = re.sub('''[!",:.;?()]$|^[!",':.;?()]|\\W["!,:.;?()]''', '',  ' '.join(temporary_list[i]))
 
             if k.lower() in relevant_words_array:
                 temporary_list_two.append(k)
@@ -145,6 +150,6 @@ class TextHighlighter(object):
     def replace_token(self, text_tokens, y, n_gram_word_list):
         txt = ' '.join(text_tokens[y:y + len(n_gram_word_list[0].split(' '))])
 
-        new_expression = txt.replace(re.sub('[!",:.;?()]$|^[!",:.;?()]|\W["!,:.;?()]', '',  txt), self.highlight_pre + n_gram_word_list[0] + self.highlight_post)
+        new_expression = txt.replace(re.sub('[!",:.;?()]$|^[!",:.;?()]|\\W["!,:.;?()]', '',  txt), self.highlight_pre + n_gram_word_list[0] + self.highlight_post)
         y += len(n_gram_word_list[0].split(' '))
         return y, new_expression
