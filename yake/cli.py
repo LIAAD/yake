@@ -1,13 +1,14 @@
+"""CLI para extração de palavras-chave utilizando YAKE!"""
+
 import sys
 import click
 from tabulate import tabulate
 import yake
 
-
 @click.command()
 @click.option(
     "-ti", "--text_input",
-    help="Input text, SURROUNDED by single quotes(\')",
+    help="Input text, SURROUNDED by single quotes(')",
     required=False,
 )
 @click.option(
@@ -21,7 +22,6 @@ import yake
     help="Language",
     required=False,
 )
-
 @click.option(
     "-n", "--ngram_size",
     default=3,
@@ -40,7 +40,6 @@ import yake
     default=0.9, 
     type=float,
 )
-
 @click.option(
     "-ws", "--window_size",
     help="Window size",
@@ -58,8 +57,6 @@ import yake
     count=True,
     help="Verbose output",
 )
-
-
 def keywords(
     text_input, input_file, language, ngram_size, dedup_func, dedup_lim, window_size, top, verbose
 ):
@@ -68,7 +65,7 @@ def keywords(
     def run_yake(text_content):
         extractor = yake.KeywordExtractor(
             lan=language, n=ngram_size, dedupLim=dedup_lim, 
-            dedupFunc=dedup_func, windowsSize=window_size, top=top
+            dedupFunc=dedup_func, windowSize=window_size, top=top
         )
         results = extractor.extract_keywords(text_content)
 
@@ -88,9 +85,12 @@ def keywords(
     if text_input:
         run_yake(text_input)
     else:
-        with open(input_file, encoding="utf-8") as f:
-            run_yake(f.read())
-
+        try:
+            with open(input_file, encoding="utf-8") as f:
+                run_yake(f.read())
+        except FileNotFoundError:
+            print(f"File '{input_file}' not found.")
+            sys.exit(1)
 
 if __name__ == "__main__":
     keywords()
