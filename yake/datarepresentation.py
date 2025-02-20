@@ -1,19 +1,23 @@
+import re
+import string
+import math
+
 from segtok.segmenter import split_multi
 from segtok.tokenizer import web_tokenizer, split_contractions
 
 import networkx as nx
 import numpy as np
-import string
-import os
-import math
 import jellyfish
-import re
 
 STOPWORD_WEIGHT = 'bi'
 
 class DataCore(object):
     
-    def __init__(self, text, stopword_set, windowsSize, n, tagsToDiscard = set(['u', 'd']), exclude = set(string.punctuation)):
+    def __init__(self, text, stopword_set, windows_size, n, tags_to_discard=None, exclude=None):
+        if tags_to_discard is None:
+            tags_to_discard = set(['u', 'd'])
+        if exclude is None:
+            exclude = set(string.punctuation)
         self.number_of_sentences = 0
         self.number_of_words = 0
         self.terms = {}
@@ -22,12 +26,12 @@ class DataCore(object):
         self.sentences_str = []
         self.G = nx.DiGraph()
         self.exclude = exclude
-        self.tagsToDiscard = tagsToDiscard
+        self.tags_to_discard = tags_to_discard
         self.freq_ns = {}
         for i in range(n):
             self.freq_ns[i+1] = 0.
         self.stopword_set = stopword_set
-        self._build(text, windowsSize, n)
+        self._build(text, windows_size, n)
 
     def build_candidate(self, candidate_string):
         sentences_str = [w for w in split_contractions(web_tokenizer(candidate_string.lower())) if not (w.startswith("'") and len(w) > 1) and len(w) > 0]
@@ -38,14 +42,14 @@ class DataCore(object):
             if term_obj.tf == 0:
                 term_obj = None
             candidate_terms.append( (tag, word, term_obj) )
-        if len([cand for cand in candidate_terms if cand[2] != None]) == 0:
+        if len([cand for cand in candidate_terms if cand[2] is not None]) == 0:
             invalid_virtual_cand = composed_word(None)
             return invalid_virtual_cand
         virtual_cand = composed_word(candidate_terms)
         return virtual_cand
 
     # Build the datacore features
-    def _build(self, text, windowsSize, n):
+    def _build(self, text, windows_size, n):
         text = self.pre_filter(text)
         self.sentences_str = [ [w for w in split_contractions(web_tokenizer(s)) if not (w.startswith("'") and len(w) > 1) and len(w) > 0] for s in list(split_multi(text)) if len(s.strip()) > 0]
         self.number_of_sentences = len(self.sentences_str)
@@ -63,14 +67,14 @@ class DataCore(object):
                 else:
                     tag = self.getTag(word, pos_sent)
                     term_obj = self.getTerm(word)
-                    term_obj.addOccur(tag, sentence_id, pos_sent, pos_text)
+                    term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
                     pos_text += 1
 
                     #Create co-occurrence matrix
-                    if tag not in self.tagsToDiscard:
-                        word_windows = list(range( max(0, len(block_of_word_obj)-windowsSize), len(block_of_word_obj) ))
+                    if tag not in self.tags_to_discard:
+                        word_windows = list(range( max(0, len(block_of_word_obj)-windows_size), len(block_of_word_obj) ))
                         for w in word_windows:
-                            if block_of_word_obj[w][0] not in self.tagsToDiscard: 
+                            if block_of_word_obj[w][0] not in self.tags_to_discard: 
                                 self.addCooccur(block_of_word_obj[w][2], term_obj)
                     #Generate candidate keyphrase list
                     candidate = [ (tag, word, term_obj) ]
@@ -101,14 +105,14 @@ class DataCore(object):
         self.number_of_words = pos_text
 
     def build_single_terms_features(self, features=None):
-        validTerms = [ term for term in self.terms.values() if not term.stopword ]
-        validTFs = (np.array([ x.tf for x in validTerms ]))
+        valid_terms = [ term for term in self.terms.values() if not term.stopword ]
+        valid_tfs = (np.array([ x.tf for x in valid_terms ]))
 
-        if len(validTFs) == 0:
+        if len(valid_tfs) == 0:
             return
 
-        avgTF = validTFs.mean()
-        stdTF = validTFs.std()
+        avgTF = valid_tfs.mean()
+        stdTF = valid_tfs.std()
         maxTF = max([ x.tf for x in self.terms.values()])
         list(map(lambda x: x.updateH(maxTF=maxTF, avgTF=avgTF, stdTF=stdTF, number_of_sentences=self.number_of_sentences, features=features), self.terms.values()))
 
@@ -131,14 +135,16 @@ class DataCore(object):
             w2 = word.replace(",","")
             float(w2)
             return "d"
-        except:
+        except ValueError:
             cdigit = len([c for c in word if c.isdigit()])
             calpha = len([c for c in word if c.isalpha()])
-            if ( cdigit > 0 and calpha > 0 ) or (cdigit == 0 and calpha == 0) or len([c for c in word if c in self.exclude]) > 1:
+            if ( cdigit > 0 and calpha > 0 ) or (cdigit == 0 and calpha == 0) or len(
+                [c for c in word if c in self.exclude]) > 1:
                 return "u"
             if len(word) == len([c for c in word if c.isupper()]):
                 return "a"
-            if len([c for c in word if c.isupper()]) == 1 and len(word) > 1 and word[0].isupper() and i > 0:
+            if (len([c for c in word if c.isupper()]) == 1 and len(word) > 1 and 
+                word[0].isupper() and i > 0):
                 return "n"
         return "p"
 
@@ -183,10 +189,10 @@ class DataCore(object):
 
 class composed_word(object):
     def __init__(self, terms): # [ (tag, word, term_obj) ]
-        if terms == None:
-             self.start_or_end_stopwords = True
-             self.tags = set()
-             return
+        if terms is None:
+            self.start_or_end_stopwords = True
+            self.tags = set()
+            return
         self.tags = set([''.join([ w[0] for w in terms ])])
         self.kw = ' '.join( [ w[1] for w in terms ] )
         self.unique_kw = self.kw.lower()
@@ -194,7 +200,7 @@ class composed_word(object):
         self.terms = [ w[2] for w in terms if w[2] != None ]
         self.tf = 0.
         self.integrity = 1.
-        self.H = 1.
+        self.h = 1.
         self.start_or_end_stopwords = self.terms[0].stopword or self.terms[-1].stopword
 
     def uptadeCand(self, cand):
@@ -213,16 +219,20 @@ class composed_word(object):
         prod_f = np.prod(list_of_features)
         return ( sum_f, prod_f, prod_f /(sum_f + 1) )
 
-    def build_features(self, doc_id=None, keys=None, rel=True, rel_approx=True, isVirtual=False, features=['WFreq', 'WRel', 'tf', 'WCase', 'WPos', 'WSpread'], _stopword=[True, False]):
+    def build_features(self, doc_id=None, keys=None, rel=True, rel_approx=True, isVirtual=False, features=None, _stopword=None):
+        if features is None:
+            features = ['WFreq', 'WRel', 'tf', 'WCase', 'WPos', 'WSpread']
+        if _stopword is None:
+            _stopword = [True, False]
         columns = []
         seen = set()
         features_cand = []
 
-        if doc_id != None:
+        if doc_id is not None:
             columns.append('doc_id')
             features_cand.append(doc_id)
 
-        if keys != None:
+        if keys is not None:
             if rel:
                 columns.append('rel')
                 if self.unique_kw in keys or isVirtual:
@@ -235,7 +245,7 @@ class composed_word(object):
                 columns.append('rel_approx')
                 max_gold_ = ('', 0.)
                 for gold_key in keys:
-                    dist = 1.-jellyfish.levenshtein_distance(gold_key, self.unique_kw ) / max(len(gold_key), len(self.unique_kw)) # _tL
+                    dist = 1.-jellyfish.levenshtein_distance(gold_key, self.unique_kw) / max(len(gold_key), len(self.unique_kw)) # _tL
                     if max_gold_[1] < dist:
                         max_gold_ = ( gold_key, dist )
                 features_cand.append(max_gold_[1])
@@ -243,7 +253,7 @@ class composed_word(object):
         columns.append('kw')
         features_cand.append(self.unique_kw)
         columns.append('h')
-        features_cand.append(self.H)
+        features_cand.append(self.h)
         columns.append('tf')
         features_cand.append(self.tf)
         columns.append('size')
@@ -255,13 +265,13 @@ class composed_word(object):
 
             for discart_stopword in _stopword:
                 (f_sum, f_prod, f_sum_prod) = self.get_composed_feature(feature_name, discart_stopword=discart_stopword)
-                columns.append('%ss_sum_K%s' % ('n' if discart_stopword else '', feature_name) )
+                columns.append(f"{'n' if discart_stopword else ''}s_sum_K{feature_name}")
                 features_cand.append(f_sum)
 
-                columns.append('%ss_prod_K%s' % ('n' if discart_stopword else '', feature_name) )
+                columns.append(f"{'n' if discart_stopword else ''}s_prod_K{feature_name}")
                 features_cand.append(f_prod)
 
-                columns.append('%ss_sum_prod_K%s' % ('n' if discart_stopword else '', feature_name) )
+                columns.append(f"{'n' if discart_stopword else ''}s_sum_prod_K{feature_name}")
                 features_cand.append(f_sum_prod)
 
         return (features_cand, columns, seen)
@@ -272,36 +282,36 @@ class composed_word(object):
 
         for (t, term_base) in enumerate(self.terms):
             if not term_base.stopword:
-                sum_H += term_base.H
-                prod_H *= term_base.H
+                sum_H += term_base.h
+                prod_H *= term_base.h
 
             else:
                 if STOPWORD_WEIGHT == 'bi':
                     prob_t1 = 0.
-                    if term_base.G.has_edge(self.terms[t-1].id, self.terms[ t ].id):
-                        prob_t1 = term_base.G[self.terms[t-1].id][self.terms[ t ].id]["TF"] / self.terms[t-1].tf
-
+                    if t > 0 and term_base.G.has_edge(self.terms[t-1].id, self.terms[t].id):
+                        prob_t1 = term_base.G[self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf
+                    
                     prob_t2 = 0.
-                    if term_base.G.has_edge(self.terms[ t ].id, self.terms[t+1].id):
-                        prob_t2 = term_base.G[self.terms[ t ].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
+                    if t < len(self.terms) - 1 and term_base.G.has_edge(self.terms[t].id, self.terms[t+1].id):
+                        prob_t2 = term_base.G[self.terms[t].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
 
                     prob = prob_t1 * prob_t2
                     prod_H *= (1 + (1 - prob ) )
                     sum_H -= (1 - prob)
                 elif STOPWORD_WEIGHT == 'h':
-                    sum_H += term_base.H
-                    prod_H *= term_base.H
+                    sum_H += term_base.h
+                    prod_H *= term_base.h
                 elif STOPWORD_WEIGHT == 'none':
                     pass
 
         tf_used = 1.
-        if features == None or "KPF" in features:
+        if features is None or "KPF" in features:
             tf_used = self.tf
 
         if isVirtual:
             tf_used = np.mean( [term_obj.tf for term_obj in self.terms] )
 
-        self.H = prod_H / ( ( sum_H + 1 ) * tf_used )
+        self.h = prod_H / ( ( sum_H + 1 ) * tf_used )
 
     def updateH_old(self, features=None, isVirtual=False):
         sum_H  = 0.
@@ -324,14 +334,14 @@ class composed_word(object):
                 prod_H *= (1 + (1 - prob ) )
                 sum_H -= (1 - prob)
             else:
-                sum_H += term_base.H
-                prod_H *= term_base.H
+                sum_H += term_base.h
+                prod_H *= term_base.h
         tf_used = 1.
         if features == None or "KPF" in features:
             tf_used = self.tf
         if isVirtual:
             tf_used = np.mean( [term_obj.tf for term_obj in self.terms] )
-        self.H = prod_H / ( ( sum_H + 1 ) * tf_used )
+        self.h = prod_H / ( ( sum_H + 1 ) * tf_used )
 
 
 class single_word(object):
@@ -350,7 +360,7 @@ class single_word(object):
         self.occurs = {}
         self.WPos = 1.0
         self.WSpread = 0.0
-        self.H = 0.0
+        self.h = 0.0
         self.stopword = False
         self.G = graph
 
@@ -362,24 +372,24 @@ class single_word(object):
             self.PR = self.WDR / maxTF
             self.WRel = ( (0.5 + (self.PWL * (self.tf / maxTF) + self.PL)) + (0.5 + (self.PWR * (self.tf / maxTF) + self.PR)) )"""
 
-        if features == None or "WRel" in features:
+        if features is None or "WRel" in features:
             self.PL = self.WDL / maxTF
             self.PR = self.WDR / maxTF
             self.WRel = ( (0.5 + (self.PWL * (self.tf / maxTF))) + (0.5 + (self.PWR * (self.tf / maxTF))) )
 
-        if features == None or "WFreq" in features:
+        if features is None or "WFreq" in features:
             self.WFreq = self.tf / (avgTF + stdTF)
         
-        if features == None or "WSpread" in features:
+        if features is None or "WSpread" in features:
             self.WSpread = len(self.occurs) / number_of_sentences
         
-        if features == None or "WCase" in features:
+        if features is None or "WCase" in features:
             self.WCase = max(self.tf_a, self.tf_n) / (1. + math.log(self.tf))
         
-        if features == None or "WPos" in features:
+        if features is None or "WPos" in features:
             self.WPos = math.log( math.log( 3. + np.median(list(self.occurs.keys())) ) )
 
-        self.H = (self.WPos * self.WRel) / (self.WCase + (self.WFreq / self.WRel) + (self.WSpread / self.WRel))
+        self.h = (self.WPos * self.WRel) / (self.WCase + (self.WFreq / self.WRel) + (self.WSpread / self.WRel))
         
     @property
     def WDR(self):
@@ -394,24 +404,46 @@ class single_word(object):
         wir = self.WIR
         if wir == 0:
             return 0
-        return self.WDR / wir 
-    
+        return self.WDR / wir
+   
     @property
     def WDL(self):
+        """
+        Calculate the number of incoming edges for the node.
+
+        Returns:
+            int: The number of incoming edges for the node.
+        """
         return len( self.G.in_edges(self.id) )
 
     @property
     def WIL(self):
-        return sum( [ d['TF'] for (u,v,d) in self.G.in_edges(self.id, data=True) ] )
+        """
+        Calculate the sum of term frequencies for incoming edges.
+        """
+        return sum(d['TF'] for (_, _, d) in self.G.in_edges(self.id, data=True))
 
     @property
     def PWL(self):
-        wil = self.WIL
-        if wil == 0:
+        WIL = self.WIL
+        if WIL == 0:
             return 0
-        return self.WDL / wil 
+        return self.WDL / WIL
 
-    def addOccur(self, tag, sent_id, pos_sent, pos_text):
+    def add_occur(self, tag, sent_id, pos_sent, pos_text):
+        """
+        Adds an occurrence of a tag in a sentence to the internal data structure.
+        Args:
+            tag (str): The tag associated with the occurrence (e.g., 'a' or 'n').
+            sent_id (int): The ID of the sentence where the occurrence is found.
+            pos_sent (int): The position of the occurrence within the sentence.
+            pos_text (int): The position of the occurrence within the entire text.
+        Updates:
+            self.occurs (dict): Adds the occurrence position to the list for the given sentence ID.
+            self.tf (float): Increments the term frequency counter.
+            self.tf_a (float): Increments the term frequency counter for tag 'a' if applicable.
+            self.tf_n (float): Increments the term frequency counter for tag 'n' if applicable.
+        """
         if sent_id not in self.occurs:
             self.occurs[sent_id] = []
 

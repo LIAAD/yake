@@ -1,4 +1,5 @@
 import re
+import logging
 
 DEFAULT_HIGHLIGHT_PRE = "<kw>"
 DEFAULT_HIGHLIGHT_POST = "</kw>"
@@ -27,7 +28,9 @@ class TextHighlighter:
         Highlights keywords in the given text.
 
         :param text: The original text to be processed.
-        :param keywords: A list of keywords to highlight. Each keyword can be a string or a tuple where the first element is the keyword.
+        :param keywords: A list of keywords to highlight.
+        Each keyword can be a string or a tuple where the first element is the keyword.
+        
         :return: The text with highlighted keywords.
         """
         n_text = ""
@@ -47,17 +50,16 @@ class TextHighlighter:
         text_tokens = text.replace("\n", " ").split(" ")
         relevant_words_array = [kw.lower() for kw in relevant_words_array]
         try:
-            for tk in range(len(text_tokens)):
+            for tk, token in enumerate(text_tokens):
                 kw = re.sub(
-                    r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '', text_tokens[tk]
+                    r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '', token
                 )
                 if kw.lower() in relevant_words_array:
-                    text_tokens[tk] = text_tokens[tk].replace(
+                    text_tokens[tk] = token.replace(
                         kw, f"{self.highlight_pre}{kw}{self.highlight_post}"
                     )
         except re.error as e:
-            import logging
-            logging.error(f"Regex error: {e}")
+            logging.error("Regex error: %s", e)
         return " ".join(text_tokens)
 
     def format_n_gram_text(self, text, relevant_words_array, n_gram):
@@ -132,7 +134,7 @@ class TextHighlighter:
                                         text_tokens, y, term_list
                                     )
                                     final_splited_text.append(new_expression)
-                            except Exception as e:
+                            except ValueError as e:
                                 print(f"Error: {e}")
                                 term_list = [temporal_kw]
                                 y, new_expression = self.replace_token(
