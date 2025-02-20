@@ -23,7 +23,13 @@ class TextHighlighter:
         self.max_ngram_size = max_ngram_size
 
     def highlight(self, text, keywords):
-        """Returns the highlighted text snippets of matching text in the original data."""
+        """
+        Highlights keywords in the given text.
+
+        :param text: The original text to be processed.
+        :param keywords: A list of keywords to highlight. Each keyword can be a string or a tuple where the first element is the keyword.
+        :return: The text with highlighted keywords.
+        """
         n_text = ""
         if len(keywords) > 0:
             kw_list = keywords
@@ -32,7 +38,7 @@ class TextHighlighter:
             text = text.strip()
             if self.max_ngram_size == 1:
                 n_text = self.format_one_gram_text(text, kw_list)
-            elif self.max_ngram_size > 1:
+            else:
                 n_text = self.format_n_gram_text(text, kw_list, self.max_ngram_size)
         return n_text
 
@@ -49,8 +55,9 @@ class TextHighlighter:
                     text_tokens[tk] = text_tokens[tk].replace(
                         kw, f"{self.highlight_pre}{kw}{self.highlight_post}"
                     )
-        except Exception:
-            pass
+        except re.error as e:
+            import logging
+            logging.error(f"Regex error: {e}")
         return " ".join(text_tokens)
 
     def format_n_gram_text(self, text, relevant_words_array, n_gram):
@@ -70,7 +77,9 @@ class TextHighlighter:
 
             if n_gram_word_list:
                 if len(n_gram_word_list[0].split(" ")) == 1:
-                    y, new_expression = self.replace_token(text_tokens, y, n_gram_word_list)
+                    y, new_expression = self.replace_token(
+                        text_tokens, y, n_gram_word_list
+                    )
                     final_splited_text.append(new_expression)
                 else:
                     kw_list = []
@@ -79,7 +88,8 @@ class TextHighlighter:
 
                     for len_kw in range(len(splited_one)):
                         kw_list, splited_n_gram_kw_list = self.find_more_relevant(
-                            y + len_kw, text_tokens, n_gram, relevant_words_array, kw_list, splited_n_gram_kw_list
+                            y + len_kw, text_tokens, n_gram,
+                            relevant_words_array, kw_list, splited_n_gram_kw_list
                         )
 
                     min_score_word = min(
@@ -88,13 +98,17 @@ class TextHighlighter:
 
                     if kw_list.index(min_score_word) == 0:
                         term_list = [min_score_word]
-                        y, new_expression = self.replace_token(text_tokens, y, term_list)
+                        y, new_expression = self.replace_token(
+                            text_tokens, y, term_list
+                        )
                         final_splited_text.append(new_expression)
                     elif kw_list.index(min_score_word) >= 1:
                         index_of_more_relevant = splited_n_gram_kw_list[0].index(
                             min_score_word.split()[0]
                         )
-                        temporal_kw = " ".join(splited_n_gram_kw_list[0][:index_of_more_relevant])
+                        temporal_kw = " ".join(
+                            splited_n_gram_kw_list[0][:index_of_more_relevant]
+                        )
 
                         if temporal_kw in relevant_words_array:
                             try:
@@ -108,21 +122,30 @@ class TextHighlighter:
                                     term_list = [combined_kw]
                                     del final_splited_text[-1]
                                     y -= 1
-                                    y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                    y, new_expression = self.replace_token(
+                                        text_tokens, y, term_list
+                                    )
                                     final_splited_text.append(new_expression)
                                 else:
                                     term_list = [temporal_kw]
-                                    y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                    y, new_expression = self.replace_token(
+                                        text_tokens, y, term_list
+                                    )
                                     final_splited_text.append(new_expression)
-                            except:
+                            except Exception as e:
+                                print(f"Error: {e}")
                                 term_list = [temporal_kw]
-                                y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                y, new_expression = self.replace_token(
+                                    text_tokens, y, term_list
+                                )
                                 final_splited_text.append(new_expression)
                         else:
                             for tmp_kw in splited_n_gram_kw_list[0][:index_of_more_relevant]:
                                 if tmp_kw in relevant_words_array:
                                     term_list = [tmp_kw]
-                                    y, new_expression = self.replace_token(text_tokens, y, term_list)
+                                    y, new_expression = self.replace_token(
+                                        text_tokens, y, term_list
+                                    )
                                     final_splited_text.append(new_expression)
                                 else:
                                     final_splited_text.append(text_tokens[y])
@@ -130,6 +153,7 @@ class TextHighlighter:
             else:
                 final_splited_text.append(text_tokens[y])
                 y += 1
+
         return " ".join(final_splited_text)
 
     def find_more_relevant(
@@ -139,9 +163,11 @@ class TextHighlighter:
         temporary_list = []
         temporary_list_two = []
         for i in range(n_gram):
-            temporary_list.append(text_tokens[y : y + i + 1])
+            temporary_list.append(text_tokens[y: y + i + 1])
             k = re.sub(
-                r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '', " ".join(temporary_list[i])
+                r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '', " ".join(
+                    temporary_list[i]
+                )
             )
             if k.lower() in relevant_words_array:
                 temporary_list_two.append(k)
@@ -156,8 +182,10 @@ class TextHighlighter:
 
     def replace_token(self, text_tokens, y, n_gram_word_list):
         """Replaces tokens in text with highlighted versions."""
-        txt = " ".join(text_tokens[y : y + len(n_gram_word_list[0].split(" "))])
-        kw_cleaned = re.sub(r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', "", txt)
+        txt = " ".join(text_tokens[y: y + len(n_gram_word_list[0].split(" "))])
+        kw_cleaned = re.sub(
+            r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', "", txt
+        )
         new_expression = txt.replace(
             kw_cleaned, f"{self.highlight_pre}{n_gram_word_list[0]}{self.highlight_post}"
         )
