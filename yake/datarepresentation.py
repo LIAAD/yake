@@ -215,11 +215,20 @@ class composed_word(object):
 
     def get_composed_feature(self, feature_name, discart_stopword=True):
         list_of_features = [ getattr(term, feature_name) for term in self.terms if ( discart_stopword and not term.stopword ) or not discart_stopword ]
-        sum_f  = sum(list_of_features)
+        sum_f = sum(list_of_features)
         prod_f = np.prod(list_of_features)
-        return ( sum_f, prod_f, prod_f /(sum_f + 1) )
+        return (sum_f, prod_f, prod_f / (sum_f + 1))
 
-    def build_features(self, doc_id=None, keys=None, rel=True, rel_approx=True, isVirtual=False, features=None, _stopword=None):
+    def build_features(
+        self,
+        doc_id = None,
+        keys = None,
+        rel = True,
+        rel_approx = True,
+        isVirtual = False,
+        features = None,
+        _stopword = None,
+        ):
         if features is None:
             features = ['WFreq', 'WRel', 'tf', 'WCase', 'WPos', 'WSpread']
         if _stopword is None:
@@ -264,7 +273,8 @@ class composed_word(object):
         for feature_name in features:
 
             for discart_stopword in _stopword:
-                (f_sum, f_prod, f_sum_prod) = self.get_composed_feature(feature_name, discart_stopword=discart_stopword)
+                (f_sum, f_prod, f_sum_prod) = self.get_composed_feature(
+                    feature_name, discart_stopword=discart_stopword)
                 columns.append(f"{'n' if discart_stopword else ''}s_sum_K{feature_name}")
                 features_cand.append(f_sum)
 
@@ -277,30 +287,33 @@ class composed_word(object):
         return (features_cand, columns, seen)
 
     def updateH(self, features=None, isVirtual=False):
-        sum_H  = 0.
-        prod_H = 1.
+        sum_h  = 0.
+        prod_h = 1.
 
         for (t, term_base) in enumerate(self.terms):
             if not term_base.stopword:
-                sum_H += term_base.h
-                prod_H *= term_base.h
+                sum_h += term_base.h
+                prod_h *= term_base.h
 
             else:
                 if STOPWORD_WEIGHT == 'bi':
                     prob_t1 = 0.
-                    if t > 0 and term_base.G.has_edge(self.terms[t-1].id, self.terms[t].id):
-                        prob_t1 = term_base.G[self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf
-                    
+                    if t > 0 and term_base.G.has_edge(
+                        self.terms[t-1].id, self.terms[t].id):
+                        prob_t1 = term_base.G[
+                            self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf                 
                     prob_t2 = 0.
-                    if t < len(self.terms) - 1 and term_base.G.has_edge(self.terms[t].id, self.terms[t+1].id):
-                        prob_t2 = term_base.G[self.terms[t].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
+                    if t < len(self.terms) - 1 and term_base.G.has_edge(
+                        self.terms[t].id, self.terms[t+1].id):
+                        prob_t2 = term_base.G[
+                            self.terms[t].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
 
                     prob = prob_t1 * prob_t2
-                    prod_H *= (1 + (1 - prob ) )
-                    sum_H -= (1 - prob)
+                    prod_h *= (1 + (1 - prob ) )
+                    sum_h -= (1 - prob)
                 elif STOPWORD_WEIGHT == 'h':
-                    sum_H += term_base.h
-                    prod_H *= term_base.h
+                    sum_h += term_base.h
+                    prod_h *= term_base.h
                 elif STOPWORD_WEIGHT == 'none':
                     pass
 
@@ -311,11 +324,11 @@ class composed_word(object):
         if isVirtual:
             tf_used = np.mean( [term_obj.tf for term_obj in self.terms] )
 
-        self.h = prod_H / ( ( sum_H + 1 ) * tf_used )
+        self.h = prod_h / ( ( sum_h + 1 ) * tf_used )
 
     def updateH_old(self, features=None, isVirtual=False):
-        sum_H  = 0.
-        prod_H = 1.
+        sum_h  = 0.
+        prod_h = 1.
 
         for (t, term_base) in enumerate(self.terms):
             if isVirtual and term_base.tf==0:
@@ -324,24 +337,26 @@ class composed_word(object):
             if term_base.stopword:
                 prob_t1 = 0.
                 if term_base.G.has_edge(self.terms[t-1].id, self.terms[ t ].id):
-                    prob_t1 = term_base.G[self.terms[t-1].id][self.terms[ t ].id]["TF"] / self.terms[t-1].tf
+                    prob_t1 = term_base.G[
+                        self.terms[t-1].id][self.terms[ t ].id]["TF"] / self.terms[t-1].tf
 
                 prob_t2 = 0.
                 if term_base.G.has_edge(self.terms[ t ].id, self.terms[t+1].id):
-                    prob_t2 = term_base.G[self.terms[ t ].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
+                    prob_t2 = term_base.G[
+                        self.terms[ t ].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
 
                 prob = prob_t1 * prob_t2
-                prod_H *= (1 + (1 - prob ) )
-                sum_H -= (1 - prob)
+                prod_h *= (1 + (1 - prob ) )
+                sum_h -= (1 - prob)
             else:
-                sum_H += term_base.h
-                prod_H *= term_base.h
+                sum_h += term_base.h
+                prod_h *= term_base.h
         tf_used = 1.
-        if features == None or "KPF" in features:
+        if features is None or "KPF" in features:
             tf_used = self.tf
         if isVirtual:
             tf_used = np.mean( [term_obj.tf for term_obj in self.terms] )
-        self.h = prod_H / ( ( sum_H + 1 ) * tf_used )
+        self.h = prod_h / ( ( sum_h + 1 ) * tf_used )
 
 
 class single_word(object):
@@ -375,7 +390,10 @@ class single_word(object):
         if features is None or "WRel" in features:
             self.PL = self.WDL / maxTF
             self.PR = self.WDR / maxTF
-            self.WRel = ( (0.5 + (self.PWL * (self.tf / maxTF))) + (0.5 + (self.PWR * (self.tf / maxTF))) )
+            self.WRel = (
+                (0.5 + (self.PWL * (self.tf / maxTF))) +
+                (0.5 + (self.PWR * (self.tf / maxTF)))
+            )
 
         if features is None or "WFreq" in features:
             self.WFreq = self.tf / (avgTF + stdTF)

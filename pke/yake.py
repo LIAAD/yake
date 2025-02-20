@@ -83,7 +83,7 @@ class YAKE(LoadFile):
         self.surface_to_lexical = {}
         """ Mapping from surface form to lexical form. """
 
-    def candidate_selection(self, n=3, stoplist=None, **kwargs):
+    def candidate_selection(self, n=3, stoplist=None):
         """Select 1-3 grams as keyphrase candidates. Candidates beginning or
         ending with a stopword are filtered out. Words that do not contain
         at least one alpha-numeric character are not allowed.
@@ -165,7 +165,7 @@ class YAKE(LoadFile):
         #   (this is important to avoid consider cooccurrence between terms like word1 and word2 on sentence "word1, word2")
 
         # loop through sentences
-        for i, sentence in enumerate(self.sentences):
+        for sentence in enumerate(self.sentences):
 
             # lowercase the words
             words = [w.lower() for w in sentence.words]
@@ -176,7 +176,7 @@ class YAKE(LoadFile):
 
             buffer = []
             # loop through words in sentence
-            for j, word in enumerate(words):
+            for word in enumerate(words):
 
                 # skip if word is not in vocabulary
                 if word not in self.words:
@@ -262,7 +262,7 @@ class YAKE(LoadFile):
             # Uppercase/Acronym Term Frequencies
             self.features[word]['TF_A'] = 0
             self.features[word]['TF_U'] = 0
-            for (offset, shift, sent_id, surface_form) in self.words[word]:
+            for (offset, shift, surface_form) in self.words[word]:
                 if surface_form.isupper() and len(word) > 1:
                     self.features[word]['TF_A'] += 1
                 elif surface_form[0].isupper() and offset != shift:
@@ -356,10 +356,6 @@ class YAKE(LoadFile):
                     sum_  = 0.
                     for j, word_cand in enumerate(words_cand):
                         if self.features[word_cand]['isstop']:
-                            """
-                                self.contexts[word][0].append(w) # left
-                                self.contexts[w][1].append(word) # right
-                            """
                             term_left  = words_cand[j-1]
                             term_right = words_cand[j+1]
                             term_stop  = word_cand
@@ -402,8 +398,7 @@ class YAKE(LoadFile):
     def get_n_best(self,
                    n=10,
                    redundancy_removal=True,
-                   stemming=False,
-                   threshold=0.8):
+                   stemming=False,):
         """ Returns the n-best candidates given the weights.
 
             Args:
