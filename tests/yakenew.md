@@ -77,4 +77,4 @@ Planos próxima semana
 
 
 
-////// Refactoring score (3.21) -> (3.85) 18/02/2025
+////// Refactoring score (3.21) -> (3.94) 18/02/2025
