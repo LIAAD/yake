@@ -108,7 +108,7 @@ class KeywordExtractor:
 
             result_set = []
             candidates_sorted = sorted(
-                [cc for cc in dc.candidates.values() if cc.isValid()],
+                [cc for cc in dc.candidates.values() if cc.is_valid()],
                 key=lambda c: c.h
             )
 

@@ -11,7 +11,7 @@ import jellyfish
 
 STOPWORD_WEIGHT = 'bi'
 
-class DataCore(object):
+class DataCore():
     def __init__(self, text, stopword_set, windows_size, n, tags_to_discard=None, exclude=None):
         if tags_to_discard is None:
             tags_to_discard = set(['u', 'd'])
@@ -33,7 +33,9 @@ class DataCore(object):
         self._build(text, windows_size, n)
 
     def build_candidate(self, candidate_string):
-        sentences_str = [w for w in split_contractions(web_tokenizer(candidate_string.lower())) if not (w.startswith("'") and len(w) > 1) and len(w) > 0]
+        sentences_str = [w for w in split_contractions(
+            web_tokenizer(candidate_string.lower())) if not
+                        (w.startswith("'") and len(w) > 1) and len(w) > 0]
         candidate_terms = []
         for (i, word) in enumerate(sentences_str):
             tag = self.getTag(word, i)
@@ -77,9 +79,9 @@ class DataCore(object):
                     if tag not in self.tags_to_discard:
                         word_windows = list(
                             range( max(0, len(block_of_word_obj)-windows_size),
-                                  len(block_of_word_obj) ))
+                                len(block_of_word_obj) ))
                         for w in word_windows:
-                            if block_of_word_obj[w][0] not in self.tags_to_discard: 
+                            if block_of_word_obj[w][0] not in self.tags_to_discard:
                                 self.addCooccur(block_of_word_obj[w][2], term_obj)
                     #Generate candidate keyphrase list
                     candidate = [ (tag, word, term_obj) ]
@@ -119,7 +121,7 @@ class DataCore(object):
 
         avgTF = valid_tfs.mean()
         stdTF = valid_tfs.std()
-        maxTF = max([ x.tf for x in self.terms.values()])
+        maxTF = max(x.tf for x in self.terms.values())
         list(map(lambda x: x.update_h(
             maxTF=maxTF, avgTF=avgTF,
             stdTF=stdTF, number_of_sentences=self.number_of_sentences,
@@ -127,7 +129,7 @@ class DataCore(object):
 
     def build_mult_terms_features(self, features=None):
         list(map(lambda x: x.update_h(features=features),
-                [cand for cand in self.candidates.values() if cand.isValid()]))
+                [cand for cand in self.candidates.values() if cand.is_valid()]))
 
     def pre_filter(self, text):
         prog = re.compile("^(\\s*([A-Z]))")
@@ -197,7 +199,7 @@ class DataCore(object):
         self.candidates[cand.unique_kw].tf += 1.
 
 
-class ComposedWord(object):
+class ComposedWord():
     def __init__(self, terms): # [ (tag, word, term_obj) ]
         if terms is None:
             self.start_or_end_stopwords = True
@@ -207,7 +209,7 @@ class ComposedWord(object):
         self.kw = ' '.join( [ w[1] for w in terms ] )
         self.unique_kw = self.kw.lower()
         self.size = len(terms)
-        self.terms = [ w[2] for w in terms if w[2] != None ]
+        self.terms = [ w[2] for w in terms if w[2] is not None ]
         self.tf = 0.
         self.integrity = 1.
         self.h = 1.
@@ -217,14 +219,15 @@ class ComposedWord(object):
         for tag in cand.tags:
             self.tags.add( tag )
 
-    def isValid(self):
-        isValid = False
+    def is_valid(self):
+        is_valid = False
         for tag in self.tags:
-            isValid = isValid or ( "u" not in tag and "d" not in tag )
-        return isValid and not self.start_or_end_stopwords
+            is_valid = is_valid or ( "u" not in tag and "d" not in tag )
+        return is_valid and not self.start_or_end_stopwords
 
     def get_composed_feature(self, feature_name, discart_stopword=True):
-        list_of_features = [ getattr(term, feature_name) for term in self.terms if ( discart_stopword and not term.stopword ) or not discart_stopword ]
+        list_of_features = [ getattr(term, feature_name) for term in self.terms
+                            if ( discart_stopword and not term.stopword ) or not discart_stopword ]
         sum_f = sum(list_of_features)
         prod_f = np.prod(list_of_features)
         return (sum_f, prod_f, prod_f / (sum_f + 1))
@@ -370,7 +373,7 @@ class ComposedWord(object):
         self.h = prod_h / ( ( sum_h + 1 ) * tf_used )
 
 
-class SingleWord(object):
+class SingleWord():
 
     def __init__(self, unique, idx, graph):
         self.unique_term = unique
@@ -428,7 +431,7 @@ class SingleWord(object):
 
     @property
     def WIR(self):
-        return sum( [ d['TF'] for (u,v,d) in self.G.out_edges(self.id, data=True) ] )
+        return sum(d['TF'] for (_, _, d) in self.G.out_edges(self.id, data=True))
 
     @property
     def PWR(self):
@@ -436,7 +439,7 @@ class SingleWord(object):
         if wir == 0:
             return 0
         return self.WDR / wir
-   
+
     @property
     def WDL(self):
         """

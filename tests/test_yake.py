@@ -3,7 +3,6 @@
 
 """Tests for yake package."""
 
-import pytest
 
 from click.testing import CliRunner
 
