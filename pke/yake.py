@@ -198,10 +198,10 @@ class YAKE(LoadFile):
             1. CASING: gives importance to acronyms or words starting with a
                capital letter.
 
-               CASING(w) = max(TF(U(w)), TF(A(w))) / (1 + log(TF(w)))
+               CASING(w) = max(tf(U(w)), tf(A(w))) / (1 + log(tf(w)))
 
-               with TF(U(w) being the # times the word starts with an uppercase
-               letter, excepts beginning of sentences. TF(A(w)) is the # times
+               with tf(U(w) being the # times the word starts with an uppercase
+               letter, excepts beginning of sentences. tf(A(w)) is the # times
                the word is marked as an acronym.
 
             2. POSITION: gives importance to words occurring at the beginning of
@@ -214,15 +214,15 @@ class YAKE(LoadFile):
 
             3. FREQUENCY: gives importance to frequent words.
 
-               FREQUENCY(w) = TF(w) / ( MEAN_TF + STD_TF)
+               FREQUENCY(w) = tf(w) / ( MEAN_tf + STD_tf)
 
-               with MEAN_TF and STD_TF computed on valid_tfs which are words
+               with MEAN_tf and STD_tf computed on valid_tfs which are words
                that are not stopwords.
 
             4. RELATEDNESS: gives importance to words that do not have the
                characteristics of stopwords.
 
-               RELATEDNESS(w) = 1 + (WR+WL)*(TF(w)/MAX_TF) + PL + PR
+               RELATEDNESS(w) = 1 + (WR+WL)*(tf(w)/MAX_tf) + PL + PR
 
             5. DIFFERENT: gives importance to words that occurs in multiple
                sentences.
@@ -242,37 +242,37 @@ class YAKE(LoadFile):
             stoplist = self.stoplist
 
         # get the Term Frequency of each word
-        TF = [len(self.words[w]) for w in self.words]
+        tf = [len(self.words[w]) for w in self.words]
 
         # get the Term Frequency of non-stop words
-        TF_nsw = [len(self.words[w]) for w in self.words if w not in stoplist]
+        tf_nsw = [len(self.words[w]) for w in self.words if w not in stoplist]
 
         # compute statistics
-        mean_TF = numpy.mean(TF_nsw)
-        std_TF = numpy.std(TF_nsw)
-        max_TF = max(TF)
+        mean_tf = numpy.mean(tf_nsw)
+        std_tf = numpy.std(tf_nsw)
+        max_tf = max(tf)
 
         # Loop through the words
         for word in self.words:
             self.features[word]['isstop'] = word in stoplist or len(word) < 3
 
             # Term Frequency
-            self.features[word]['TF'] = len(self.words[word])
+            self.features[word]['tf'] = len(self.words[word])
 
             # Uppercase/Acronym Term Frequencies
-            self.features[word]['TF_A'] = 0
-            self.features[word]['TF_U'] = 0
+            self.features[word]['tf_A'] = 0
+            self.features[word]['tf_U'] = 0
             for (offset, shift, surface_form) in self.words[word]:
                 if surface_form.isupper() and len(word) > 1:
-                    self.features[word]['TF_A'] += 1
+                    self.features[word]['tf_A'] += 1
                 elif surface_form[0].isupper() and offset != shift:
-                    self.features[word]['TF_U'] += 1
+                    self.features[word]['tf_U'] += 1
 
             # 1. CASING feature
-            self.features[word]['CASING'] = max(self.features[word]['TF_A'],
-                                                self.features[word]['TF_U'])
+            self.features[word]['CASING'] = max(self.features[word]['tf_A'],
+                                                self.features[word]['tf_U'])
             self.features[word]['CASING'] /= 1.0 + math.log(
-                self.features[word]['TF'])
+                self.features[word]['tf'])
 
             # 2. POSITION feature
             sentence_ids = list(set([t[2] for t in self.words[word]]))
@@ -280,28 +280,28 @@ class YAKE(LoadFile):
             self.features[word]['POSITION'] = math.log(self.features[word]['POSITION'])
 
             # 3. FREQUENCY feature
-            self.features[word]['FREQUENCY'] = self.features[word]['TF']
-            self.features[word]['FREQUENCY'] /= (mean_TF + std_TF)
+            self.features[word]['FREQUENCY'] = self.features[word]['tf']
+            self.features[word]['FREQUENCY'] /= (mean_tf + std_tf)
 
             # 4. RELATEDNESS feature
             self.features[word]['WL'] = 0.0
             if len(self.contexts[word][0]):
                 self.features[word]['WL'] = len(set(self.contexts[word][0]))
                 self.features[word]['WL'] /= len(self.contexts[word][0])
-            self.features[word]['PL'] = len(set(self.contexts[word][0])) / max_TF
+            self.features[word]['PL'] = len(set(self.contexts[word][0])) / max_tf
 
             self.features[word]['WR'] = 0.0
             if len(self.contexts[word][1]):
                 self.features[word]['WR'] = len(set(self.contexts[word][1]))
                 self.features[word]['WR'] /= len(self.contexts[word][1])
-            self.features[word]['PR'] = len(set(self.contexts[word][1])) / max_TF
+            self.features[word]['PR'] = len(set(self.contexts[word][1])) / max_tf
 
             self.features[word]['RELATEDNESS'] = 1
             #self.features[word]['RELATEDNESS'] += self.features[word]['PL']
             #self.features[word]['RELATEDNESS'] += self.features[word]['PR']
             self.features[word]['RELATEDNESS'] += (self.features[word]['WR'] +
                                                    self.features[word]['WL']) * \
-                                                  (self.features[word]['TF'] / max_TF)
+                                                  (self.features[word]['tf'] / max_tf)
 
             # 5. DIFFERENT feature
             self.features[word]['DIFFERENT'] = len(set(sentence_ids))
@@ -350,7 +350,7 @@ class YAKE(LoadFile):
             else:
                 lowercase_forms = [' '.join(t).lower() for t in v.surface_forms]
                 for i, candidate in enumerate(lowercase_forms):
-                    TF = lowercase_forms.count(candidate)
+                    tf = lowercase_forms.count(candidate)
                     words_cand = [t.lower() for t in v.surface_forms[i]]
                     prod_ = 1.
                     sum_  = 0.
@@ -360,9 +360,9 @@ class YAKE(LoadFile):
                             term_right = words_cand[j+1]
                             term_stop  = word_cand
 
-                            prob_t1 = self.contexts[term_left][1].count(term_stop) / self.features[term_left]['TF']
+                            prob_t1 = self.contexts[term_left][1].count(term_stop) / self.features[term_left]['tf']
 
-                            prob_t2 = self.contexts[term_stop][0].count(term_right) / self.features[term_right]['TF']
+                            prob_t2 = self.contexts[term_stop][0].count(term_right) / self.features[term_right]['tf']
 
                             prob = prob_t1 * prob_t2
                             prod_ *= (1 + (1 - prob ) )
@@ -371,7 +371,7 @@ class YAKE(LoadFile):
                             prod_ *= self.features[word_cand]['weight']
                             sum_  += self.features[word_cand]['weight']
                     self.weights[candidate] = prod_
-                    self.weights[candidate] /= TF * (1 + sum_)
+                    self.weights[candidate] /= tf * (1 + sum_)
                     self.surface_to_lexical[candidate] = k
 
     def is_redundant(self, candidate, prev, threshold=0.8):

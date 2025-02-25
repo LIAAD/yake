@@ -7,7 +7,6 @@ from segtok.tokenizer import web_tokenizer, split_contractions
 
 import networkx as nx
 import numpy as np
-import jellyfish
 
 STOPWORD_WEIGHT = 'bi'
 
@@ -188,8 +187,8 @@ class DataCore():
 
     def add_cooccur(self, left_term, right_term):
         if right_term.id not in self.g[left_term.id]:
-            self.g.add_edge(left_term.id, right_term.id, TF=0.)
-        self.g[left_term.id][right_term.id]["TF"]+=1.
+            self.g.add_edge(left_term.id, right_term.id, tf=0.)
+        self.g[left_term.id][right_term.id]["tf"]+=1.
 
     def add_or_update_composedword(self, cand):
         if cand.unique_kw not in self.candidates:
@@ -315,12 +314,12 @@ class ComposedWord():
                     if t > 0 and term_base.g.has_edge(
                         self.terms[t-1].id, self.terms[t].id):
                         prob_t1 = term_base.g[
-                            self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf
+                            self.terms[t-1].id][self.terms[t].id]["tf"] / self.terms[t-1].tf
                     prob_t2 = 0.
                     if t < len(self.terms) - 1 and term_base.g.has_edge(
                         self.terms[t].id, self.terms[t+1].id):
                         prob_t2 = term_base.g[
-                            self.terms[t].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
+                            self.terms[t].id][self.terms[t+1].id]["tf"] / self.terms[t+1].tf
 
                     prob = prob_t1 * prob_t2
                     prod_h *= (1 + (1 - prob ) )
@@ -352,12 +351,12 @@ class ComposedWord():
                 prob_t1 = 0.
                 if term_base.g.has_edge(self.terms[t-1].id, self.terms[ t ].id):
                     prob_t1 = term_base.g[
-                        self.terms[t-1].id][self.terms[ t ].id]["TF"] / self.terms[t-1].tf
+                        self.terms[t-1].id][self.terms[ t ].id]["tf"] / self.terms[t-1].tf
 
                 prob_t2 = 0.
                 if term_base.g.has_edge(self.terms[ t ].id, self.terms[t+1].id):
                     prob_t2 = term_base.g[
-                        self.terms[ t ].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
+                        self.terms[ t ].id][self.terms[t+1].id]["tf"] / self.terms[t+1].tf
 
                 prob = prob_t1 * prob_t2
                 prod_h *= (1 + (1 - prob ) )
@@ -397,13 +396,13 @@ class SingleWord():
 
     def update_h(self, max_tf, avg_tf, std_tf, number_of_sentences, features=None):
         """if features is None or "wrel" in features:
-            self.pl = self.WDL / max_tf
+            self.pl = self.wdl / max_tf
             self.pr = self.wdr / max_tf
             self.wrel = ( (0.5 + (self.pwl * (self.tf / max_tf) + self.pl)) +(0.5 + (
                 self.pwr * (self.tf / max_tf) + self.pr)) )"""
 
         if features is None or "wrel" in features:
-            self.pl = self.WDL / max_tf
+            self.pl = self.wdl / max_tf
             self.pr = self.wdr / max_tf
             self.wrel = (
                 (0.5 + (self.pwl * (self.tf / max_tf))) +
@@ -431,7 +430,7 @@ class SingleWord():
 
     @property
     def wir(self):
-        return sum(d['TF'] for (_, _, d) in self.g.out_edges(self.id, data=True))
+        return sum(d['tf'] for (_, _, d) in self.g.out_edges(self.id, data=True))
 
     @property
     def pwr(self):
@@ -441,7 +440,7 @@ class SingleWord():
         return self.wdr / wir
 
     @property
-    def WDL(self):
+    def wdl(self):
         """
         Calculate the number of incoming edges for the node.
 
@@ -455,14 +454,14 @@ class SingleWord():
         """
         Calculate the sum of term frequencies for incoming edges.
         """
-        return sum(d['TF'] for (_, _, d) in self.g.in_edges(self.id, data=True))
+        return sum(d['tf'] for (_, _, d) in self.g.in_edges(self.id, data=True))
 
     @property
     def pwl(self):
         wil = self.wil
         if wil == 0:
             return 0
-        return self.WDL / wil
+        return self.wdl / wil
 
     def add_occur(self, tag, sent_id, pos_sent, pos_text):
         """
