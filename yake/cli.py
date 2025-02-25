@@ -57,6 +57,7 @@ import yake
     count=True,
     help="Verbose output",
 )
+@click.pass_context
 def keywords(
     text_input, input_file, language, ngram_size, dedup_func, dedup_lim, window_size, top, verbose
 ):
@@ -65,7 +66,7 @@ def keywords(
     def run_yake(text_content):
         extractor = yake.KeywordExtractor(
             lan=language, n=ngram_size, dedupLim=dedup_lim,
-            dedupFunc=dedup_func, windowSize=window_size, top=top
+            dedupFunc=dedup_func, window_size=window_size, top=top
         )
         results = extractor.extract_keywords(text_content)
 
@@ -91,6 +92,3 @@ def keywords(
         except FileNotFoundError:
             print(f"File '{input_file}' not found.")
             sys.exit(1)
-
-if __name__ == "__main__":
-    keywords()

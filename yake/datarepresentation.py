@@ -23,7 +23,7 @@ class DataCore():
         self.candidates = {}
         self.sentences_obj = []
         self.sentences_str = []
-        self.G = nx.DiGraph()
+        self.g = nx.DiGraph()
         self.exclude = exclude
         self.tags_to_discard = tags_to_discard
         self.freq_ns = {}
@@ -38,8 +38,8 @@ class DataCore():
                         (w.startswith("'") and len(w) > 1) and len(w) > 0]
         candidate_terms = []
         for (i, word) in enumerate(sentences_str):
-            tag = self.getTag(word, i)
-            term_obj = self.getTerm(word, save_non_seen=False)
+            tag = self.get_tag(word, i)
+            term_obj = self.get_term(word, save_non_seen=False)
             if term_obj.tf == 0:
                 term_obj = None
             candidate_terms.append( (tag, word, term_obj) )
@@ -70,8 +70,8 @@ class DataCore():
                         sentence_obj_aux.append( block_of_word_obj )
                         block_of_word_obj = []
                 else:
-                    tag = self.getTag(word, pos_sent)
-                    term_obj = self.getTerm(word)
+                    tag = self.get_tag(word, pos_sent)
+                    term_obj = self.get_term(word)
                     term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
                     pos_text += 1
 
@@ -82,18 +82,18 @@ class DataCore():
                                 len(block_of_word_obj) ))
                         for w in word_windows:
                             if block_of_word_obj[w][0] not in self.tags_to_discard:
-                                self.addCooccur(block_of_word_obj[w][2], term_obj)
+                                self.add_cooccur(block_of_word_obj[w][2], term_obj)
                     #Generate candidate keyphrase list
                     candidate = [ (tag, word, term_obj) ]
                     cand = ComposedWord(candidate)
-                    self.addOrUpdateComposedWord(cand)
+                    self.add_or_update_composedword(cand)
                     word_windows = list(
                         range( max(0, len(block_of_word_obj)-(n-1)), len(block_of_word_obj) ))[::-1]
                     for w in word_windows:
                         candidate.append(block_of_word_obj[w])
                         self.freq_ns[len(candidate)] += 1.
                         cand = ComposedWord(candidate[::-1])
-                        self.addOrUpdateComposedWord(cand)
+                        self.add_or_update_composedword(cand)
 
                     # Add term to the block of words' buffer
                     block_of_word_obj.append( (tag, word, term_obj) )
@@ -119,12 +119,12 @@ class DataCore():
         if len(valid_tfs) == 0:
             return
 
-        avgTF = valid_tfs.mean()
-        stdTF = valid_tfs.std()
-        maxTF = max(x.tf for x in self.terms.values())
+        avg_tf = valid_tfs.mean()
+        std_tf = valid_tfs.std()
+        max_tf = max(x.tf for x in self.terms.values())
         list(map(lambda x: x.update_h(
-            maxTF=maxTF, avgTF=avgTF,
-            stdTF=stdTF, number_of_sentences=self.number_of_sentences,
+            max_tf=max_tf, avg_tf=avg_tf,
+            std_tf=std_tf, number_of_sentences=self.number_of_sentences,
             features=features), self.terms.values()))
 
     def build_mult_terms_features(self, features=None):
@@ -142,7 +142,7 @@ class DataCore():
             buffer += sep + part.replace('\t',' ')
         return buffer
 
-    def getTag(self, word, i):
+    def get_tag(self, word, i):
         try:
             w2 = word.replace(",","")
             float(w2)
@@ -160,7 +160,7 @@ class DataCore():
                 return "n"
         return "p"
 
-    def getTerm(self, str_word, save_non_seen=True):
+    def get_term(self, str_word, save_non_seen=True):
         unique_term = str_word.lower()
         simples_sto = unique_term in self.stopword_set
         if unique_term.endswith('s') and len(unique_term) > 3:
@@ -177,25 +177,25 @@ class DataCore():
         isstopword = simples_sto or unique_term in self.stopword_set or len(simples_unique_term) < 3
 
         term_id = len(self.terms)
-        term_obj = SingleWord(unique_term, term_id, self.G)
+        term_obj = SingleWord(unique_term, term_id, self.g)
         term_obj.stopword = isstopword
 
         if save_non_seen:
-            self.G.add_node(term_id)
+            self.g.add_node(term_id)
             self.terms[unique_term] = term_obj
 
         return term_obj
 
-    def addCooccur(self, left_term, right_term):
-        if right_term.id not in self.G[left_term.id]:
-            self.G.add_edge(left_term.id, right_term.id, TF=0.)
-        self.G[left_term.id][right_term.id]["TF"]+=1.
+    def add_cooccur(self, left_term, right_term):
+        if right_term.id not in self.g[left_term.id]:
+            self.g.add_edge(left_term.id, right_term.id, TF=0.)
+        self.g[left_term.id][right_term.id]["TF"]+=1.
 
-    def addOrUpdateComposedWord(self, cand):
+    def add_or_update_composedword(self, cand):
         if cand.unique_kw not in self.candidates:
             self.candidates[cand.unique_kw] = cand
         else:
-            self.candidates[cand.unique_kw].uptadeCand(cand)
+            self.candidates[cand.unique_kw].uptade_cand(cand)
         self.candidates[cand.unique_kw].tf += 1.
 
 
@@ -215,7 +215,7 @@ class ComposedWord():
         self.h = 1.
         self.start_or_end_stopwords = self.terms[0].stopword or self.terms[-1].stopword
 
-    def uptadeCand(self, cand):
+    def uptade_cand(self, cand):
         for tag in cand.tags:
             self.tags.add( tag )
 
@@ -243,7 +243,7 @@ class ComposedWord():
         _stopword = None,
         ):
         if features is None:
-            features = ['WFreq', 'WRel', 'tf', 'WCase', 'WPos', 'WSpread']
+            features = ['wfreq', 'wrel', 'tf', 'wcase', 'wpos', 'wspread']
         if _stopword is None:
             _stopword = [True, False]
         columns = []
@@ -312,14 +312,14 @@ class ComposedWord():
             else:
                 if STOPWORD_WEIGHT == 'bi':
                     prob_t1 = 0.
-                    if t > 0 and term_base.G.has_edge(
+                    if t > 0 and term_base.g.has_edge(
                         self.terms[t-1].id, self.terms[t].id):
-                        prob_t1 = term_base.G[
-                            self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf                 
+                        prob_t1 = term_base.g[
+                            self.terms[t-1].id][self.terms[t].id]["TF"] / self.terms[t-1].tf
                     prob_t2 = 0.
-                    if t < len(self.terms) - 1 and term_base.G.has_edge(
+                    if t < len(self.terms) - 1 and term_base.g.has_edge(
                         self.terms[t].id, self.terms[t+1].id):
-                        prob_t2 = term_base.G[
+                        prob_t2 = term_base.g[
                             self.terms[t].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
 
                     prob = prob_t1 * prob_t2
@@ -350,13 +350,13 @@ class ComposedWord():
 
             if term_base.stopword:
                 prob_t1 = 0.
-                if term_base.G.has_edge(self.terms[t-1].id, self.terms[ t ].id):
-                    prob_t1 = term_base.G[
+                if term_base.g.has_edge(self.terms[t-1].id, self.terms[ t ].id):
+                    prob_t1 = term_base.g[
                         self.terms[t-1].id][self.terms[ t ].id]["TF"] / self.terms[t-1].tf
 
                 prob_t2 = 0.
-                if term_base.G.has_edge(self.terms[ t ].id, self.terms[t+1].id):
-                    prob_t2 = term_base.G[
+                if term_base.g.has_edge(self.terms[ t ].id, self.terms[t+1].id):
+                    prob_t2 = term_base.g[
                         self.terms[ t ].id][self.terms[t+1].id]["TF"] / self.terms[t+1].tf
 
                 prob = prob_t1 * prob_t2
@@ -379,66 +379,66 @@ class SingleWord():
         self.unique_term = unique
         self.id = idx
         self.tf = 0.
-        self.WFreq = 0.0
-        self.WCase = 0.0
+        self.wfreq = 0.0
+        self.wcase = 0.0
         self.tf_a = 0.
         self.tf_n = 0.
-        self.WRel = 1.0
-        self.PL = 0.
-        self.PR = 0.
+        self.wrel = 1.0
+        self.pl = 0.
+        self.pr = 0.
         self.occurs = {}
-        self.WPos = 1.0
-        self.WSpread = 0.0
+        self.wpos = 1.0
+        self.wspread = 0.0
         self.h = 0.0
         self.stopword = False
-        self.G = graph
+        self.g = graph
 
         self.pagerank = 1.
 
-    def update_h(self, maxTF, avgTF, stdTF, number_of_sentences, features=None):
-        """if features is None or "WRel" in features:
-            self.PL = self.WDL / maxTF
-            self.PR = self.WDR / maxTF
-            self.WRel = ( (0.5 + (self.PWL * (self.tf / maxTF) + self.PL)) +(0.5 + (
-                self.PWR * (self.tf / maxTF) + self.PR)) )"""
+    def update_h(self, max_tf, avg_tf, std_tf, number_of_sentences, features=None):
+        """if features is None or "wrel" in features:
+            self.pl = self.WDL / max_tf
+            self.pr = self.wdr / max_tf
+            self.wrel = ( (0.5 + (self.pwl * (self.tf / max_tf) + self.pl)) +(0.5 + (
+                self.pwr * (self.tf / max_tf) + self.pr)) )"""
 
-        if features is None or "WRel" in features:
-            self.PL = self.WDL / maxTF
-            self.PR = self.WDR / maxTF
-            self.WRel = (
-                (0.5 + (self.PWL * (self.tf / maxTF))) +
-                (0.5 + (self.PWR * (self.tf / maxTF)))
+        if features is None or "wrel" in features:
+            self.pl = self.WDL / max_tf
+            self.pr = self.wdr / max_tf
+            self.wrel = (
+                (0.5 + (self.pwl * (self.tf / max_tf))) +
+                (0.5 + (self.pwr * (self.tf / max_tf)))
             )
 
-        if features is None or "WFreq" in features:
-            self.WFreq = self.tf / (avgTF + stdTF)
+        if features is None or "wfreq" in features:
+            self.wfreq = self.tf / (avg_tf + std_tf)
 
-        if features is None or "WSpread" in features:
-            self.WSpread = len(self.occurs) / number_of_sentences
+        if features is None or "wspread" in features:
+            self.wspread = len(self.occurs) / number_of_sentences
 
-        if features is None or "WCase" in features:
-            self.WCase = max(self.tf_a, self.tf_n) / (1. + math.log(self.tf))
+        if features is None or "wcase" in features:
+            self.wcase = max(self.tf_a, self.tf_n) / (1. + math.log(self.tf))
 
-        if features is None or "WPos" in features:
-            self.WPos = math.log( math.log( 3. + np.median(list(self.occurs.keys())) ) )
+        if features is None or "wpos" in features:
+            self.wpos = math.log( math.log( 3. + np.median(list(self.occurs.keys())) ) )
 
-        self.h = (self.WPos * self.WRel) / (
-            self.WCase + (self.WFreq / self.WRel) + (self.WSpread / self.WRel))
-
-    @property
-    def WDR(self):
-        return len( self.G.out_edges(self.id) )
+        self.h = (self.wpos * self.wrel) / (
+            self.wcase + (self.wfreq / self.wrel) + (self.wspread / self.wrel))
 
     @property
-    def WIR(self):
-        return sum(d['TF'] for (_, _, d) in self.G.out_edges(self.id, data=True))
+    def wdr(self):
+        return len( self.g.out_edges(self.id) )
 
     @property
-    def PWR(self):
-        wir = self.WIR
+    def wir(self):
+        return sum(d['TF'] for (_, _, d) in self.g.out_edges(self.id, data=True))
+
+    @property
+    def pwr(self):
+        wir = self.wir
         if wir == 0:
             return 0
-        return self.WDR / wir
+        return self.wdr / wir
 
     @property
     def WDL(self):
@@ -448,21 +448,21 @@ class SingleWord():
         Returns:
             int: The number of incoming edges for the node.
         """
-        return len( self.G.in_edges(self.id) )
+        return len( self.g.in_edges(self.id) )
 
     @property
-    def WIL(self):
+    def wil(self):
         """
         Calculate the sum of term frequencies for incoming edges.
         """
-        return sum(d['TF'] for (_, _, d) in self.G.in_edges(self.id, data=True))
+        return sum(d['TF'] for (_, _, d) in self.g.in_edges(self.id, data=True))
 
     @property
-    def PWL(self):
-        WIL = self.WIL
-        if WIL == 0:
+    def pwl(self):
+        wil = self.wil
+        if wil == 0:
             return 0
-        return self.WDL / WIL
+        return self.WDL / wil
 
     def add_occur(self, tag, sent_id, pos_sent, pos_text):
         """

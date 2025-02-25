@@ -5,7 +5,7 @@
 
 from setuptools import setup, find_packages
 
-readme = """
+README = """
 # Yet Another Keyword Extractor (Yake)
 
 Unsupervised Approach for Automatic Keyword Extraction using Text Features.
