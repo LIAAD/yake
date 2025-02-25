@@ -4,7 +4,6 @@ Organizadas em grupos (stdlib, third-party, local)
 Ordenadas alfabeticamente
 Removida importação não utilizada de string
 
-
 Nomes de variáveis e funções:
 
 Convertidos para snake_case: dedupLim → dedup_lim
@@ -13,23 +12,20 @@ stop_fil → stop_file
 todedup → candidates_sorted
 toadd → should_add
 
-
-Docstrings:
+----------------------Docstrings----------------------------------:
 
 Adicionada docstring ao módulo
 Adicionada docstring à classe
 Adicionadas docstrings aos métodos com descrição dos parâmetros
 
-
-Formatação:
+----------------------Formatação----------------------------------:
 
 Espaçamento atualizados
 Parênteses removidos de condicionais desnecessários
-Limite de 79 caracteres
+Limite de 100 caracteres
 Parâmetros do __init__ organizados verticalmente para melhor legibilidade
 
-
-Boas práticas:
+-----------------------Boas práticas------------------------------:
 
 Removida herança explícita de object (atualmente desnecessária em Python 3)
 Melhorada mensagem de exceção
@@ -41,15 +37,11 @@ por
 
 Melhorada verificação de string vazia usando if not text
 
-
-Consistência:
+-------------------------Consistência-----------------------------:
 
 Uso consistente de aspas simples
 Tratamento de exceções mais específico
 Nomes mais descritivos para variáveis temporárias
-
-
-
 
 Status semanda 07/02/2025   //////Refactoring score (3.21)
 
@@ -75,12 +67,8 @@ Planos próxima semana
 
 - Avançar com refatorização e tratamento de problemas identificados pelo pylint.
 
-
-
 ////// Refactoring score (3.21) -> (3.94) 18/02/2025
-
 
 ////// Refactoring score (3.94) -> (5.07) 20/02/2025
 
-
-////// Refactoring score (5.07) -> (6.52) 25/02/2025
+////// Refactoring score (5.07) -> (6.57) 25/02/2025
