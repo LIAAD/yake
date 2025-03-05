@@ -162,7 +162,8 @@ class YAKE(LoadFile):
                 co-occurrence counts, defaults to 2.
         """
         # change: split sentence to block of words
-        #   (this is important to avoid consider cooccurrence between terms like word1 and word2 on sentence "word1, word2")
+        #   (this is important to avoid consider cooccurrence between terms like
+        #                           word1 and word2 on sentence "word1, word2")
 
         # loop through sentences
         for sentence in enumerate(self.sentences):
@@ -360,9 +361,11 @@ class YAKE(LoadFile):
                             term_right = words_cand[j+1]
                             term_stop  = word_cand
 
-                            prob_t1 = self.contexts[term_left][1].count(term_stop) / self.features[term_left]['tf']
+                            prob_t1 = self.contexts[
+                                term_left][1].count(term_stop) / self.features[term_left]['tf']
 
-                            prob_t2 = self.contexts[term_stop][0].count(term_right) / self.features[term_right]['tf']
+                            prob_t2 = self.contexts[
+                                term_stop][0].count(term_right) / self.features[term_right]['tf']
 
                             prob = prob_t1 * prob_t2
                             prod_ *= (1 + (1 - prob ) )

@@ -69,6 +69,18 @@ Planos próxima semana
 
 ////// Refactoring score (3.21) -> (3.94) 18/02/2025
 
+Tamanhos de linha e troca para enumerate
+isinstance() por vez de type()
+
 ////// Refactoring score (3.94) -> (5.07) 20/02/2025
 
+indexação de linhas e espaços
+tamanho de linhas
+atualizados os catches de erros (especificação quantos aos catches)
+
 ////// Refactoring score (5.07) -> (6.57) 25/02/2025
+
+organização dos métodos, classes e variaveis
+generator por vez 'sum'
+enumerate por vez de iteração com range e len
+prefixos com 'u' e 'r' removidos e adicionados respetivamente ( 'u' não necessarios para o python 3.10 e o contrário para 'r')

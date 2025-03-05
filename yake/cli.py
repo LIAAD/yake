@@ -58,7 +58,7 @@ import yake
     help="Verbose output",
 )
 @click.pass_context
-def keywords(ctx,
+def keywords(
     text_input, input_file, language, ngram_size, dedup_func, dedup_lim, window_size, top, verbose
 ):
     """Extract keywords using YAKE!"""
@@ -92,4 +92,3 @@ def keywords(ctx,
         except FileNotFoundError:
             print(f"File '{input_file}' not found.")
             sys.exit(1)
-

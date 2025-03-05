@@ -99,7 +99,7 @@ else:
                 max_words=numOfKeywords,
                 background_color="white",
                 collocations=False,
-                regexp = r"\w[\w ']+").generate(keywords_list),
+                regexp = r"\w[\w ']+").generate(keywords_list)
 
     #display the generated image
     plt.imshow(wordcloud, interpolation='bilinear')
