@@ -84,3 +84,12 @@ organização dos métodos, classes e variaveis
 generator por vez 'sum'
 enumerate por vez de iteração com range e len
 prefixos com 'u' e 'r' removidos e adicionados respetivamente ( 'u' não necessarios para o python 3.10 e o contrário para 'r')
+
+
+///// Refactoring score (6.57) -> (6.59) 05/03/2025
+
+yake.py
+
+Redução de código duplo
+Criação de dicionários de "guia", _get_dedup_function
+Lógica foi extraída para um método separado,_load_stopwords

@@ -1,3 +1,5 @@
+"""Module for keyword extraction from text documents."""
+
 import os
 import jellyfish
 from .Levenshtein import Levenshtein
