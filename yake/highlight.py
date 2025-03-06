@@ -71,92 +71,114 @@ class TextHighlighter:
         final_splited_text = []
 
         while y < len(text_tokens):
-            splited_n_gram_kw_list = []
-            n_gram_kw_list = []
-            n_gram_word_list, splited_n_gram_kw_list = self.find_more_relevant(
-                y, text_tokens, n_gram, relevant_words_array, n_gram_kw_list, splited_n_gram_kw_list
+            n_gram_word_list, splited_n_gram_kw_list = self.find_relevant_ngrams(
+                y, text_tokens, n_gram, relevant_words_array
             )
 
             if n_gram_word_list:
-                if len(n_gram_word_list[0].split(" ")) == 1:
-                    y, new_expression = self.replace_token(
-                        text_tokens, y, n_gram_word_list
-                    )
-                    final_splited_text.append(new_expression)
-                else:
-                    kw_list = []
-                    splited_n_gram_kw_list = []
-                    splited_one = n_gram_word_list[0].split()
-
-                    for len_kw in range(len(splited_one)):
-                        kw_list, splited_n_gram_kw_list = self.find_more_relevant(
-                            y + len_kw, text_tokens, n_gram,
-                            relevant_words_array, kw_list, splited_n_gram_kw_list
-                        )
-
-                    min_score_word = min(
-                        kw_list, key=lambda x: relevant_words_array.index(x.lower())
-                    )
-
-                    if kw_list.index(min_score_word) == 0:
-                        term_list = [min_score_word]
-                        y, new_expression = self.replace_token(
-                            text_tokens, y, term_list
-                        )
-                        final_splited_text.append(new_expression)
-                    elif kw_list.index(min_score_word) >= 1:
-                        index_of_more_relevant = splited_n_gram_kw_list[0].index(
-                            min_score_word.split()[0]
-                        )
-                        temporal_kw = " ".join(
-                            splited_n_gram_kw_list[0][:index_of_more_relevant]
-                        )
-
-                        if temporal_kw in relevant_words_array:
-                            try:
-                                last_item = final_splited_text[-1]
-                                combined_kw = f"{last_item} {temporal_kw}"
-                                if (
-                                    relevant_words_array.index(temporal_kw)
-                                    > relevant_words_array.index(combined_kw)
-                                    and not re.findall(self.highlight_pre, last_item)
-                                ):
-                                    term_list = [combined_kw]
-                                    del final_splited_text[-1]
-                                    y -= 1
-                                    y, new_expression = self.replace_token(
-                                        text_tokens, y, term_list
-                                    )
-                                    final_splited_text.append(new_expression)
-                                else:
-                                    term_list = [temporal_kw]
-                                    y, new_expression = self.replace_token(
-                                        text_tokens, y, term_list
-                                    )
-                                    final_splited_text.append(new_expression)
-                            except ValueError as e:
-                                print(f"Error: {e}")
-                                term_list = [temporal_kw]
-                                y, new_expression = self.replace_token(
-                                    text_tokens, y, term_list
-                                )
-                                final_splited_text.append(new_expression)
-                        else:
-                            for tmp_kw in splited_n_gram_kw_list[0][:index_of_more_relevant]:
-                                if tmp_kw in relevant_words_array:
-                                    term_list = [tmp_kw]
-                                    y, new_expression = self.replace_token(
-                                        text_tokens, y, term_list
-                                    )
-                                    final_splited_text.append(new_expression)
-                                else:
-                                    final_splited_text.append(text_tokens[y])
-                                    y += 1
+                y, new_expression = self.process_ngrams(
+                    y, text_tokens, n_gram_word_list, splited_n_gram_kw_list, relevant_words_array, final_splited_text
+                )
+                final_splited_text.append(new_expression)
             else:
                 final_splited_text.append(text_tokens[y])
                 y += 1
 
         return " ".join(final_splited_text)
+
+    def find_relevant_ngrams(self, y, text_tokens, n_gram, relevant_words_array):
+        """Finds relevant n-grams in the text."""
+        splited_n_gram_kw_list = []
+        n_gram_kw_list = []
+        n_gram_word_list, splited_n_gram_kw_list = self.find_more_relevant(
+            y, text_tokens, n_gram, relevant_words_array, n_gram_kw_list, splited_n_gram_kw_list
+        )
+        return n_gram_word_list, splited_n_gram_kw_list
+
+    def process_ngrams(self, y, text_tokens, n_gram_word_list, splited_n_gram_kw_list, relevant_words_array, final_splited_text):
+        """Processes n-grams and updates the final text."""
+        if len(n_gram_word_list[0].split(" ")) == 1:
+            y, new_expression = self.replace_token(
+                text_tokens, y, n_gram_word_list
+            )
+        else:
+            y, new_expression = self.process_multi_word_ngrams(
+                y, text_tokens, n_gram_word_list, splited_n_gram_kw_list, relevant_words_array, final_splited_text
+            )
+        return y, new_expression
+
+    def process_multi_word_ngrams(self, y, text_tokens, n_gram_word_list, splited_n_gram_kw_list, relevant_words_array, final_splited_text):
+        """Processes multi-word n-grams and updates the final text."""
+        kw_list = []
+        splited_one = n_gram_word_list[0].split()
+
+        for len_kw in range(len(splited_one)):
+            kw_list, splited_n_gram_kw_list = self.find_more_relevant(
+                y + len_kw, text_tokens, len(splited_one),
+                relevant_words_array, kw_list, splited_n_gram_kw_list
+            )
+
+        min_score_word = min(
+            kw_list, key=lambda x: relevant_words_array.index(x.lower())
+        )
+
+        if kw_list.index(min_score_word) == 0:
+            term_list = [min_score_word]
+            y, new_expression = self.replace_token(
+                text_tokens, y, term_list
+            )
+        else:
+            y, new_expression = self.process_relevant_terms(
+                y, text_tokens, splited_n_gram_kw_list, min_score_word, relevant_words_array, final_splited_text
+            )
+        return y, new_expression
+
+    def process_relevant_terms(self, y, text_tokens, splited_n_gram_kw_list, min_score_word, relevant_words_array, final_splited_text):
+        """Processes relevant terms and updates the final text."""
+        index_of_more_relevant = splited_n_gram_kw_list[0].index(
+            min_score_word.split()[0]
+        )
+        temporal_kw = " ".join(
+            splited_n_gram_kw_list[0][:index_of_more_relevant]
+        )
+
+        if temporal_kw in relevant_words_array:
+            try:
+                last_item = final_splited_text[-1]
+                combined_kw = f"{last_item} {temporal_kw}"
+                if (
+                    relevant_words_array.index(temporal_kw)
+                    > relevant_words_array.index(combined_kw)
+                    and not re.findall(self.highlight_pre, last_item)
+                ):
+                    term_list = [combined_kw]
+                    del final_splited_text[-1]
+                    y -= 1
+                    y, new_expression = self.replace_token(
+                        text_tokens, y, term_list
+                    )
+                else:
+                    term_list = [temporal_kw]
+                    y, new_expression = self.replace_token(
+                        text_tokens, y, term_list
+                    )
+            except ValueError as e:
+                print(f"Error: {e}")
+                term_list = [temporal_kw]
+                y, new_expression = self.replace_token(
+                    text_tokens, y, term_list
+                )
+        else:
+            for tmp_kw in splited_n_gram_kw_list[0][:index_of_more_relevant]:
+                if tmp_kw in relevant_words_array:
+                    term_list = [tmp_kw]
+                    y, new_expression = self.replace_token(
+                        text_tokens, y, term_list
+                    )
+                else:
+                    new_expression = text_tokens[y]
+                    y += 1
+        return y, new_expression
 
     def find_more_relevant(
         self, y, text_tokens, n_gram, relevant_words_array, kw_list, splited_n_gram_word_list
