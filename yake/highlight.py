@@ -267,13 +267,10 @@ class TextHighlighter:
 
         for len_kw in range(len(splited_one)):
             if position + len_kw < len(text_tokens):
-                ngram_result = self._find_more_relevant_helper(
-                    position + len_kw, text_tokens, relevant_words_array
+                self._update_kw_list(
+                    position + len_kw, text_tokens,
+                    relevant_words_array, kw_list, splited_n_gram_kw_list
                 )
-                new_kw_list, new_split_list = ngram_result
-                kw_list.extend(new_kw_list)
-                if new_split_list:
-                    splited_n_gram_kw_list.extend(new_split_list)
 
         if not kw_list:
             return position + 1, text_tokens[position]
@@ -299,6 +296,26 @@ class TextHighlighter:
             )
 
         return position, new_expression
+
+    def _update_kw_list(self, position,
+                        text_tokens, relevant_words_array, kw_list, splited_n_gram_kw_list):
+        """
+        Updates the keyword list and split n-gram keyword list.
+        
+        Args:
+            position: Current position in text tokens
+            text_tokens: List of tokens from the text
+            relevant_words_array: Keywords to highlight
+            kw_list: List of keywords
+            splited_n_gram_kw_list: List of split n-gram keywords
+        """
+        ngram_result = self._find_more_relevant_helper(
+            position, text_tokens, relevant_words_array
+        )
+        new_kw_list, new_split_list = ngram_result
+        kw_list.extend(new_kw_list)
+        if new_split_list:
+            splited_n_gram_kw_list.extend(new_split_list)
 
     def _process_relevant_terms_helper(
         self, text_tokens, position, ctx
