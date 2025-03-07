@@ -93,3 +93,11 @@ yake.py
 Redução de código duplo
 Criação de dicionários de "guia", _get_dedup_function
 Lógica foi extraída para um método separado,_load_stopwords
+
+///// Refactoring score (6.57) -> (6.86) 06/03/2025
+
+highligh.py
+
+Redução de código duplo (Próximo passo)
+Documentação +/-
+Separação de métodos e argumentos (quase todos)
