@@ -56,7 +56,7 @@ class KeywordExtractor:
         }.get(func_name.lower(), self.levs)
 
     def jaro(self, cand1, cand2):
-        return jellyfish.jaro_winkler(cand1, cand2)
+        return jellyfish.jaro(cand1, cand2)
 
     def levs(self, cand1, cand2):
         return 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2))

@@ -69,7 +69,7 @@ class YAKE(LoadFile):
         """Redefining initializer for YAKE.
         """
 
-        super(YAKE, self).__init__()
+        super().__init__()
 
         self.words = defaultdict(set)
         """ Container for the vocabulary. """
@@ -133,7 +133,7 @@ class YAKE(LoadFile):
         for i, sentence in enumerate(self.sentences):
 
             # compute the offset shift for the sentence
-            shift = sum([s.length for s in self.sentences[0:i]])
+            shift = sum(s.length for s in self.sentences[0:i])
 
             # loop through words in sentence
             for j, word in enumerate(sentence.words):
@@ -185,7 +185,7 @@ class YAKE(LoadFile):
                     continue
 
                 # add the right context
-                for w in [ w for w in buffer[max(0, len(buffer) - window):len(buffer)] ]:
+                for w in [ w for w in list(buffer[max(0, len(buffer) - window):len(buffer)]) ]:
                     self.contexts[word][0].append(w)
                     self.contexts[w][1].append(word)
 

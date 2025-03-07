@@ -101,3 +101,7 @@ highligh.py
 Redução de código duplo (Próximo passo)
 Documentação +/-
 Separação de métodos e argumentos (quase todos)
+
+///// Refactoring score (6.57) -> (6.91) 07/03/2025
+
+Criação de dicionários de forma a diminuir o numero de argumentos por cada função e comparações condicionais.
