@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yake.features &#8212; yake 0.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=601dbdee" />
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">yake 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yake.features</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for yake.features</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="c1"># Constants</span>
+<span class="n">STOPWORD_WEIGHT</span> <span class="o">=</span> <span class="s2">&quot;bi&quot;</span>
+
+
+<div class="viewcode-block" id="calculate_term_features">
+<a class="viewcode-back" href="../../pyake.html#yake.features.calculate_term_features">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_term_features</span><span class="p">(</span>
+    <span class="n">term</span><span class="p">,</span> <span class="n">max_tf</span><span class="p">,</span> <span class="n">avg_tf</span><span class="p">,</span> <span class="n">std_tf</span><span class="p">,</span> <span class="n">number_of_sentences</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate features for a single term.</span>
+
+<span class="sd">    This function computes various statistical features for a term that are used to </span>
+<span class="sd">    determine its importance as a potential keyword. The features include term relevance,</span>
+<span class="sd">    frequency, spread across the document, case information, and position. These features</span>
+<span class="sd">    are combined to calculate an overall importance score (H).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        term: SingleWord object containing term information and statistics</span>
+<span class="sd">        max_tf: Maximum term frequency in the document</span>
+<span class="sd">        avg_tf: Average term frequency across all terms</span>
+<span class="sd">        std_tf: Standard deviation of term frequency</span>
+<span class="sd">        number_of_sentences: Total number of sentences in document</span>
+<span class="sd">        features: List of features to calculate or None for all</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary of calculated features which may include:</span>
+<span class="sd">        - WRel: Term relevance based on connection to other terms</span>
+<span class="sd">        - WFreq: Normalized term frequency</span>
+<span class="sd">        - WSpread: Term spread across document sentences</span>
+<span class="sd">        - WCase: Case feature capturing capitalization patterns</span>
+<span class="sd">        - WPos: Position feature based on median occurrence position</span>
+<span class="sd">        - H: Overall importance score combining all features</span>
+<span class="sd">        - Additional intermediate values like PL and PR (left/right probabilities)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Calculate WRel feature (term relevance)</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;WRel&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="c1"># Calculate left and right probabilities</span>
+        <span class="n">WDL</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">in_edges</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="n">WDR</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">out_edges</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+        <span class="n">WIL</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;TF&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">term</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">in_edges</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">WIR</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;TF&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">term</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">out_edges</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+        <span class="n">PWL</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">WIL</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">WDL</span> <span class="o">/</span> <span class="n">WIL</span>
+        <span class="n">PWR</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">WIR</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">WDR</span> <span class="o">/</span> <span class="n">WIR</span>
+
+        <span class="c1"># Calculate probabilities</span>
+        <span class="n">PL</span> <span class="o">=</span> <span class="n">WDL</span> <span class="o">/</span> <span class="n">max_tf</span>
+        <span class="n">PR</span> <span class="o">=</span> <span class="n">WDR</span> <span class="o">/</span> <span class="n">max_tf</span>
+
+        <span class="c1"># Calculate relevance</span>
+        <span class="n">WRel</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="p">(</span><span class="n">PWL</span> <span class="o">*</span> <span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">tf</span> <span class="o">/</span> <span class="n">max_tf</span><span class="p">)))</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">+</span> <span class="p">(</span><span class="n">PWR</span> <span class="o">*</span> <span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">tf</span> <span class="o">/</span> <span class="n">max_tf</span><span class="p">)))</span>
+
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;PL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PL</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;PR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">PR</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WRel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WRel</span>
+
+    <span class="c1"># Calculate term frequency feature</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;WFreq&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">WFreq</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">tf</span> <span class="o">/</span> <span class="p">(</span><span class="n">avg_tf</span> <span class="o">+</span> <span class="n">std_tf</span><span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WFreq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WFreq</span>
+
+    <span class="c1"># Calculate term spread feature</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;WSpread&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">WSpread</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">occurs</span><span class="p">)</span> <span class="o">/</span> <span class="n">number_of_sentences</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WSpread&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WSpread</span>
+
+    <span class="c1"># Calculate case feature (all caps/proper nouns)</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;WCase&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">WCase</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">tf_a</span><span class="p">,</span> <span class="n">term</span><span class="o">.</span><span class="n">tf_n</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">tf</span><span class="p">))</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WCase&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WCase</span>
+
+    <span class="c1"># Calculate position feature</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;WPos&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">WPos</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">occurs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))))</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WPos&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">WPos</span>
+
+    <span class="c1"># Calculate H score if we have all required features</span>
+    <span class="n">required_features</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;WPos&quot;</span><span class="p">,</span> <span class="s2">&quot;WRel&quot;</span><span class="p">,</span> <span class="s2">&quot;WCase&quot;</span><span class="p">,</span> <span class="s2">&quot;WFreq&quot;</span><span class="p">,</span> <span class="s2">&quot;WSpread&quot;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">f</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">required_features</span><span class="p">):</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;WPos&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WRel&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WCase&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;WFreq&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WRel&quot;</span><span class="p">])</span>
+            <span class="o">+</span> <span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;WSpread&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;WRel&quot;</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="n">result</span><span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_composed_features">
+<a class="viewcode-back" href="../../pyake.html#yake.features.calculate_composed_features">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_composed_features</span><span class="p">(</span><span class="n">composed_word</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_virtual</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate features for composed words (n-grams).</span>
+
+<span class="sd">    This function computes features for multi-word expressions (n-grams) by combining</span>
+<span class="sd">    the features of individual terms. It handles stopwords differently based on the</span>
+<span class="sd">    STOPWORD_WEIGHT configuration. The function calculates an overall importance score (H)</span>
+<span class="sd">    that considers the relationships between terms in the n-gram.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        composed_word: ComposedWord object containing the n-gram information</span>
+<span class="sd">        features: List of features to calculate or None for all</span>
+<span class="sd">        is_virtual: Whether this is a virtual candidate (not directly observed in text)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary with calculated features including:</span>
+<span class="sd">        - H: Overall importance score for the n-gram</span>
+<span class="sd">        - prod_h: Product of H scores of component terms</span>
+<span class="sd">        - sum_h: Sum of H scores of component terms</span>
+<span class="sd">        - tf_used: Term frequency used in calculations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Initialize summation and product for H score</span>
+    <span class="n">sum_h</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">prod_h</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="c1"># Process each term in the composed word</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">term_base</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">term_base</span><span class="o">.</span><span class="n">stopword</span><span class="p">:</span>
+            <span class="c1"># For non-stopwords, simply add/multiply H scores</span>
+            <span class="n">sum_h</span> <span class="o">+=</span> <span class="n">term_base</span><span class="o">.</span><span class="n">H</span>
+            <span class="n">prod_h</span> <span class="o">*=</span> <span class="n">term_base</span><span class="o">.</span><span class="n">H</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># For stopwords, weight by connection probability</span>
+            <span class="k">if</span> <span class="n">STOPWORD_WEIGHT</span> <span class="o">==</span> <span class="s2">&quot;bi&quot;</span><span class="p">:</span>
+                <span class="n">prob_t1</span> <span class="o">=</span> <span class="n">prob_t2</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="c1"># Check if terms exist at t-1 and t</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">term_base</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span>
+                    <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">term_base</span><span class="o">.</span><span class="n">id</span>
+                <span class="p">):</span>
+                    <span class="n">prob_t1</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">term_base</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="n">term_base</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="s2">&quot;TF&quot;</span><span class="p">]</span>
+                        <span class="o">/</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tf</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Check if terms exist at t and t+1</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">term_base</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span>
+                    <span class="n">term_base</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+                <span class="p">):</span>
+                    <span class="n">prob_t2</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">term_base</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">term_base</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="s2">&quot;TF&quot;</span><span class="p">]</span>
+                        <span class="o">/</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tf</span>
+                    <span class="p">)</span>
+
+                <span class="n">prob</span> <span class="o">=</span> <span class="n">prob_t1</span> <span class="o">*</span> <span class="n">prob_t2</span>
+                <span class="n">prod_h</span> <span class="o">*=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">prob</span><span class="p">)</span>
+                <span class="n">sum_h</span> <span class="o">-=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">prob</span>
+            <span class="k">elif</span> <span class="n">STOPWORD_WEIGHT</span> <span class="o">==</span> <span class="s2">&quot;h&quot;</span><span class="p">:</span>
+                <span class="c1"># Alternative: include stopword&#39;s H value</span>
+                <span class="n">sum_h</span> <span class="o">+=</span> <span class="n">term_base</span><span class="o">.</span><span class="n">H</span>
+                <span class="n">prod_h</span> <span class="o">*=</span> <span class="n">term_base</span><span class="o">.</span><span class="n">H</span>
+            <span class="c1"># If STOPWORD_WEIGHT is &#39;none&#39;, do nothing</span>
+
+    <span class="c1"># Determine term frequency to use</span>
+    <span class="n">tf_used</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">if</span> <span class="n">features</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="s2">&quot;KPF&quot;</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
+        <span class="n">tf_used</span> <span class="o">=</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">tf</span>
+
+    <span class="c1"># For virtual candidates, use mean term frequency</span>
+    <span class="k">if</span> <span class="n">is_virtual</span><span class="p">:</span>
+        <span class="n">tf_used</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">term_obj</span><span class="o">.</span><span class="n">tf</span> <span class="k">for</span> <span class="n">term_obj</span> <span class="ow">in</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span><span class="p">])</span>
+
+    <span class="c1"># Calculate final H score</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">prod_h</span> <span class="o">/</span> <span class="p">((</span><span class="n">sum_h</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">tf_used</span><span class="p">)</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;H&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">H</span>
+
+    <span class="c1"># Add derived features</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;prod_h&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prod_h</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;sum_h&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sum_h</span>
+    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;tf_used&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf_used</span>
+
+    <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<div class="viewcode-block" id="get_composed_feature">
+<a class="viewcode-back" href="../../pyake.html#yake.features.get_composed_feature">[docs]</a>
+<span class="k">def</span> <span class="nf">get_composed_feature</span><span class="p">(</span><span class="n">composed_word</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">discard_stopword</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate combined metrics for a feature across all terms in a composed word.</span>
+
+<span class="sd">    This function aggregates a specific feature across all terms in a multi-word expression.</span>
+<span class="sd">    It computes the sum, product, and ratio of the feature values, optionally excluding</span>
+<span class="sd">    stopwords from the calculation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        composed_word: ComposedWord object containing the n-gram information</span>
+<span class="sd">        feature_name: Name of the feature to compose (must be an attribute of the term objects)</span>
+<span class="sd">        discard_stopword: Whether to exclude stopwords from calculation (True by default)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Tuple of (sum, product, ratio) for the feature where:</span>
+<span class="sd">        - sum: Sum of the feature values across all relevant terms</span>
+<span class="sd">        - product: Product of the feature values across all relevant terms</span>
+<span class="sd">        - ratio: Product divided by (sum + 1), a measure of feature consistency</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">list_of_features</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">getattr</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">composed_word</span><span class="o">.</span><span class="n">terms</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">discard_stopword</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">term</span><span class="o">.</span><span class="n">stopword</span>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">list_of_features</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">sum_f</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">list_of_features</span><span class="p">)</span>
+    <span class="n">prod_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">list_of_features</span><span class="p">)</span>
+
+    <span class="c1"># Calculate ratio, avoiding division by zero</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">prod_f</span> <span class="o">/</span> <span class="p">(</span><span class="n">sum_f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">sum_f</span><span class="p">,</span> <span class="n">prod_f</span><span class="p">,</span> <span class="n">ratio</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="apply_features_to_term">
+<a class="viewcode-back" href="../../pyake.html#yake.features.apply_features_to_term">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_features_to_term</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">features</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply calculated features to a SingleWord object.</span>
+
+<span class="sd">    This function takes a dictionary of calculated features and sets them as attributes</span>
+<span class="sd">    on the provided term object, making the features accessible directly from the term.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        term: SingleWord object to update with feature values</span>
+<span class="sd">        features: Dictionary of features from calculate_term_features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="apply_features_to_composed_word">
+<a class="viewcode-back" href="../../pyake.html#yake.features.apply_features_to_composed_word">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_features_to_composed_word</span><span class="p">(</span><span class="n">composed_word</span><span class="p">,</span> <span class="n">features</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply calculated features to a ComposedWord object.</span>
+
+<span class="sd">    This function takes a dictionary of calculated features and sets the main H score</span>
+<span class="sd">    as an attribute on the provided composed word object. Unlike apply_features_to_term,</span>
+<span class="sd">    this function only sets the H score, not all features.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        composed_word: ComposedWord object to update with feature values</span>
+<span class="sd">        features: Dictionary of features from calculate_composed_features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">feature_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">feature_name</span> <span class="o">==</span> <span class="s2">&quot;H&quot;</span><span class="p">:</span>  <span class="c1"># Only set the main H score</span>
+            <span class="n">composed_word</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="n">value</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">yake 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yake.features</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2017, LIAAD.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>

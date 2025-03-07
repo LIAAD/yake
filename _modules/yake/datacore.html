@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yake.datacore &#8212; yake 0.5.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/nature.css?v=601dbdee" />
+    <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">yake 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yake.datacore</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for yake.datacore</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span>
+<span class="kn">from</span> <span class="nn">segtok.segmenter</span> <span class="kn">import</span> <span class="n">split_multi</span>
+<span class="kn">from</span> <span class="nn">segtok.tokenizer</span> <span class="kn">import</span> <span class="n">web_tokenizer</span><span class="p">,</span> <span class="n">split_contractions</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">yake.ngrams</span> <span class="kn">import</span> <span class="n">ComposedWord</span>
+<span class="kn">from</span> <span class="nn">yake.terms</span> <span class="kn">import</span> <span class="n">SingleWord</span>
+
+<span class="n">STOPWORD_WEIGHT</span> <span class="o">=</span> <span class="s2">&quot;bi&quot;</span>
+
+
+<div class="viewcode-block" id="DataCore">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore">[docs]</a>
+<span class="k">class</span> <span class="nc">DataCore</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">stopword_set</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">windowsSize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">tagsToDiscard</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exclude</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the data core for keyword extraction.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text: Input text to process</span>
+<span class="sd">            stopword_set: Set of stopwords to ignore</span>
+<span class="sd">            windowsSize: Size of window for co-occurrence matrix</span>
+<span class="sd">            n: Maximum n-gram size</span>
+<span class="sd">            tagsToDiscard: Tags to discard during processing</span>
+<span class="sd">            exclude: Set of characters to exclude</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_sentences</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_words</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentences_obj</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentences_str</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span> <span class="o">=</span> <span class="n">exclude</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tagsToDiscard</span> <span class="o">=</span> <span class="n">tagsToDiscard</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">([</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">freq_ns</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">freq_ns</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stopword_set</span> <span class="o">=</span> <span class="n">stopword_set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">windowsSize</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataCore.build_candidate">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.build_candidate">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_candidate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">candidate_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a candidate from a string.</span>
+
+<span class="sd">        This function processes a candidate string by tokenizing it, tagging each word,</span>
+<span class="sd">        and creating a ComposedWord object from the resulting terms. It&#39;s used to</span>
+<span class="sd">        convert external strings into the internal candidate representation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            candidate_string: String to build candidate from</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A ComposedWord instance representing the candidate, or an invalid</span>
+<span class="sd">            ComposedWord if no valid terms were found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sentences_str</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">w</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">split_contractions</span><span class="p">(</span><span class="n">web_tokenizer</span><span class="p">(</span><span class="n">candidate_string</span><span class="o">.</span><span class="n">lower</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="n">candidate_terms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sentences_str</span><span class="p">):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">term_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_term</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">save_non_seen</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">term_obj</span><span class="o">.</span><span class="n">tf</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">term_obj</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">candidate_terms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">tag</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">term_obj</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">([</span><span class="n">cand</span> <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">candidate_terms</span> <span class="k">if</span> <span class="n">cand</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">invalid_virtual_cand</span> <span class="o">=</span> <span class="n">ComposedWord</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">invalid_virtual_cand</span>
+
+        <span class="n">virtual_cand</span> <span class="o">=</span> <span class="n">ComposedWord</span><span class="p">(</span><span class="n">candidate_terms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">virtual_cand</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">windowsSize</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build the datacore features.</span>
+
+<span class="sd">        This method processes the input text to extract terms, build the co-occurrence graph,</span>
+<span class="sd">        and generate candidate keyphrases. It performs the following steps:</span>
+<span class="sd">        1. Pre-filters and tokenizes the text into sentences and words</span>
+<span class="sd">        2. Processes each word to create term objects</span>
+<span class="sd">        3. Builds a co-occurrence matrix based on the window size</span>
+<span class="sd">        4. Generates candidate keyphrases of various n-gram sizes</span>
+<span class="sd">        5. Updates internal data structures with the extracted information</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text: Input text to process</span>
+<span class="sd">            windowsSize: Size of window for co-occurrence matrix calculation</span>
+<span class="sd">            n: Maximum n-gram size to consider for candidate keyphrases</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_filter</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sentences_str</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span>
+                <span class="n">w</span>
+                <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">split_contractions</span><span class="p">(</span><span class="n">web_tokenizer</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">split_multi</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_sentences</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentences_str</span><span class="p">)</span>
+        <span class="n">pos_text</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">sentence_id</span><span class="p">,</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sentences_str</span><span class="p">):</span>
+            <span class="n">sentence_obj_aux</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">block_of_word_obj</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">pos_sent</span><span class="p">,</span> <span class="n">word</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+                <span class="c1"># Skip words made only of excluded characters</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">block_of_word_obj</span><span class="p">:</span>
+                        <span class="n">sentence_obj_aux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">)</span>
+                        <span class="n">block_of_word_obj</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tag</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">pos_sent</span><span class="p">)</span>
+                    <span class="n">term_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_term</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+                    <span class="n">term_obj</span><span class="o">.</span><span class="n">add_occur</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="n">sentence_id</span><span class="p">,</span> <span class="n">pos_sent</span><span class="p">,</span> <span class="n">pos_text</span><span class="p">)</span>
+                    <span class="n">pos_text</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                    <span class="c1"># Create co-occurrence matrix</span>
+                    <span class="k">if</span> <span class="n">tag</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagsToDiscard</span><span class="p">:</span>
+                        <span class="n">word_windows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                            <span class="nb">range</span><span class="p">(</span>
+                                <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">)</span> <span class="o">-</span> <span class="n">windowsSize</span><span class="p">),</span>
+                                <span class="nb">len</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">),</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_windows</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">block_of_word_obj</span><span class="p">[</span><span class="n">w</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tagsToDiscard</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">add_cooccur</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">[</span><span class="n">w</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">term_obj</span><span class="p">)</span>
+
+                    <span class="c1"># Generate candidate keyphrase list</span>
+                    <span class="n">candidate</span> <span class="o">=</span> <span class="p">[(</span><span class="n">tag</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">term_obj</span><span class="p">)]</span>
+                    <span class="n">cand</span> <span class="o">=</span> <span class="n">ComposedWord</span><span class="p">(</span><span class="n">candidate</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_or_update_composed_word</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span>
+
+                    <span class="n">word_windows</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                        <span class="nb">range</span><span class="p">(</span>
+                            <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)),</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_windows</span><span class="p">:</span>
+                        <span class="n">candidate</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">[</span><span class="n">w</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">freq_ns</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">)]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+                        <span class="n">cand</span> <span class="o">=</span> <span class="n">ComposedWord</span><span class="p">(</span><span class="n">candidate</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">add_or_update_composed_word</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span>
+
+                    <span class="c1"># Add term to the block of words&#39; buffer</span>
+                    <span class="n">block_of_word_obj</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">tag</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">term_obj</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">block_of_word_obj</span><span class="p">:</span>
+                <span class="n">sentence_obj_aux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block_of_word_obj</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sentence_obj_aux</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sentences_obj</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence_obj_aux</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_words</span> <span class="o">=</span> <span class="n">pos_text</span>
+
+<div class="viewcode-block" id="DataCore.build_single_terms_features">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.build_single_terms_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_single_terms_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build features for single terms.</span>
+
+<span class="sd">        Calculates and updates statistical features for all single terms in the text.</span>
+<span class="sd">        This includes term frequency statistics and other features specified in the</span>
+<span class="sd">        features parameter. Only non-stopword terms are considered for statistics</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            features: List of features to build. If None, all available features will be built.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">term</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">term</span><span class="o">.</span><span class="n">stopword</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">valid_terms</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">valid_tfs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">tf</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">valid_terms</span><span class="p">])</span>
+        <span class="n">avg_tf</span> <span class="o">=</span> <span class="n">valid_tfs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">std_tf</span> <span class="o">=</span> <span class="n">valid_tfs</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+        <span class="n">max_tf</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">tf</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">term</span><span class="o">.</span><span class="n">update_h</span><span class="p">(</span>
+                <span class="n">max_tf</span><span class="o">=</span><span class="n">max_tf</span><span class="p">,</span>
+                <span class="n">avg_tf</span><span class="o">=</span><span class="n">avg_tf</span><span class="p">,</span>
+                <span class="n">std_tf</span><span class="o">=</span><span class="n">std_tf</span><span class="p">,</span>
+                <span class="n">number_of_sentences</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_sentences</span><span class="p">,</span>
+                <span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataCore.build_mult_terms_features">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.build_mult_terms_features">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_mult_terms_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build features for multi-word terms.</span>
+
+<span class="sd">        Updates the features for all valid multi-word candidate terms (n-grams).</span>
+<span class="sd">        Only candidates that pass the validity check will have their features updated.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            features: List of features to build. If None, all available features will be built.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">cand</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+                <span class="n">cand</span><span class="o">.</span><span class="n">update_h</span><span class="p">(</span><span class="n">features</span><span class="o">=</span><span class="n">features</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataCore.pre_filter">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.pre_filter">[docs]</a>
+    <span class="k">def</span> <span class="nf">pre_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pre-filter text before processing.</span>
+
+<span class="sd">        Performs initial text cleaning and formatting:</span>
+<span class="sd">        1. Handles line breaks and paragraph structure</span>
+<span class="sd">        2. Ensures proper spacing between sentences</span>
+<span class="sd">        3. Replaces tabs with spaces</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            text: Input text to be filtered</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Filtered text ready for further processing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prog</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(\s*([A-Z]))&quot;</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">buffer</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+            <span class="k">if</span> <span class="n">prog</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">part</span><span class="p">):</span>
+                <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="n">buffer</span> <span class="o">+=</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">part</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">buffer</span></div>
+
+
+<div class="viewcode-block" id="DataCore.get_tag">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.get_tag">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get tag for a word.</span>
+
+<span class="sd">        Determines the type of word based on its characteristics:</span>
+<span class="sd">        - &#39;d&#39;: Digit (numeric value)</span>
+<span class="sd">        - &#39;u&#39;: Unknown (mixed alphanumeric or special characters)</span>
+<span class="sd">        - &#39;a&#39;: All caps (acronym)</span>
+<span class="sd">        - &#39;n&#39;: Proper noun (capitalized word not at sentence start)</span>
+<span class="sd">        - &#39;p&#39;: Regular word</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            word: Word to tag</span>
+<span class="sd">            position: Position in sentence (used to identify proper nouns)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tag as string representing the word type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">w2</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">w2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;d&quot;</span>  <span class="c1"># Digit</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">cdigit</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">())</span>
+            <span class="n">calpha</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalpha</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">cdigit</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">calpha</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">cdigit</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">calpha</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="s2">&quot;u&quot;</span>  <span class="c1"># Unknown</span>
+
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s2">&quot;a&quot;</span>  <span class="c1"># All caps</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">word</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isupper</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">word</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                <span class="ow">and</span> <span class="n">word</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span>
+                <span class="ow">and</span> <span class="n">position</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="s2">&quot;n&quot;</span>  <span class="c1"># Proper noun</span>
+
+        <span class="k">return</span> <span class="s2">&quot;p&quot;</span>  <span class="c1"># Regular word</span></div>
+
+
+<div class="viewcode-block" id="DataCore.get_term">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.get_term">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_term</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_non_seen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SingleWord&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get or create a term object for a word.</span>
+
+<span class="sd">        Retrieves an existing term object for a word or creates a new one.</span>
+<span class="sd">        The function also:</span>
+<span class="sd">        1. Normalizes the word (lowercase, handles plural forms)</span>
+<span class="sd">        2. Determines if the word is a stopword</span>
+<span class="sd">        3. Creates a new term object if needed and adds it to the graph</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            word: Word to get term for</span>
+<span class="sd">            save_non_seen: Whether to save new terms to the internal dictionary.</span>
+<span class="sd">                           If False, creates a temporary term without saving it.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SingleWord instance representing the term</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_term</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">is_simple_stopword</span> <span class="o">=</span> <span class="n">unique_term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopword_set</span>
+
+        <span class="k">if</span> <span class="n">unique_term</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_term</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">unique_term</span> <span class="o">=</span> <span class="n">unique_term</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">unique_term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">unique_term</span><span class="p">]</span>
+
+        <span class="c1"># Check if word is a stopword</span>
+        <span class="n">simple_unique_term</span> <span class="o">=</span> <span class="n">unique_term</span>
+        <span class="k">for</span> <span class="n">punctuation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">:</span>
+            <span class="n">simple_unique_term</span> <span class="o">=</span> <span class="n">simple_unique_term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">punctuation</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="n">is_stopword</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">is_simple_stopword</span>
+            <span class="ow">or</span> <span class="n">unique_term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopword_set</span>
+            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">simple_unique_term</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create new term</span>
+        <span class="n">term_id</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span>
+        <span class="n">term_obj</span> <span class="o">=</span> <span class="n">SingleWord</span><span class="p">(</span><span class="n">unique_term</span><span class="p">,</span> <span class="n">term_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">)</span>
+        <span class="n">term_obj</span><span class="o">.</span><span class="n">stopword</span> <span class="o">=</span> <span class="n">is_stopword</span>
+
+        <span class="k">if</span> <span class="n">save_non_seen</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">term_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">[</span><span class="n">unique_term</span><span class="p">]</span> <span class="o">=</span> <span class="n">term_obj</span>
+
+        <span class="k">return</span> <span class="n">term_obj</span></div>
+
+
+<div class="viewcode-block" id="DataCore.add_cooccur">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.add_cooccur">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_cooccur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_term</span><span class="p">:</span> <span class="s2">&quot;SingleWord&quot;</span><span class="p">,</span> <span class="n">right_term</span><span class="p">:</span> <span class="s2">&quot;SingleWord&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add co-occurrence between terms.</span>
+
+<span class="sd">        Updates the co-occurrence graph by adding or incrementing an edge between</span>
+<span class="sd">        two terms. This information is used to calculate term relatedness and</span>
+<span class="sd">        importance in the text.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            left_term: Left term in the co-occurrence relationship</span>
+<span class="sd">            right_term: Right term in the co-occurrence relationship</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">right_term</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">left_term</span><span class="o">.</span><span class="n">id</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">left_term</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">right_term</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">TF</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">[</span><span class="n">left_term</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="n">right_term</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="s2">&quot;TF&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span></div>
+
+
+<div class="viewcode-block" id="DataCore.add_or_update_composed_word">
+<a class="viewcode-back" href="../../pyake.html#yake.datacore.DataCore.add_or_update_composed_word">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_or_update_composed_word</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cand</span><span class="p">:</span> <span class="s2">&quot;ComposedWord&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add or update a composed word.</span>
+
+<span class="sd">        Adds a new candidate composed word (n-gram) to the candidates dictionary</span>
+<span class="sd">        or updates an existing one by incrementing its frequency. This is used to</span>
+<span class="sd">        track potential keyphrases in the text.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cand: ComposedWord instance to add or update in the candidates dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">cand</span><span class="o">.</span><span class="n">unique_kw</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="p">[</span><span class="n">cand</span><span class="o">.</span><span class="n">unique_kw</span><span class="p">]</span> <span class="o">=</span> <span class="n">cand</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="p">[</span><span class="n">cand</span><span class="o">.</span><span class="n">unique_kw</span><span class="p">]</span><span class="o">.</span><span class="n">update_cand</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">candidates</span><span class="p">[</span><span class="n">cand</span><span class="o">.</span><span class="n">unique_kw</span><span class="p">]</span><span class="o">.</span><span class="n">tf</span> <span class="o">+=</span> <span class="mf">1.0</span></div>
+</div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">yake 0.5.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">yake.datacore</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2017, LIAAD.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
+    </div>
+  </body>
+</html>
