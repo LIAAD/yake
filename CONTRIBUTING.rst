@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/LIAAD/yake/issues.
+Report bugs at https://github.com/arianpasquali/yake/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-yake could always use more documentation, whether as part of the
-official yake docs, in docstrings, or even on the web in blog posts,
+YAKE! could always use more documentation, whether as part of the
+official documentation, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -64,11 +64,11 @@ Ready to contribute? Here's how to set up `yake` for local development.
 
     $ git clone git@github.com:your_name_here/yake.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy. This project uses uv for dependency management::
 
-    $ mkvirtualenv yake
+    $ curl -LsSf https://astral.sh/uv/install.sh | sh
     $ cd yake/
-    $ python setup.py develop
+    $ uv pip install -e ".[dev]"
 
 4. Create a branch for local development::
 
@@ -76,13 +76,10 @@ Ready to contribute? Here's how to set up `yake` for local development.
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+5. When you're done making changes, check that your changes pass flake8 and the tests::
 
-    $ flake8 yake tests
-    $ python setup.py test or py.test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ ruff check yake tests
+    $ pytest
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -100,15 +97,14 @@ Before you submit a pull request, check that it meets these guidelines:
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
-   feature to the list in README.rst.
-3. The pull request should work for Python 2.6, 2.7, 3.3, 3.4 and 3.5, and for PyPy. Check
-   https://travis-ci.org/LIAAD/yake/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+   feature to the list in README.md.
+3. The pull request should work for Python 3.8, 3.9, 3.10, and 3.11. Check
+   the GitHub Actions workflow results for your PR to ensure tests pass for all
+   supported Python versions.
 
 Tips
 ----
 
 To run a subset of tests::
 
-$ py.test tests.test_yake
-
+    $ pytest tests/test_specific_module.py

@@ -12,24 +12,56 @@ yake.cli module
     :undoc-members:
     :show-inheritance:
 
-yake.datarepresentation module
--------------------------------
+yake.datacore module
+--------------------
 
-.. automodule:: yake.datarepresentation
+.. automodule:: yake.datacore
     :members:
     :undoc-members:
     :show-inheritance:
 
-yake.keywordextraction module
-------------------------------
+yake.features module
+--------------------
 
-.. automodule:: yake.keywordextraction
+.. automodule:: yake.features
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yake.Levenshtein module
+-----------------------
+
+.. automodule:: yake.Levenshtein
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yake.ngrams module
+-----------------
+
+.. automodule:: yake.ngrams
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yake.terms module
+----------------
+
+.. automodule:: yake.terms
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+yake.utils module
+----------------
+
+.. automodule:: yake.utils
     :members:
     :undoc-members:
     :show-inheritance:
 
 yake.yake module
-------------------
+---------------
 
 .. automodule:: yake.yake
     :members:
