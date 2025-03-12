@@ -1,16 +1,15 @@
 Importações:
 
 Organizadas em grupos (stdlib, third-party, local)
-Ordenadas alfabeticamente
+Ordenadas alfabeticamente e por natividade
 Removida importação não utilizada de string
 
 Nomes de variáveis e funções:
 
-Convertidos para snake_case: dedupLim → dedup_lim
-windowsSize → window_size
-stop_fil → stop_file
-todedup → candidates_sorted
-toadd → should_add
+Classes CamelCase
+Função: snake_case
+Variáveis: snake_case
+Constantes: UPPER_CASE
 
 ----------------------Docstrings----------------------------------:
 
@@ -37,13 +36,9 @@ por
 
 Melhorada verificação de string vazia usando if not text
 
--------------------------Consistência-----------------------------:
+-----------------------------------------------------------------------------------------------------------------------
 
-Uso consistente de aspas simples
-Tratamento de exceções mais específico
-Nomes mais descritivos para variáveis temporárias
-
-Status semanda 07/02/2025   //////Refactoring score (3.21)
+Status semanda 07/02/2025   //////Refactoring score (3.21) ---------> PYlint (PEP 8)
 
 - Exploração das mencionadas ferramentas puppet e cheff.
 (Ferramentas que acabam por ser extremamente parecidas ao git actions, não considero que usá-las seja algo que vala a pena; visto que o github actions será mais intuitivo.) (04 e 05 /02/2025)
@@ -94,7 +89,7 @@ Redução de código duplo
 Criação de dicionários de "guia", _get_dedup_function
 Lógica foi extraída para um método separado,_load_stopwords
 
-///// Refactoring score (6.57) -> (6.86) 06/03/2025
+///// Refactoring score (6.59) -> (6.86) 06/03/2025
 
 highligh.py
 
@@ -102,6 +97,6 @@ Redução de código duplo (Próximo passo)
 Documentação +/-
 Separação de métodos e argumentos (quase todos)
 
-///// Refactoring score (6.57) -> (6.91) 07/03/2025
+///// Refactoring score (6.86) -> (6.93) 07/03/2025
 
 Criação de dicionários de forma a diminuir o numero de argumentos por cada função e comparações condicionais.
