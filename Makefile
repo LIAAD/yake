@@ -7,10 +7,11 @@ test:
 	python -m pytest -vv --cov= test_*.py
 
 format:	
-	black *.py 
+	black .
 
 lint:
-	ruff check *.py
+	ruff check --fix .
+	ruff check .
 
 deploy:
 	# no rules for now
