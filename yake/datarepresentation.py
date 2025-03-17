@@ -52,65 +52,68 @@ class DataCore():
     # Build the datacore features
     def _build(self, text, windows_size, n):
         text = self.pre_filter(text)
-        self.sentences_str = [ [
-            w for w in split_contractions(web_tokenizer(s)) if not (
-                w.startswith("'") and len(w) > 1) and len(w) > 0] for s in
-                              list(split_multi(text)) if len(s.strip()) > 0]
+        self.sentences_str = self.tokenize_sentences(text)
         self.number_of_sentences = len(self.sentences_str)
         pos_text = 0
-        block_of_word_obj = []
-        sentence_obj_aux = []
         for (sentence_id, sentence) in enumerate(self.sentences_str):
-            sentence_obj_aux = []
-            block_of_word_obj = []
-            for (pos_sent, word) in enumerate(sentence):
-                if len( # If the word is based on exclude chars
-                    [c for c in word if c in self.exclude]) == len(word):
-                    if len(block_of_word_obj) > 0:
-                        sentence_obj_aux.append( block_of_word_obj )
-                        block_of_word_obj = []
-                else:
-                    tag = self.get_tag(word, pos_sent)
-                    term_obj = self.get_term(word)
-                    term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
-                    pos_text += 1
+            pos_text = self.process_sentence(sentence, sentence_id, pos_text, windows_size, n)
+        self.number_of_words = pos_text
 
-                    #Create co-occurrence matrix
-                    if tag not in self.tags_to_discard:
-                        word_windows = list(
-                            range( max(0, len(block_of_word_obj)-windows_size),
-                                len(block_of_word_obj) ))
-                        for w in word_windows:
-                            if block_of_word_obj[w][0] not in self.tags_to_discard:
-                                self.add_cooccur(block_of_word_obj[w][2], term_obj)
-                    #Generate candidate keyphrase list
-                    candidate = [ (tag, word, term_obj) ]
-                    cand = ComposedWord(candidate)
-                    self.add_or_update_composedword(cand)
-                    word_windows = list(
-                        range( max(0, len(block_of_word_obj)-(n-1)), len(block_of_word_obj) ))[::-1]
-                    for w in word_windows:
-                        candidate.append(block_of_word_obj[w])
-                        self.freq_ns[len(candidate)] += 1.
-                        cand = ComposedWord(candidate[::-1])
-                        self.add_or_update_composedword(cand)
+    def tokenize_sentences(self, text):
+        return [[
+            w for w in split_contractions(web_tokenizer(s)) if not (
+                w.startswith("'") and len(w) > 1) and len(w) > 0] for s in
+                list(split_multi(text)) if len(s.strip()) > 0]
 
-                    # Add term to the block of words' buffer
-                    block_of_word_obj.append( (tag, word, term_obj) )
-
-            if len(block_of_word_obj) > 0:
-                sentence_obj_aux.append( block_of_word_obj )
-
-            if len(sentence_obj_aux) > 0:
-                self.sentences_obj.append(sentence_obj_aux)
-
+    def process_sentence(self, sentence, sentence_id, pos_text, windows_size, n):
+        sentence_obj_aux = []
+        block_of_word_obj = []
+        for (pos_sent, word) in enumerate(sentence):
+            if len([c for c in word if c in self.exclude]) == len(word):
+                if len(block_of_word_obj) > 0:
+                    sentence_obj_aux.append(block_of_word_obj)
+                    block_of_word_obj = []
+            else:
+                pos_text = self.process_word(
+                    word, pos_sent, sentence_id, pos_text, block_of_word_obj, windows_size, n
+                    )
         if len(block_of_word_obj) > 0:
-            sentence_obj_aux.append( block_of_word_obj )
-
+            sentence_obj_aux.append(block_of_word_obj)
         if len(sentence_obj_aux) > 0:
             self.sentences_obj.append(sentence_obj_aux)
+        return pos_text
 
-        self.number_of_words = pos_text
+    def process_word(
+        self, word, pos_sent, sentence_id, pos_text, block_of_word_obj, windows_size, n
+        ):
+        tag = self.get_tag(word, pos_sent)
+        term_obj = self.get_term(word)
+        term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
+        pos_text += 1
+        if tag not in self.tags_to_discard:
+            self.update_cooccurrence(block_of_word_obj, term_obj, windows_size)
+        self.generate_candidates((tag, word), term_obj, block_of_word_obj, n)
+        block_of_word_obj.append((tag, word, term_obj))
+        return pos_text
+
+    def update_cooccurrence(self, block_of_word_obj, term_obj, windows_size):
+        word_windows = list(
+            range(max(0, len(block_of_word_obj) - windows_size), len(block_of_word_obj)))
+        for w in word_windows:
+            if block_of_word_obj[w][0] not in self.tags_to_discard:
+                self.add_cooccur(block_of_word_obj[w][2], term_obj)
+
+    def generate_candidates(self, term, term_obj, block_of_word_obj, n):
+        candidate = [term + (term_obj,)]
+        cand = ComposedWord(candidate)
+        self.add_or_update_composedword(cand)
+        word_windows = list(
+            range(max(0, len(block_of_word_obj) - (n - 1)), len(block_of_word_obj)))[::-1]
+        for w in word_windows:
+            candidate.append(block_of_word_obj[w])
+            self.freq_ns[len(candidate)] += 1.
+            cand = ComposedWord(candidate[::-1])
+            self.add_or_update_composedword(cand)
 
     def build_single_terms_features(self, features=None):
         valid_terms = [ term for term in self.terms.values() if not term.stopword ]
