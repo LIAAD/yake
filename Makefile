@@ -3,8 +3,13 @@ install:
 		pip install -r requirements.txt
 
 test:
+<<<<<<< Updated upstream
 	# python -m pytest --nbval *.ipynb
 	python -m pytest -vv --cov= test_*.py
+=======
+	python -m pytest --nbval *.ipynb
+	# python -m pytest -vv --cov= test_*.py
+>>>>>>> Stashed changes
 
 format:	
 	black .
