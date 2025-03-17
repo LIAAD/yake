@@ -122,10 +122,13 @@ class DataCore():
         avg_tf = valid_tfs.mean()
         std_tf = valid_tfs.std()
         max_tf = max(x.tf for x in self.terms.values())
-        list(map(lambda x: x.update_h(
-            max_tf=max_tf, avg_tf=avg_tf,
-            std_tf=std_tf, number_of_sentences=self.number_of_sentences,
-            features=features), self.terms.values()))
+        stats = {
+            'max_tf': max_tf,
+            'avg_tf': avg_tf,
+            'std_tf': std_tf,
+            'number_of_sentences': self.number_of_sentences
+        }
+        list(map(lambda x: x.update_h(stats, features=features), self.terms.values()))
 
     def build_mult_terms_features(self, features=None):
         list(map(lambda x: x.update_h(features=features),
@@ -232,45 +235,47 @@ class ComposedWord():
         prod_f = np.prod(list_of_features)
         return (sum_f, prod_f, prod_f / (sum_f + 1))
 
-    def build_features(
-        self,
-        doc_id = None,
-        keys = None,
-        rel = True,
-        rel_approx = True,
-        is_virtual = False,
-        features = None,
-        _stopword = None,
-        ):
+    def build_features(self, params):
+        """
+        Build features for the composed word.
+
+        Args:
+            params (dict): Dictionary containing the following keys:
+                - doc_id (optional): Document ID.
+                - keys (optional): List of keys.
+                - rel (optional): Boolean indicating relevance.
+                - rel_approx (optional): Boolean indicating approximate relevance.
+        """
+        features = params.get('features', ['wfreq', 'wrel', 'tf', 'wcase', 'wpos', 'wspread'])
+        _stopword = params.get('_stopword', [True, False])
         if features is None:
             features = ['wfreq', 'wrel', 'tf', 'wcase', 'wpos', 'wspread']
         if _stopword is None:
             _stopword = [True, False]
         columns = []
-        seen = set()
         features_cand = []
-
-        if doc_id is not None:
+        seen = set()
+        if params.get('doc_id') is not None:
             columns.append('doc_id')
-            features_cand.append(doc_id)
+            features_cand.append(params['doc_id'])
 
-        if keys is not None:
-            if rel:
+        if params.get('keys') is not None:
+            if params.get('rel', True):
                 columns.append('rel')
-                if self.unique_kw in keys or is_virtual:
+                if self.unique_kw in params['keys'] or params.get('is_virtual', False):
                     features_cand.append(1)
                     seen.add(self.unique_kw)
                 else:
                     features_cand.append(0)
 
-            if rel_approx:
+            if params.get('rel_approx', True):
                 columns.append('rel_approx')
                 max_gold_ = ('', 0.)
-                for gold_key in keys:
+                for gold_key in params['keys']:
                     dist = 1.-jellyfish.levenshtein_distance(
                         gold_key, self.unique_kw) / max(len(gold_key), len(self.unique_kw)) # _tL
-                    if max_gold_[1] < dist:
-                        max_gold_ = ( gold_key, dist )
+                    max_gold_ = ( gold_key, dist )
+                features_cand.append(max_gold_[1])
                 features_cand.append(max_gold_[1])
 
         columns.append('kw')
@@ -282,8 +287,8 @@ class ComposedWord():
         columns.append('size')
         features_cand.append(self.size)
         columns.append('is_virtual')
-        features_cand.append(int(is_virtual))
-
+        columns.append('is_virtual')
+        features_cand.append(int(params.get('is_virtual', False)))
         for feature_name in features:
 
             for discart_stopword in _stopword:
@@ -395,12 +400,17 @@ class SingleWord():
 
         self.pagerank = 1.
 
-    def update_h(self, max_tf, avg_tf, std_tf, number_of_sentences, features=None):
+    def update_h(self, stats, features=None):
         """if features is None or "wrel" in features:
             self.pl = self.wdl / max_tf
             self.pr = self.wdr / max_tf
             self.wrel = ( (0.5 + (self.pwl * (self.tf / max_tf) + self.pl)) +(0.5 + (
                 self.pwr * (self.tf / max_tf) + self.pr)) )"""
+
+        max_tf = stats['max_tf']
+        avg_tf = stats['avg_tf']
+        std_tf = stats['std_tf']
+        number_of_sentences = stats['number_of_sentences']
 
         if features is None or "wrel" in features:
             self.pl = self.wdl / max_tf
