@@ -19,7 +19,7 @@ class WordProcessingContext:
         self.sentence_id = sentence_id
         self.pos_text = pos_text
         self.block_of_word_obj = block_of_word_obj
-        
+
 class SentenceProcessingContext:
     """Helper class to encapsulate sentence processing parameters"""
     def __init__(self, sentence, sentence_id, pos_text):
@@ -35,14 +35,12 @@ class DataCore():
             tags_to_discard = set(['u', 'd'])
         if exclude is None:
             exclude = set(string.punctuation)
-        
         # Group text analysis stats
         self.stats = {
             'number_of_sentences': 0,
             'number_of_words': 0,
             'freq_ns': {i+1: 0. for i in range(n)}
         }
-        
         # Group text components
         self.components = {
             'terms': {},
@@ -50,7 +48,6 @@ class DataCore():
             'sentences_obj': [],
             'sentences_str': []
         }
-        
         # Group configuration parameters
         self.config = {
             'g': nx.DiGraph(),
@@ -58,7 +55,6 @@ class DataCore():
             'tags_to_discard': tags_to_discard,
             'stopword_set': stopword_set
         }
-        
         # Build the core data structures
         self._build(text, windows_size, n)
 
@@ -66,47 +62,36 @@ class DataCore():
     @property
     def number_of_sentences(self):
         return self.stats['number_of_sentences']
-    
     @property
     def number_of_words(self):
         return self.stats['number_of_words']
-    
     @property
     def terms(self):
         return self.components['terms']
-    
     @property
     def candidates(self):
         return self.components['candidates']
-    
     @property
     def sentences_obj(self):
         return self.components['sentences_obj']
-    
     @property
     def sentences_str(self):
         return self.components['sentences_str']
-    
     @property
     def g(self):
         return self.config['g']
-    
     @property
     def exclude(self):
         return self.config['exclude']
-    
     @property
     def tags_to_discard(self):
         return self.config['tags_to_discard']
-    
     @property
     def freq_ns(self):
         return self.stats['freq_ns']
-    
     @property
     def stopword_set(self):
         return self.config['stopword_set']
-
     def build_candidate(self, candidate_string):
         sentences_str = [w for w in split_contractions(
             web_tokenizer(candidate_string.lower())) if not
@@ -155,13 +140,10 @@ class DataCore():
                     word, pos_sent, context.sentence_id, context.pos_text, context.block_of_word_obj
                 )
                 context.pos_text = self.process_word(word_context, windows_size, n)
-                
         if len(context.block_of_word_obj) > 0:
             context.sentence_obj_aux.append(context.block_of_word_obj)
-            
         if len(context.sentence_obj_aux) > 0:
             self.components['sentences_obj'].append(context.sentence_obj_aux)
-            
         return context.pos_text
 
     def process_word(self, context, windows_size, n):
@@ -170,13 +152,13 @@ class DataCore():
         term_obj = self.get_term(context.word)
         term_obj.add_occur(tag, context.sentence_id, context.pos_sent, context.pos_text)
         context.pos_text += 1
-        
+
         if tag not in self.config['tags_to_discard']:
             self.update_cooccurrence(context.block_of_word_obj, term_obj, windows_size)
-            
+
         self.generate_candidates((tag, context.word), term_obj, context.block_of_word_obj, n)
         context.block_of_word_obj.append((tag, context.word, term_obj))
-        
+
         return context.pos_text
 
     def update_cooccurrence(self, block_of_word_obj, term_obj, windows_size):
@@ -258,11 +240,12 @@ class DataCore():
         if unique_term in self.components['terms']:
             return self.components['terms'][unique_term]
 
-       
+
         simples_unique_term = unique_term
         for pontuation in self.config['exclude']:
             simples_unique_term = simples_unique_term.replace(pontuation, '')
-        isstopword = simples_sto or unique_term in self.config['stopword_set'] or len(simples_unique_term) < 3
+        isstopword = simples_sto or unique_term in self.config[
+            'stopword_set'] or len(simples_unique_term) < 3
 
         term_id = len(self.components['terms'])
         term_obj = SingleWord(unique_term, term_id, self.config['g'])
