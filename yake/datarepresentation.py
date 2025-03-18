@@ -11,26 +11,101 @@ import numpy as np
 
 STOPWORD_WEIGHT = 'bi'
 
+class WordProcessingContext:
+    """Helper class to encapsulate word processing parameters"""
+    def __init__(self, word, pos_sent, sentence_id, pos_text, block_of_word_obj):
+        self.word = word
+        self.pos_sent = pos_sent
+        self.sentence_id = sentence_id
+        self.pos_text = pos_text
+        self.block_of_word_obj = block_of_word_obj
+        
+class SentenceProcessingContext:
+    """Helper class to encapsulate sentence processing parameters"""
+    def __init__(self, sentence, sentence_id, pos_text):
+        self.sentence = sentence
+        self.sentence_id = sentence_id
+        self.pos_text = pos_text
+        self.sentence_obj_aux = []
+        self.block_of_word_obj = []
+
 class DataCore():
     def __init__(self, text, stopword_set, windows_size, n, tags_to_discard=None, exclude=None):
         if tags_to_discard is None:
             tags_to_discard = set(['u', 'd'])
         if exclude is None:
             exclude = set(string.punctuation)
-        self.number_of_sentences = 0
-        self.number_of_words = 0
-        self.terms = {}
-        self.candidates = {}
-        self.sentences_obj = []
-        self.sentences_str = []
-        self.g = nx.DiGraph()
-        self.exclude = exclude
-        self.tags_to_discard = tags_to_discard
-        self.freq_ns = {}
-        for i in range(n):
-            self.freq_ns[i+1] = 0.
-        self.stopword_set = stopword_set
+        
+        # Group text analysis stats
+        self.stats = {
+            'number_of_sentences': 0,
+            'number_of_words': 0,
+            'freq_ns': {i+1: 0. for i in range(n)}
+        }
+        
+        # Group text components
+        self.components = {
+            'terms': {},
+            'candidates': {},
+            'sentences_obj': [],
+            'sentences_str': []
+        }
+        
+        # Group configuration parameters
+        self.config = {
+            'g': nx.DiGraph(),
+            'exclude': exclude,
+            'tags_to_discard': tags_to_discard,
+            'stopword_set': stopword_set
+        }
+        
+        # Build the core data structures
         self._build(text, windows_size, n)
+
+    # Properties to maintain backwards compatibility
+    @property
+    def number_of_sentences(self):
+        return self.stats['number_of_sentences']
+    
+    @property
+    def number_of_words(self):
+        return self.stats['number_of_words']
+    
+    @property
+    def terms(self):
+        return self.components['terms']
+    
+    @property
+    def candidates(self):
+        return self.components['candidates']
+    
+    @property
+    def sentences_obj(self):
+        return self.components['sentences_obj']
+    
+    @property
+    def sentences_str(self):
+        return self.components['sentences_str']
+    
+    @property
+    def g(self):
+        return self.config['g']
+    
+    @property
+    def exclude(self):
+        return self.config['exclude']
+    
+    @property
+    def tags_to_discard(self):
+        return self.config['tags_to_discard']
+    
+    @property
+    def freq_ns(self):
+        return self.stats['freq_ns']
+    
+    @property
+    def stopword_set(self):
+        return self.config['stopword_set']
 
     def build_candidate(self, candidate_string):
         sentences_str = [w for w in split_contractions(
@@ -52,12 +127,14 @@ class DataCore():
     # Build the datacore features
     def _build(self, text, windows_size, n):
         text = self.pre_filter(text)
-        self.sentences_str = self.tokenize_sentences(text)
-        self.number_of_sentences = len(self.sentences_str)
+        self.components['sentences_str'] = self.tokenize_sentences(text)
+        self.stats['number_of_sentences'] = len(self.components['sentences_str'])
         pos_text = 0
-        for (sentence_id, sentence) in enumerate(self.sentences_str):
-            pos_text = self.process_sentence(sentence, sentence_id, pos_text, windows_size, n)
-        self.number_of_words = pos_text
+        for sentence_id, sentence in enumerate(self.components['sentences_str']):
+            # Create sentence context object
+            context = SentenceProcessingContext(sentence, sentence_id, pos_text)
+            pos_text = self.process_sentence(context, windows_size, n)
+        self.stats['number_of_words'] = pos_text
 
     def tokenize_sentences(self, text):
         return [[
@@ -65,42 +142,48 @@ class DataCore():
                 w.startswith("'") and len(w) > 1) and len(w) > 0] for s in
                 list(split_multi(text)) if len(s.strip()) > 0]
 
-    def process_sentence(self, sentence, sentence_id, pos_text, windows_size, n):
-        sentence_obj_aux = []
-        block_of_word_obj = []
-        for (pos_sent, word) in enumerate(sentence):
-            if len([c for c in word if c in self.exclude]) == len(word):
-                if len(block_of_word_obj) > 0:
-                    sentence_obj_aux.append(block_of_word_obj)
-                    block_of_word_obj = []
+    def process_sentence(self, context, windows_size, n):
+        """Process a sentence using the context object and configuration parameters"""
+        for pos_sent, word in enumerate(context.sentence):
+            if len([c for c in word if c in self.config['exclude']]) == len(word):
+                if len(context.block_of_word_obj) > 0:
+                    context.sentence_obj_aux.append(context.block_of_word_obj)
+                    context.block_of_word_obj = []
             else:
-                pos_text = self.process_word(
-                    word, pos_sent, sentence_id, pos_text, block_of_word_obj, windows_size, n
-                    )
-        if len(block_of_word_obj) > 0:
-            sentence_obj_aux.append(block_of_word_obj)
-        if len(sentence_obj_aux) > 0:
-            self.sentences_obj.append(sentence_obj_aux)
-        return pos_text
+                # Create word context object
+                word_context = WordProcessingContext(
+                    word, pos_sent, context.sentence_id, context.pos_text, context.block_of_word_obj
+                )
+                context.pos_text = self.process_word(word_context, windows_size, n)
+                
+        if len(context.block_of_word_obj) > 0:
+            context.sentence_obj_aux.append(context.block_of_word_obj)
+            
+        if len(context.sentence_obj_aux) > 0:
+            self.components['sentences_obj'].append(context.sentence_obj_aux)
+            
+        return context.pos_text
 
-    def process_word(
-        self, word, pos_sent, sentence_id, pos_text, block_of_word_obj, windows_size, n
-        ):
-        tag = self.get_tag(word, pos_sent)
-        term_obj = self.get_term(word)
-        term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
-        pos_text += 1
-        if tag not in self.tags_to_discard:
-            self.update_cooccurrence(block_of_word_obj, term_obj, windows_size)
-        self.generate_candidates((tag, word), term_obj, block_of_word_obj, n)
-        block_of_word_obj.append((tag, word, term_obj))
-        return pos_text
+    def process_word(self, context, windows_size, n):
+        """Process a word using the context object and configuration parameters"""
+        tag = self.get_tag(context.word, context.pos_sent)
+        term_obj = self.get_term(context.word)
+        term_obj.add_occur(tag, context.sentence_id, context.pos_sent, context.pos_text)
+        context.pos_text += 1
+        
+        if tag not in self.config['tags_to_discard']:
+            self.update_cooccurrence(context.block_of_word_obj, term_obj, windows_size)
+            
+        self.generate_candidates((tag, context.word), term_obj, context.block_of_word_obj, n)
+        context.block_of_word_obj.append((tag, context.word, term_obj))
+        
+        return context.pos_text
 
     def update_cooccurrence(self, block_of_word_obj, term_obj, windows_size):
         word_windows = list(
             range(max(0, len(block_of_word_obj) - windows_size), len(block_of_word_obj)))
         for w in word_windows:
-            if block_of_word_obj[w][0] not in self.tags_to_discard:
+            if block_of_word_obj[w][0] not in self.config['tags_to_discard']:
                 self.add_cooccur(block_of_word_obj[w][2], term_obj)
 
     def generate_candidates(self, term, term_obj, block_of_word_obj, n):
@@ -111,31 +194,31 @@ class DataCore():
             range(max(0, len(block_of_word_obj) - (n - 1)), len(block_of_word_obj)))[::-1]
         for w in word_windows:
             candidate.append(block_of_word_obj[w])
-            self.freq_ns[len(candidate)] += 1.
+            self.stats['freq_ns'][len(candidate)] += 1.
             cand = ComposedWord(candidate[::-1])
             self.add_or_update_composedword(cand)
 
     def build_single_terms_features(self, features=None):
-        valid_terms = [ term for term in self.terms.values() if not term.stopword ]
-        valid_tfs = np.array([ x.tf for x in valid_terms ])
+        valid_terms = [term for term in self.components['terms'].values() if not term.stopword]
+        valid_tfs = np.array([x.tf for x in valid_terms])
 
         if len(valid_tfs) == 0:
             return
 
         avg_tf = valid_tfs.mean()
         std_tf = valid_tfs.std()
-        max_tf = max(x.tf for x in self.terms.values())
+        max_tf = max(x.tf for x in self.components['terms'].values())
         stats = {
             'max_tf': max_tf,
             'avg_tf': avg_tf,
             'std_tf': std_tf,
-            'number_of_sentences': self.number_of_sentences
+            'number_of_sentences': self.stats['number_of_sentences']
         }
-        list(map(lambda x: x.update_h(stats, features=features), self.terms.values()))
+        list(map(lambda x: x.update_h(stats, features=features), self.components['terms'].values()))
 
     def build_mult_terms_features(self, features=None):
         list(map(lambda x: x.update_h(features=features),
-                [cand for cand in self.candidates.values() if cand.is_valid()]))
+                [cand for cand in self.components['candidates'].values() if cand.is_valid()]))
 
     def pre_filter(self, text):
         prog = re.compile("^(\\s*([A-Z]))")
@@ -157,7 +240,7 @@ class DataCore():
             cdigit = len([c for c in word if c.isdigit()])
             calpha = len([c for c in word if c.isalpha()])
             if ( cdigit > 0 and calpha > 0 ) or (cdigit == 0 and calpha == 0) or len(
-                [c for c in word if c in self.exclude]) > 1:
+                [c for c in word if c in self.config['exclude']]) > 1:
                 return "u"
             if len(word) == len([c for c in word if c.isupper()]):
                 return "a"
@@ -168,41 +251,40 @@ class DataCore():
 
     def get_term(self, str_word, save_non_seen=True):
         unique_term = str_word.lower()
-        simples_sto = unique_term in self.stopword_set
+        simples_sto = unique_term in self.config['stopword_set']
         if unique_term.endswith('s') and len(unique_term) > 3:
             unique_term = unique_term[:-1]
 
-        if unique_term in self.terms:
-            return self.terms[unique_term]
+        if unique_term in self.components['terms']:
+            return self.components['terms'][unique_term]
 
-        # Include this part
+       
         simples_unique_term = unique_term
-        for pontuation in self.exclude:
+        for pontuation in self.config['exclude']:
             simples_unique_term = simples_unique_term.replace(pontuation, '')
-        # until here
-        isstopword = simples_sto or unique_term in self.stopword_set or len(simples_unique_term) < 3
+        isstopword = simples_sto or unique_term in self.config['stopword_set'] or len(simples_unique_term) < 3
 
-        term_id = len(self.terms)
-        term_obj = SingleWord(unique_term, term_id, self.g)
+        term_id = len(self.components['terms'])
+        term_obj = SingleWord(unique_term, term_id, self.config['g'])
         term_obj.stopword = isstopword
 
         if save_non_seen:
-            self.g.add_node(term_id)
-            self.terms[unique_term] = term_obj
+            self.config['g'].add_node(term_id)
+            self.components['terms'][unique_term] = term_obj
 
         return term_obj
 
     def add_cooccur(self, left_term, right_term):
-        if right_term.id not in self.g[left_term.id]:
-            self.g.add_edge(left_term.id, right_term.id, tf=0.)
-        self.g[left_term.id][right_term.id]["tf"]+=1.
+        if right_term.id not in self.config['g'][left_term.id]:
+            self.config['g'].add_edge(left_term.id, right_term.id, tf=0.)
+        self.config['g'][left_term.id][right_term.id]["tf"] += 1.
 
     def add_or_update_composedword(self, cand):
-        if cand.unique_kw not in self.candidates:
-            self.candidates[cand.unique_kw] = cand
+        if cand.unique_kw not in self.components['candidates']:
+            self.components['candidates'][cand.unique_kw] = cand
         else:
-            self.candidates[cand.unique_kw].uptade_cand(cand)
-        self.candidates[cand.unique_kw].tf += 1.
+            self.components['candidates'][cand.unique_kw].uptade_cand(cand)
+        self.components['candidates'][cand.unique_kw].tf += 1.
 
 
 class ComposedWord():
