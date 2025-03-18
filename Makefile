@@ -4,7 +4,7 @@ install:
 
 test:
 	# python -m pytest --nbval *.ipynb
-	python -m pytest -vv --cov= test_*.py
+	python -m pytest -vv --cov= test_*.
 
 
 format:	

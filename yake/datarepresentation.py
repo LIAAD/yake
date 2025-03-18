@@ -20,6 +20,20 @@ class WordProcessingContext:
         self.pos_text = pos_text
         self.block_of_word_obj = block_of_word_obj
 
+    def get_word_info(self):
+        """Returns a dictionary with word information"""
+        return {
+            'word': self.word,
+            'position_in_sentence': self.pos_sent,
+            'sentence_id': self.sentence_id,
+            'position_in_text': self.pos_text
+        }
+
+    def append_to_block(self, tag, term_obj):
+        """Adds a processed word to the block of word objects"""
+        self.block_of_word_obj.append((tag, self.word, term_obj))
+
+
 class SentenceProcessingContext:
     """Helper class to encapsulate sentence processing parameters"""
     def __init__(self, sentence, sentence_id, pos_text):
@@ -28,6 +42,21 @@ class SentenceProcessingContext:
         self.pos_text = pos_text
         self.sentence_obj_aux = []
         self.block_of_word_obj = []
+
+    def clear_block(self):
+        """Clears the current block and adds it to sentence objects if not empty"""
+        if len(self.block_of_word_obj) > 0:
+            self.sentence_obj_aux.append(self.block_of_word_obj)
+            self.block_of_word_obj = []
+
+    def get_sentence_info(self):
+        """Returns a dictionary with sentence information"""
+        return {
+            'sentence': self.sentence,
+            'sentence_id': self.sentence_id,
+            'word_count': len(self.sentence),
+            'processed_blocks': len(self.sentence_obj_aux)
+        }
 
 class DataCore():
     def __init__(self, text, stopword_set, windows_size, n, tags_to_discard=None, exclude=None):
@@ -131,19 +160,20 @@ class DataCore():
         """Process a sentence using the context object and configuration parameters"""
         for pos_sent, word in enumerate(context.sentence):
             if len([c for c in word if c in self.config['exclude']]) == len(word):
-                if len(context.block_of_word_obj) > 0:
-                    context.sentence_obj_aux.append(context.block_of_word_obj)
-                    context.block_of_word_obj = []
+                context.clear_block()
             else:
                 # Create word context object
                 word_context = WordProcessingContext(
                     word, pos_sent, context.sentence_id, context.pos_text, context.block_of_word_obj
                 )
                 context.pos_text = self.process_word(word_context, windows_size, n)
-        if len(context.block_of_word_obj) > 0:
-            context.sentence_obj_aux.append(context.block_of_word_obj)
+
+        # Make sure we handle any remaining blocks
+        context.clear_block()
+
         if len(context.sentence_obj_aux) > 0:
             self.components['sentences_obj'].append(context.sentence_obj_aux)
+
         return context.pos_text
 
     def process_word(self, context, windows_size, n):
@@ -155,9 +185,11 @@ class DataCore():
 
         if tag not in self.config['tags_to_discard']:
             self.update_cooccurrence(context.block_of_word_obj, term_obj, windows_size)
-
+   
         self.generate_candidates((tag, context.word), term_obj, context.block_of_word_obj, n)
-        context.block_of_word_obj.append((tag, context.word, term_obj))
+
+        # Use the new method to append to block
+        context.append_to_block(tag, term_obj)
 
         return context.pos_text
 
