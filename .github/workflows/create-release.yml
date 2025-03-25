@@ -6,6 +6,7 @@ on:
       - closed
     branches:
       - master  # Change to your default branch if different (e.g., master)
+  workflow_dispatch:
 
 jobs:
   create_release:
