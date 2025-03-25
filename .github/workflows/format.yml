@@ -1,4 +1,7 @@
 name: Format
+
+on: [push]
+
 on:
   push:
     branches: [ "main" ]

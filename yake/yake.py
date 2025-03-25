@@ -5,6 +5,7 @@ import jellyfish
 from .Levenshtein import Levenshtein
 from .datarepresentation import DataCore
 
+
 class KeywordExtractor:
     """Class to extract and process keywords from text."""
 
@@ -70,12 +71,14 @@ class KeywordExtractor:
             return []
 
         text = text.replace("\n", " ")
-        dc = DataCore(
-            text=text,
-            stopword_set=self.stopword_set,
-            windows_size=self.config["window_size"],
-            n=self.config["n"],
-        )
+
+        # Create a config dictionary for DataCore
+        core_config = {
+            "windows_size": self.config["window_size"],
+            "n": self.config["n"],
+        }
+
+        dc = DataCore(text=text, stopword_set=self.stopword_set, config=core_config)
 
         dc.build_single_terms_features(features=self.config["features"])
         dc.build_mult_terms_features(features=self.config["features"])
@@ -86,13 +89,17 @@ class KeywordExtractor:
         )
 
         if self.config["dedup_lim"] >= 1.0:
-            return [(cand.unique_kw, cand.h) for cand in candidates_sorted][: self.config["top"]]
+            return [(cand.unique_kw, cand.h) for cand in candidates_sorted][
+                : self.config["top"]
+            ]
 
         for cand in candidates_sorted:
             should_add = True
-            for (h, cand_result) in result_set:
-                if self.dedup_function(
-                    cand.unique_kw, cand_result.unique_kw) > self.config["dedup_lim"]:
+            for h, cand_result in result_set:
+                if (
+                    self.dedup_function(cand.unique_kw, cand_result.unique_kw)
+                    > self.config["dedup_lim"]
+                ):
                     should_add = False
                     break
 

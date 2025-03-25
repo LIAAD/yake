@@ -62,8 +62,8 @@ class Levenshtein:
                     cost = 1
 
                 matrix[x, y] = min(
-                    matrix[x - 1, y] + 1,     # Deletion
-                    matrix[x, y - 1] + 1,     # Insertion
+                    matrix[x - 1, y] + 1,  # Deletion
+                    matrix[x, y - 1] + 1,  # Insertion
                     matrix[x - 1, y - 1] + cost,  # Substitution
                 )
 

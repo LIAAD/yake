@@ -2,6 +2,7 @@
 Module for highlighting text based on keywords.
 Provides functionality to highlight specific keywords in text.
 """
+
 import re
 import logging
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ DEFAULT_HIGHLIGHT_POST = "</kw>"
 @dataclass
 class NgramData:
     """Data structure to hold n-gram processing results."""
+
     word_list: List[str]
     split_kw_list: List[List[str]]
 
@@ -21,7 +23,7 @@ class NgramData:
 class TextHighlighter:
     """
     Class for highlighting keywords in text.
-    
+
     This class provides functionality to highlight keywords in text
     using pre-defined markers. It supports one-gram and n-gram highlighting.
     """
@@ -52,7 +54,7 @@ class TextHighlighter:
             text: The original text to be processed.
             keywords: A list of keywords to highlight.
                      Each keyword can be a string or a tuple where the first element is the keyword.
-        
+
         Returns:
             The text with highlighted keywords.
         """
@@ -71,11 +73,11 @@ class TextHighlighter:
     def format_one_gram_text(self, text, relevant_words_array):
         """
         Formats text for one-gram highlighting.
-        
+
         Args:
             text: The text to process
             relevant_words_array: Keywords to highlight
-            
+
         Returns:
             Formatted text with highlighted keywords
         """
@@ -83,7 +85,7 @@ class TextHighlighter:
         relevant_words_array = [kw.lower() for kw in relevant_words_array]
         try:
             for tk, token in enumerate(text_tokens):
-                kw = re.sub(r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '', token)
+                kw = re.sub(r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', "", token)
                 if kw.lower() in relevant_words_array:
                     text_tokens[tk] = token.replace(
                         kw, f"{self.highlight_pre}{kw}{self.highlight_post}"
@@ -95,11 +97,11 @@ class TextHighlighter:
     def format_n_gram_text(self, text, relevant_words_array):
         """
         Formats text for n-gram highlighting.
-        
+
         Args:
             text: The text to process
             relevant_words_array: Keywords to highlight
-            
+
         Returns:
             Formatted text with highlighted keywords
         """
@@ -118,9 +120,9 @@ class TextHighlighter:
 
             if n_gram_word_list:
                 context = {
-                    'splited_n_gram_kw_list': splited_n_gram_kw_list,
-                    'relevant_words_array': relevant_words_array,
-                    'final_splited_text': final_splited_text
+                    "splited_n_gram_kw_list": splited_n_gram_kw_list,
+                    "relevant_words_array": relevant_words_array,
+                    "final_splited_text": final_splited_text,
                 }
                 y, new_expression = self.process_ngrams(
                     text_tokens, y, n_gram_word_list, context
@@ -135,12 +137,12 @@ class TextHighlighter:
     def find_relevant_ngrams(self, position, text_tokens, relevant_words_array):
         """
         Finds relevant n-grams in the text.
-        
+
         Args:
             position: Current position in text tokens
             text_tokens: List of tokens from the text
             relevant_words_array: Keywords to highlight
-            
+
         Returns:
             Tuple containing n-gram word list and split n-gram keyword list
         """
@@ -151,17 +153,15 @@ class TextHighlighter:
 
         return ngram_data
 
-    def _find_more_relevant_helper(
-        self, position, text_tokens, relevant_words_array
-    ):
+    def _find_more_relevant_helper(self, position, text_tokens, relevant_words_array):
         """
         Helper method for finding relevant n-gram words.
-        
+
         Args:
             position: Current position in text tokens
             text_tokens: List of tokens from the text
             relevant_words_array: Keywords to highlight
-            
+
         Returns:
             NgramData containing keyword list and split n-gram word list
         """
@@ -172,18 +172,18 @@ class TextHighlighter:
 
         for i in range(self.max_ngram_size):
             if position + i < len(text_tokens):
-                temporary_list.append(text_tokens[position: position + i + 1])
+                temporary_list.append(text_tokens[position : position + i + 1])
                 k = re.sub(
-                    r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', '',
-                    " ".join(temporary_list[i])
+                    r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]',
+                    "",
+                    " ".join(temporary_list[i]),
                 )
                 if k.lower() in relevant_words_array:
                     temporary_list_two.append(k)
 
         if temporary_list_two:
             sorted_temp = sorted(
-                temporary_list_two,
-                key=lambda x: relevant_words_array.index(x.lower())
+                temporary_list_two, key=lambda x: relevant_words_array.index(x.lower())
             )
             kw_list.append(sorted_temp[0])
             splited_n_gram_word_list.append(kw_list[0].split())
@@ -193,14 +193,14 @@ class TextHighlighter:
     def process_ngrams(self, text_tokens, position, n_gram_word_list, context):
         """
         Processes n-grams and updates the final text.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             n_gram_word_list: List of n-gram words
-            context: Dictionary containing split n-gram keywords, 
+            context: Dictionary containing split n-gram keywords,
                 relevant words array, and final split text
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -210,8 +210,10 @@ class TextHighlighter:
             )
         else:
             ctx = self._create_ngram_context(
-                n_gram_word_list, context['splited_n_gram_kw_list'],
-                context['relevant_words_array'], context['final_splited_text']
+                n_gram_word_list,
+                context["splited_n_gram_kw_list"],
+                context["relevant_words_array"],
+                context["final_splited_text"],
             )
             position, new_expression = self._process_multi_word_ngrams_helper(
                 text_tokens, position, ctx
@@ -220,19 +222,22 @@ class TextHighlighter:
         return position, new_expression
 
     def _create_ngram_context(
-        self, n_gram_word_list, splited_n_gram_kw_list,
-        relevant_words_array, final_splited_text
+        self,
+        n_gram_word_list,
+        splited_n_gram_kw_list,
+        relevant_words_array,
+        final_splited_text,
     ):
         """
         Creates a context object for n-gram processing.
-        
+
         Args:
             position: Current position in text tokens
             n_gram_word_list: List of n-gram words
             splited_n_gram_kw_list: List of split n-gram keywords
             relevant_words_array: Keywords to highlight
             final_splited_text: List of processed text tokens
-            
+
         Returns:
             Dictionary with context information
         """
@@ -243,17 +248,15 @@ class TextHighlighter:
             "final_splited_text": final_splited_text,
         }
 
-    def _process_multi_word_ngrams_helper(
-        self, text_tokens, position, ctx
-    ):
+    def _process_multi_word_ngrams_helper(self, text_tokens, position, ctx):
         """
         Helper method for processing multi-word n-grams.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             ctx: Context dictionary with processing information
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -268,9 +271,13 @@ class TextHighlighter:
         for len_kw in range(len(splited_one)):
             if position + len_kw < len(text_tokens):
                 self._update_kw_list(
-                    position + len_kw, text_tokens,
-                    relevant_words_array, {
-                        'kw_list': kw_list, 'splited_n_gram_kw_list': splited_n_gram_kw_list}
+                    position + len_kw,
+                    text_tokens,
+                    relevant_words_array,
+                    {
+                        "kw_list": kw_list,
+                        "splited_n_gram_kw_list": splited_n_gram_kw_list,
+                    },
                 )
 
         if not kw_list:
@@ -290,7 +297,7 @@ class TextHighlighter:
                 "splited_n_gram_kw_list": splited_n_gram_kw_list,
                 "min_score_word": min_score_word,
                 "relevant_words_array": relevant_words_array,
-                "final_splited_text": final_splited_text
+                "final_splited_text": final_splited_text,
             }
             position, new_expression = self._process_relevant_terms_helper(
                 text_tokens, position, terms_ctx
@@ -298,11 +305,10 @@ class TextHighlighter:
 
         return position, new_expression
 
-    def _update_kw_list(self, position,
-                        text_tokens, relevant_words_array, kw_dict):
+    def _update_kw_list(self, position, text_tokens, relevant_words_array, kw_dict):
         """
         Updates the keyword list and split n-gram keyword list.
-        
+
         Args:
             position: Current position in text tokens
             text_tokens: List of tokens from the text
@@ -313,21 +319,19 @@ class TextHighlighter:
             position, text_tokens, relevant_words_array
         )
         new_kw_list, new_split_list = ngram_result
-        kw_dict['kw_list'].extend(new_kw_list)
+        kw_dict["kw_list"].extend(new_kw_list)
         if new_split_list:
-            kw_dict['splited_n_gram_kw_list'].extend(new_split_list)
+            kw_dict["splited_n_gram_kw_list"].extend(new_split_list)
 
-    def _process_relevant_terms_helper(
-        self, text_tokens, position, ctx
-    ):
+    def _process_relevant_terms_helper(self, text_tokens, position, ctx):
         """
         Helper method for processing relevant terms.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             ctx: Context dictionary with processing information
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -342,20 +346,16 @@ class TextHighlighter:
         index_of_more_relevant = splited_n_gram_kw_list[0].index(
             min_score_word.split()[0]
         )
-        temporal_kw = " ".join(
-            splited_n_gram_kw_list[0][:index_of_more_relevant]
-        )
+        temporal_kw = " ".join(splited_n_gram_kw_list[0][:index_of_more_relevant])
 
         if temporal_kw.lower() in relevant_words_array:
             try:
                 handle_ctx = {
                     "temporal_kw": temporal_kw,
                     "relevant_words_array": relevant_words_array,
-                    "final_splited_text": final_splited_text
+                    "final_splited_text": final_splited_text,
                 }
-                return self._handle_temporal_keyword(
-                    text_tokens, position, handle_ctx
-                )
+                return self._handle_temporal_keyword(text_tokens, position, handle_ctx)
             except ValueError as e:
                 print(f"Error: {e}")
                 term_list = [temporal_kw]
@@ -366,7 +366,7 @@ class TextHighlighter:
             nonrelevant_ctx = {
                 "splited_n_gram_kw_list": splited_n_gram_kw_list,
                 "index_of_more_relevant": index_of_more_relevant,
-                "relevant_words_array": relevant_words_array
+                "relevant_words_array": relevant_words_array,
             }
             position, new_expression = self._handle_nonrelevant_temporal_keyword(
                 text_tokens, position, nonrelevant_ctx
@@ -374,17 +374,15 @@ class TextHighlighter:
 
         return position, new_expression
 
-    def _handle_temporal_keyword(
-        self, text_tokens, position, ctx
-    ):
+    def _handle_temporal_keyword(self, text_tokens, position, ctx):
         """
         Helper method for handling temporal keywords.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             ctx: Context dictionary with processing information
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -399,10 +397,12 @@ class TextHighlighter:
         last_item = final_splited_text[-1]
         combined_kw = f"{last_item} {temporal_kw}"
 
-        if (combined_kw.lower() in relevant_words_array and
-            relevant_words_array.index(temporal_kw.lower()) >
-            relevant_words_array.index(combined_kw.lower()) and
-            not re.findall(self.highlight_pre, last_item)):
+        if (
+            combined_kw.lower() in relevant_words_array
+            and relevant_words_array.index(temporal_kw.lower())
+            > relevant_words_array.index(combined_kw.lower())
+            and not re.findall(self.highlight_pre, last_item)
+        ):
             term_list = [combined_kw]
             del final_splited_text[-1]
             position -= 1
@@ -417,17 +417,15 @@ class TextHighlighter:
 
         return position, new_expression
 
-    def _handle_nonrelevant_temporal_keyword(
-        self, text_tokens, position, ctx
-    ):
+    def _handle_nonrelevant_temporal_keyword(self, text_tokens, position, ctx):
         """
         Helper method for handling non-relevant temporal keywords.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             ctx: Context dictionary with processing information
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -448,12 +446,12 @@ class TextHighlighter:
     def replace_token(self, text_tokens, position, n_gram_word_list):
         """
         Replaces tokens in text with highlighted versions.
-        
+
         Args:
             text_tokens: List of tokens from the text
             position: Current position in text tokens
             n_gram_word_list: List of n-gram words
-            
+
         Returns:
             Tuple containing new position and new expression
         """
@@ -465,13 +463,11 @@ class TextHighlighter:
         if position + num_tokens > len(text_tokens):
             num_tokens = len(text_tokens) - position
 
-        txt = " ".join(text_tokens[position: position + num_tokens])
-        kw_cleaned = re.sub(
-            r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', "", txt
-        )
+        txt = " ".join(text_tokens[position : position + num_tokens])
+        kw_cleaned = re.sub(r'[!",:.;?()]$|^[!",:.;?()]|\W[!",:.;?()]', "", txt)
         new_expression = txt.replace(
             kw_cleaned,
-            f"{self.highlight_pre}{n_gram_word_list[0]}{self.highlight_post}"
+            f"{self.highlight_pre}{n_gram_word_list[0]}{self.highlight_post}",
         )
 
         return position + num_tokens, new_expression
