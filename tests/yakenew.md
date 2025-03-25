@@ -100,3 +100,10 @@ Separação de métodos e argumentos (quase todos)
 ///// Refactoring score (6.86) -> (6.93) 07/03/2025
 
 Criação de dicionários de forma a diminuir o numero de argumentos por cada função e comparações condicionais.
+
+///// Refactoring score (6.86) -> (7.23) 25/03/2025
+
+data representation acabado
+separação de argumentos e atributos por dicionáros
+métodos mais compactos
+criação de propriedades de "backwards compatibility" para facilitar refatorização, não necessário mas peça imperial para desenvolvimento sem problemas com variaveis e criação de novos dicionários
