@@ -12,16 +12,38 @@ import numpy as np
 STOPWORD_WEIGHT = 'bi'
 
 class WordProcessingContext:
-    """Helper class to encapsulate word processing parameters"""
-    def __init__(self, word, pos_sent, sentence_id, pos_text, block_of_word_obj):
+    """
+    Helper class to encapsulate word processing parameters and methods.
+
+    This class manages the context and processing of individual words during text analysis,
+    tracking word-level information and providing methods for word processing.
+    """
+    def __init__(self, word, pos_sent, sentence_id, pos_text, block_of_word_obj, config):
+        """
+        Initialize the WordProcessingContext.
+
+        Args:
+            word (str): The word being processed.
+            pos_sent (int): Position of the word in the sentence.
+            sentence_id (int): Unique identifier for the sentence.
+            pos_text (int): Position of the word in the entire text.
+            block_of_word_obj (list): Current block of word objects.
+            config (dict): Configuration parameters for word processing.
+        """
         self.word = word
         self.pos_sent = pos_sent
         self.sentence_id = sentence_id
         self.pos_text = pos_text
         self.block_of_word_obj = block_of_word_obj
+        self.config = config
 
     def get_word_info(self):
-        """Returns a dictionary with word information"""
+        """
+        Returns a dictionary with word information.
+
+        Returns:
+            dict: A dictionary containing word-level details.
+        """
         return {
             'word': self.word,
             'position_in_sentence': self.pos_sent,
@@ -30,13 +52,56 @@ class WordProcessingContext:
         }
 
     def append_to_block(self, tag, term_obj):
-        """Adds a processed word to the block of word objects"""
+        """
+        Adds a processed word to the block of word objects.
+
+        Args:
+            tag (str): Tag associated with the word.
+            term_obj (SingleWord): Term object representing the word.
+        """
         self.block_of_word_obj.append((tag, self.word, term_obj))
+
+    def get_tag(self):
+        """
+        Determine the tag for the current word.
+
+        Returns:
+            str: A tag representing the word's characteristics.
+        """
+        try:
+            w2 = self.word.replace(",","")
+            float(w2)
+            return "d"
+        except ValueError:
+            cdigit = len([c for c in self.word if c.isdigit()])
+            calpha = len([c for c in self.word if c.isalpha()])
+            if (cdigit > 0 and calpha > 0) or (cdigit == 0 and calpha == 0) or len(
+                [c for c in self.word if c in self.config['exclude']]) > 1:
+                return "u"
+            if len(self.word) == len([c for c in self.word if c.isupper()]):
+                return "a"
+            if (len([c for c in self.word if c.isupper()]) == 1 and len(self.word) > 1 and
+                self.word[0].isupper() and self.pos_sent > 0):
+                return "n"
+        return "p"
 
 
 class SentenceProcessingContext:
-    """Helper class to encapsulate sentence processing parameters"""
+    """
+    Helper class to encapsulate sentence processing parameters and methods.
+
+    This class manages the context and processing of sentences during text analysis,
+    tracking sentence-level information and providing methods for sentence processing.
+    """
     def __init__(self, sentence, sentence_id, pos_text):
+        """
+        Initialize the SentenceProcessingContext.
+
+        Args:
+            sentence (list): List of words in the sentence.
+            sentence_id (int): Unique identifier for the sentence.
+            pos_text (int): Position of the sentence in the entire text.
+        """
         self.sentence = sentence
         self.sentence_id = sentence_id
         self.pos_text = pos_text
@@ -44,13 +109,20 @@ class SentenceProcessingContext:
         self.block_of_word_obj = []
 
     def clear_block(self):
-        """Clears the current block and adds it to sentence objects if not empty"""
+        """
+        Clears the current block and adds it to sentence objects if not empty.
+        """
         if len(self.block_of_word_obj) > 0:
             self.sentence_obj_aux.append(self.block_of_word_obj)
             self.block_of_word_obj = []
 
     def get_sentence_info(self):
-        """Returns a dictionary with sentence information"""
+        """
+        Returns a dictionary with sentence information.
+
+        Returns:
+            dict: A dictionary containing sentence-level details.
+        """
         return {
             'sentence': self.sentence,
             'sentence_id': self.sentence_id,
@@ -58,34 +130,81 @@ class SentenceProcessingContext:
             'processed_blocks': len(self.sentence_obj_aux)
         }
 
-class DataCore():
-    def __init__(self, text, stopword_set, windows_size, n, tags_to_discard=None, exclude=None):
-        if tags_to_discard is None:
-            tags_to_discard = set(['u', 'd'])
-        if exclude is None:
-            exclude = set(string.punctuation)
-        # Group text analysis stats
-        self.stats = {
+
+class DataCore:
+    """
+    Core data representation class for text analysis.
+
+    This class handles text processing, term extraction, and feature generation
+    for advanced text analysis techniques.
+    """
+    def __init__(self, text, stopword_set, windows_size, n, 
+                 tags_to_discard=None, exclude=None):
+        """
+        Initialize the DataCore with text and processing parameters.
+
+        Args:
+            text (str): Input text to be processed.
+            stopword_set (set): Set of stopwords to be excluded.
+            windows_size (int): Size of the co-occurrence window.
+            n (int): Maximum n-gram size for candidate generation.
+            tags_to_discard (set, optional): Tags to ignore during processing.
+            exclude (set, optional): Characters to exclude from processing.
+        """
+        self.config = self._initialize_config(stopword_set, tags_to_discard, exclude)
+        self.stats = self._initialize_stats(n)
+        self.components = self._initialize_components()
+
+        self._build(text, windows_size, n)
+
+    def _initialize_config(self, stopword_set, tags_to_discard, exclude):
+        """
+        Initialize configuration parameters.
+
+        Args:
+            stopword_set (set): Set of stopwords.
+            tags_to_discard (set): Tags to ignore.
+            exclude (set): Characters to exclude.
+
+        Returns:
+            dict: Initialized configuration dictionary.
+        """
+        return {
+            'g': nx.DiGraph(),
+            'exclude': exclude or set(string.punctuation),
+            'tags_to_discard': tags_to_discard or set(['u', 'd']),
+            'stopword_set': stopword_set
+        }
+
+    def _initialize_stats(self, n):
+        """
+        Initialize statistics dictionary.
+
+        Args:
+            n (int): Maximum n-gram size.
+
+        Returns:
+            dict: Initialized statistics dictionary.
+        """
+        return {
             'number_of_sentences': 0,
             'number_of_words': 0,
             'freq_ns': {i+1: 0. for i in range(n)}
         }
-        # Group text components
-        self.components = {
+
+    def _initialize_components(self):
+        """
+        Initialize components dictionary.
+
+        Returns:
+            dict: Initialized components dictionary.
+        """
+        return {
             'terms': {},
             'candidates': {},
             'sentences_obj': [],
             'sentences_str': []
         }
-        # Group configuration parameters
-        self.config = {
-            'g': nx.DiGraph(),
-            'exclude': exclude,
-            'tags_to_discard': tags_to_discard,
-            'stopword_set': stopword_set
-        }
-        # Build the core data structures
-        self._build(text, windows_size, n)
 
     # Properties to maintain backwards compatibility
     @property
@@ -164,7 +283,9 @@ class DataCore():
             else:
                 # Create word context object
                 word_context = WordProcessingContext(
-                    word, pos_sent, context.sentence_id, context.pos_text, context.block_of_word_obj
+                    word, pos_sent, context.sentence_id,
+                    context.pos_text, context.block_of_word_obj,
+                    self.config
                 )
                 context.pos_text = self.process_word(word_context, windows_size, n)
 
@@ -185,7 +306,7 @@ class DataCore():
 
         if tag not in self.config['tags_to_discard']:
             self.update_cooccurrence(context.block_of_word_obj, term_obj, windows_size)
-   
+
         self.generate_candidates((tag, context.word), term_obj, context.block_of_word_obj, n)
 
         # Use the new method to append to block
