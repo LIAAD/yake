@@ -1,0 +1,497 @@
+---
+title: "DataCore"
+description: "Core data representation class for YAKE keyword extraction"
+---
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# DataCore
+
+The `DataCore` class is the foundation of YAKE (Yet Another Keyword Extractor), providing the core data representation for document analysis and keyword extraction.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Class Overview
+
+```python
+class DataCore:
+    def __init__(self, text, stopword_set, config=None):
+        # Initialize the data core with text and configuration
+```
+
+The `DataCore` class processes text documents to identify potential keywords based on statistical features and contextual relationships.
+
+## Constructor
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="init">
+    <AccordionTrigger>
+      <code>__init__(text, stopword_set, config=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __init__(self, text, stopword_set, config=None):
+          """Initialize the data core with text and configuration."""
+          # Initialize default configuration
+          if config is None:
+              config = {}
+
+          # Extract configuration values with defaults
+          windows_size = config.get("windows_size", 2)
+          n = config.get("n", 3)
+          tags_to_discard = config.get("tags_to_discard", set(["u", "d"]))
+          exclude = config.get("exclude", set(string.punctuation))
+
+          self._state = {
+              # Configuration
+              "config": {
+                  "exclude": exclude,
+                  "tags_to_discard": tags_to_discard,
+                  "stopword_set": stopword_set  # Moved here from direct attribute
+              },
+
+              # Text analysis results
+              "text_stats": {
+                  "number_of_sentences": 0,
+                  "number_of_words": 0
+              },
+
+              # Data collections
+              "collections": {
+                  "terms": {},            # Dictionary of term objects
+                  "candidates": {},       # Dictionary of candidate objects
+                  "sentences_obj": [],    # Processed sentence objects
+                  "sentences_str": [],    # Raw sentence strings
+                  "freq_ns": {}           # Frequency of n-grams
+              },
+
+              # Graph for co-occurrence analysis
+              "g": nx.DiGraph()  # Moved here from direct attribute
+          }
+
+          # Initialize n-gram frequencies
+          for i in range(n):
+              self._state["collections"]["freq_ns"][i + 1] = 0.0
+
+          # Build the data structures
+          self._build(text, windows_size, n)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `text` (str): The input text to analyze for keyword extraction
+- `stopword_set` (set): A set of stopwords to filter out non-content words
+- `config` (dict, optional): Configuration options including:
+  - `windows_size` (int): Size of word window for co-occurrence (default: 2)
+  - `n` (int): Maximum length of keyword phrases (default: 3)
+  - `tags_to_discard` (set): POS tags to ignore (default: {"u", "d"})
+  - `exclude` (set): Characters to exclude (default: string.punctuation)
+
+**Example:**
+```python
+from yake.datarepresentation import DataCore
+import string
+
+# Initialize with default configuration
+data = DataCore("Sample text for analysis", stopword_set)
+
+# Initialize with custom configuration
+config = {
+    "windows_size": 3,
+    "n": 4,
+    "tags_to_discard": {"u", "d", "p"},
+    "exclude": set(string.punctuation)
+}
+data = DataCore("Sample text for analysis", stopword_set, config)
+```
+
+## Core Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="build">
+    <AccordionTrigger>
+      <code>_build(text, windows_size, n)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _build(self, text, windows_size, n):
+          """Build the data structures from the text."""
+          text = pre_filter(text)
+          self.sentences_str = tokenize_sentences(text)
+          self.number_of_sentences = len(self.sentences_str)
+          pos_text = 0
+
+          # Create a processing context dictionary to pass fewer arguments
+          context = {"windows_size": windows_size, "n": n}
+
+          for sentence_id, sentence in enumerate(self.sentences_str):
+              pos_text = self._process_sentence(sentence, sentence_id, pos_text, context)
+          self.number_of_words = pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="process_sentence">
+    <AccordionTrigger>
+      <code>_process_sentence(sentence, sentence_id, pos_text, context)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _process_sentence(self, sentence, sentence_id, pos_text, context):
+          """Process a single sentence."""
+          sentence_obj_aux = []
+          block_of_word_obj = []
+
+          # Extend the context with sentence information
+          processing_context = context.copy()
+          processing_context["sentence_id"] = sentence_id
+
+          for pos_sent, word in enumerate(sentence):
+              if len([c for c in word if c in self.exclude]) == len(word):
+                  if len(block_of_word_obj) > 0:
+                      sentence_obj_aux.append(block_of_word_obj)
+                      block_of_word_obj = []
+              else:
+                  word_context = {
+                      "pos_sent": pos_sent,
+                      "block_of_word_obj": block_of_word_obj,
+                  }
+                  pos_text = self._process_word(
+                      word, pos_text, processing_context, word_context
+                  )
+
+          if len(block_of_word_obj) > 0:
+              sentence_obj_aux.append(block_of_word_obj)
+          if len(sentence_obj_aux) > 0:
+              self.sentences_obj.append(sentence_obj_aux)
+          return pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="process_word">
+    <AccordionTrigger>
+      <code>_process_word(word, pos_text, context, word_context)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _process_word(self, word, pos_text, context, word_context):
+          """Process a single word."""
+          sentence_id = context["sentence_id"]
+          windows_size = context["windows_size"]
+          n = context["n"]
+          pos_sent = word_context["pos_sent"]
+          block_of_word_obj = word_context["block_of_word_obj"]
+
+          tag = self.get_tag(word, pos_sent)
+          term_obj = self.get_term(word)
+          term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
+          pos_text += 1
+          if tag not in self.tags_to_discard:
+              self._update_cooccurrence(block_of_word_obj, term_obj, windows_size)
+          self._generate_candidates((tag, word), term_obj, block_of_word_obj, n)
+          block_of_word_obj.append((tag, word, term_obj))
+          return pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="update_cooccurrence">
+    <AccordionTrigger>
+      <code>_update_cooccurrence(block_of_word_obj, term_obj, windows_size)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _update_cooccurrence(self, block_of_word_obj, term_obj, windows_size):
+          """Update co-occurrence information between terms."""
+          word_windows = list(
+              range(max(0, len(block_of_word_obj) - windows_size), len(block_of_word_obj))
+          )
+          for w in word_windows:
+              if block_of_word_obj[w][0] not in self.tags_to_discard:
+                  self.add_cooccur(block_of_word_obj[w][2], term_obj)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="generate_candidates">
+    <AccordionTrigger>
+      <code>_generate_candidates(term, term_obj, block_of_word_obj, n)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _generate_candidates(self, term, term_obj, block_of_word_obj, n):
+          """Generate keyword candidates from terms."""
+          candidate = [term + (term_obj,)]
+          cand = ComposedWord(candidate)
+          self.add_or_update_composedword(cand)
+          word_windows = list(
+              range(max(0, len(block_of_word_obj) - (n - 1)), len(block_of_word_obj))
+          )[::-1]
+          for w in word_windows:
+              candidate.append(block_of_word_obj[w])
+              self.freq_ns[len(candidate)] += 1.0
+              cand = ComposedWord(candidate[::-1])
+              self.add_or_update_composedword(cand)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Public API Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="get_tag">
+    <AccordionTrigger>
+      <code>get_tag(word, i)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_tag(self, word, i):
+          """Get the tag for a word."""
+          return get_tag(word, i, self.exclude)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_candidate">
+    <AccordionTrigger>
+      <code>build_candidate(candidate_string)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_candidate(self, candidate_string):
+          """Build a candidate from a string."""
+          from segtok.tokenizer import web_tokenizer, split_contractions
+          
+          tokenized_words = [
+              w
+              for w in split_contractions(web_tokenizer(candidate_string.lower()))
+              if not (w.startswith("'") and len(w) > 1) and len(w) > 0
+          ]
+
+          candidate_terms = []
+          for index, word in enumerate(tokenized_words):
+              tag = self.get_tag(word, index)
+              term_obj = self.get_term(word, save_non_seen=False)
+
+              # Skip terms with zero term frequency
+              if term_obj.tf == 0:
+                  term_obj = None
+
+              candidate_terms.append((tag, word, term_obj))
+
+          # Check if the candidate has any valid terms
+          if not any(term[2] for term in candidate_terms):
+              return ComposedWord(None)
+
+          return ComposedWord(candidate_terms)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_single_terms_features">
+    <AccordionTrigger>
+      <code>build_single_terms_features(features=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_single_terms_features(self, features=None):
+          """Build features for single terms."""
+          valid_terms = [term for term in self.terms.values() if not term.stopword]
+          valid_tfs = np.array([x.tf for x in valid_terms])
+
+          if len(valid_tfs) == 0:
+              return
+
+          avg_tf = valid_tfs.mean()
+          std_tf = valid_tfs.std()
+          max_tf = max(x.tf for x in self.terms.values())
+          stats = {
+              "max_tf": max_tf,
+              "avg_tf": avg_tf,
+              "std_tf": std_tf,
+              "number_of_sentences": self.number_of_sentences,
+          }
+          list(map(lambda x: x.update_h(stats, features=features), self.terms.values()))
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_mult_terms_features">
+    <AccordionTrigger>
+      <code>build_mult_terms_features(features=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_mult_terms_features(self, features=None):
+          """Build features for multi-word terms."""
+          list(
+              map(
+                  lambda x: x.update_h(features=features),
+                  [cand for cand in self.candidates.values() if cand.is_valid()],
+              )
+          )
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_term">
+    <AccordionTrigger>
+      <code>get_term(str_word, save_non_seen=True)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_term(self, str_word, save_non_seen=True):
+          """Get or create a term object for a word."""
+          unique_term = str_word.lower()
+          simples_sto = unique_term in self.stopword_set
+          if unique_term.endswith("s") and len(unique_term) > 3:
+              unique_term = unique_term[:-1]
+
+          if unique_term in self.terms:
+              return self.terms[unique_term]
+
+          simples_unique_term = unique_term
+          for pontuation in self.exclude:
+              simples_unique_term = simples_unique_term.replace(pontuation, "")
+          isstopword = (
+              simples_sto
+              or unique_term in self.stopword_set
+              or len(simples_unique_term) < 3
+          )
+
+          term_id = len(self.terms)
+          term_obj = SingleWord(unique_term, term_id, self.g)
+          term_obj.stopword = isstopword
+
+          if save_non_seen:
+              self.g.add_node(term_id)
+              self.terms[unique_term] = term_obj
+
+          return term_obj
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="add_cooccur">
+    <AccordionTrigger>
+      <code>add_cooccur(left_term, right_term)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def add_cooccur(self, left_term, right_term):
+          """Add a co-occurrence relationship between two terms."""
+          if right_term.id not in self.g[left_term.id]:
+              self.g.add_edge(left_term.id, right_term.id, tf=0.0)
+          self.g[left_term.id][right_term.id]["tf"] += 1.0
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="add_or_update_composedword">
+    <AccordionTrigger>
+      <code>add_or_update_composedword(cand)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def add_or_update_composedword(self, cand):
+          """Add or update a composed word in the candidates collection."""
+          if cand.unique_kw not in self.candidates:
+              self.candidates[cand.unique_kw] = cand
+          else:
+              self.candidates[cand.unique_kw].uptade_cand(cand)
+          self.candidates[cand.unique_kw].tf += 1.0
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Property Accessors
+
+The `DataCore` class includes various property accessors for backward compatibility:
+
+### Configuration Properties
+
+- `exclude`: Characters to exclude from processing
+- `tags_to_discard`: Part-of-speech tags to ignore during analysis
+- `stopword_set`: Set of stopwords to filter out
+- `g`: DirectedGraph representing term co-occurrences
+
+```python
+# Examples
+excluded_chars = data.exclude
+ignored_tags = data.tags_to_discard
+stopwords = data.stopword_set
+graph = data.g
+```
+
+### Text Statistics Properties
+
+- `number_of_sentences`: Count of sentences in the processed text
+- `number_of_words`: Total number of words processed
+
+```python
+# Examples
+sentence_count = data.number_of_sentences
+word_count = data.number_of_words
+```
+
+### Collection Properties
+
+- `terms`: Dictionary of `SingleWord` objects representing individual terms
+- `candidates`: Dictionary of `ComposedWord` objects representing keyword candidates
+- `sentences_obj`: Processed sentence objects
+- `sentences_str`: Raw sentence strings from the original text
+- `freq_ns`: Frequency of n-grams by length
+
+```python
+# Examples
+all_terms = data.terms
+all_candidates = data.candidates
+processed_sentences = data.sentences_obj
+raw_sentences = data.sentences_str
+ngram_frequencies = data.freq_ns
+```
+
+## Complete Usage Example
+
+```python
+from yake.datarepresentation import DataCore
+from yake.stopwordremover import StopwordRemover
+
+# Initialize stopwords
+stopword_remover = StopwordRemover("en")
+stopword_set = stopword_remover.get_stopword_set()
+
+# Create DataCore instance
+text = "Natural language processing is a field of artificial intelligence that focuses on the interaction between computers and humans using natural language."
+data = DataCore(text, stopword_set)
+
+# Build features for keyword extraction
+data.build_single_terms_features()
+data.build_mult_terms_features()
+
+# Extract top candidates
+candidates = [(cand.unique_kw, cand.h) for cand in data.candidates.values() if cand.is_valid()]
+candidates.sort(key=lambda x: x[1])  # Sort by score (lower is better in YAKE)
+
+# Print top 5 keywords
+for keyword, score in candidates[:5]:
+    print(f"{keyword}: {score:.4f}")
+```
+
+## Dependencies
+
+The `DataCore` class relies on:
+
+- `string`: For punctuation constants
+- `networkx`: For graph representation (co-occurrences)
+- `numpy`: For statistical calculations
+- `segtok`: For tokenization
+- Internal utility modules:
+  - `utils`: For pre-filtering and tokenization
+  - `single_word`: For representing individual terms
+  - `composed_word`: For representing multi-word candidates

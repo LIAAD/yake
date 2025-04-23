@@ -2,8 +2,9 @@
 
 import os
 import jellyfish
+from yake.data import DataCore
 from .Levenshtein import Levenshtein
-from .datarepresentation import DataCore
+
 
 
 class KeywordExtractor:

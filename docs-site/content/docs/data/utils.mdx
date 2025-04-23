@@ -1,0 +1,204 @@
+---
+title: "Utils"
+description: "Utility functions for text processing in YAKE keyword extraction"
+---
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# Utils
+
+The `utils` module provides essential text processing functions for YAKE (Yet Another Keyword Extractor), handling tokenization, normalization, and classification of textual elements.
+
+> **Info:** This documentation provides interactive code views for each function. Click on a function name to view its implementation.
+
+## Module Overview
+
+```python
+"""Utility functions for text processing."""
+
+import re
+from segtok.segmenter import split_multi
+from segtok.tokenizer import web_tokenizer, split_contractions
+
+STOPWORD_WEIGHT = "bi"
+```
+
+The `utils` module contains functions for text preprocessing, tokenization, and classification that support the keyword extraction pipeline.
+
+## Functions
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="pre_filter">
+    <AccordionTrigger>
+      <code>pre_filter(text)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def pre_filter(text):
+          """Pre-filter the text to normalize line breaks and spacing."""
+          prog = re.compile("^(\\s*([A-Z]))")
+          parts = text.split("\n")
+          buffer = ""
+          for part in parts:
+              sep = " "
+              if prog.match(part):
+                  sep = "\n\n"
+              buffer += sep + part.replace("\t", " ")
+          return buffer
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="tokenize_sentences">
+    <AccordionTrigger>
+      <code>tokenize_sentences(text)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def tokenize_sentences(text):
+          """Tokenize text into sentences and words."""
+          return [
+              [
+                  w
+                  for w in split_contractions(web_tokenizer(s))
+                  if not (w.startswith("'") and len(w) > 1) and len(w) > 0
+              ]
+              for s in list(split_multi(text))
+              if len(s.strip()) > 0
+          ]
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_tag">
+    <AccordionTrigger>
+      <code>get_tag(word, i, exclude)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_tag(word, i, exclude):
+          """Determine the tag of a word based on its characteristics."""
+
+          # Check if word is numeric 
+          if word.replace(",", "").isdigit() or word.replace(",", "").replace(".", "", 1).isdigit():
+              return "d"
+
+          # Use counting instead of list comprehensions for better performance
+          cdigit = sum(c.isdigit() for c in word)
+          calpha = sum(c.isalpha() for c in word)
+          cexclude = sum(c in exclude for c in word)
+
+          # Check for unusual combinations
+          if (cdigit > 0 and calpha > 0) or (cdigit == 0 and calpha == 0) or cexclude > 1:
+              return "u"
+
+          # Check for ALL CAPS (acronym)
+          if word.isupper() and len(word) > 0:
+              return "a"
+
+          # Check for Proper noun (capitalized)
+          if len(word) > 1 and word[0].isupper() and i > 0:
+              # Optimized check for single uppercase letter
+              if sum(c.isupper() for c in word) == 1:
+                  return "n"
+
+          return "p"
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Function Descriptions
+
+### pre_filter
+
+Normalizes text by handling line breaks and spacing to prepare for tokenization.
+
+**Parameters:**
+- `text` (str): The input text to normalize
+
+**Returns:**
+- str: Normalized text with standardized spacing and line breaks
+
+**Example:**
+```python
+from yake.utils import pre_filter
+
+raw_text = "This is line one.\nThis is line two.\tAnd this has a tab."
+normalized_text = pre_filter(raw_text)
+print(normalized_text)
+# Output: " This is line one. This is line two. And this has a tab."
+```
+
+### tokenize_sentences
+
+Splits text into sentences and then tokenizes each sentence into words, filtering out invalid tokens.
+
+**Parameters:**
+- `text` (str): The input text to tokenize
+
+**Returns:**
+- list: A nested list where each inner list contains the tokens of a sentence
+
+**Example:**
+```python
+from yake.utils import tokenize_sentences
+
+text = "Hello world! This is a sample text. It has multiple sentences."
+sentences = tokenize_sentences(text)
+print(sentences)
+# Output: [['Hello', 'world', '!'], ['This', 'is', 'a', 'sample', 'text', '.'], ['It', 'has', 'multiple', 'sentences', '.']]
+```
+
+### get_tag
+
+Classifies words based on their characteristics, assigning a tag for each word type.
+
+**Parameters:**
+- `word` (str): The word to classify
+- `i` (int): The position of the word in its sentence
+- `exclude` (set): Set of characters to exclude from regular words
+
+**Returns:**
+- str: A single character tag representing the word type:
+  - `"d"`: Digit/number
+  - `"u"`: Unusual combination (mixed alphanumeric or special characters)
+  - `"a"`: Acronym (all uppercase)
+  - `"n"`: Proper noun (capitalized word not at the beginning of a sentence)
+  - `"p"`: Plain word (default)
+
+**Example:**
+```python
+from yake.utils import get_tag
+import string
+
+exclude = set(string.punctuation)
+
+# Examples of different word classifications
+print(get_tag("Hello", 0, exclude))  # Output: "p" (plain word)
+print(get_tag("Hello", 3, exclude))  # Output: "n" (proper noun, capitalized not at sentence start)
+print(get_tag("123", 0, exclude))    # Output: "d" (digit)
+print(get_tag("NASA", 0, exclude))   # Output: "a" (acronym)
+print(get_tag("test@example", 0, exclude))  # Output: "u" (unusual)
+```
+
+## Module Constants
+
+- `STOPWORD_WEIGHT` (str): Default weighting scheme for stopwords, set to "bi"
+
+## Usage in YAKE Pipeline
+
+The utility functions serve as foundation components for the YAKE keyword extraction process:
+
+1. `pre_filter` normalizes the input text
+2. `tokenize_sentences` breaks the text into processable tokens
+3. `get_tag` classifies each token for further analysis
+
+These functions are primarily used by the `DataCore` class to build the data representation needed for keyword extraction.
+
+## Dependencies
+
+The utils module relies on:
+- `re`: For regular expression operations
+- `segtok.segmenter`: For sentence segmentation
+- `segtok.tokenizer`: For tokenization and contraction handling

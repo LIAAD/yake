@@ -1,0 +1,473 @@
+---
+title: "ComposedWord"
+description: "Multi-word term representation class for YAKE keyword extraction"
+---
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# ComposedWord
+
+The `ComposedWord` class represents multi-word terms in YAKE (Yet Another Keyword Extractor), providing the foundation for analyzing and scoring potential keyword phrases.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Class Overview
+
+```python
+class ComposedWord:
+    def __init__(self, terms):
+        # Initialize a composed word from term tuples [(tag, word, term_obj)]
+```
+
+The `ComposedWord` class processes and scores multi-word candidates for keyword extraction based on their constituent terms and statistical properties.
+
+## Constructor
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="init">
+    <AccordionTrigger>
+      <code>__init__(terms)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __init__(self, terms):  # [ (tag, word, term_obj) ]
+          # If terms is None, initialize an invalid candidate
+          if terms is None:
+              self.data = {
+                  "start_or_end_stopwords": True,
+                  "tags": set(),
+                  "h": 0.0,
+                  "tf": 0.0,
+                  "kw": "",
+                  "unique_kw": "",
+                  "size": 0,
+                  "terms": [],
+                  "integrity": 0.0,
+              }
+              return
+
+          # Basic initialization from terms
+          self.data = {}
+
+          # Calculate derived properties
+          self.data["tags"] = set(["".join([w[0] for w in terms])])
+          self.data["kw"] = " ".join([w[1] for w in terms])
+          self.data["unique_kw"] = self.data["kw"].lower()
+          self.data["size"] = len(terms)
+          self.data["terms"] = [w[2] for w in terms if w[2] is not None]
+          self.data["tf"] = 0.0
+          self.data["integrity"] = 1.0
+          self.data["h"] = 1.0
+
+          # Check if the candidate starts or ends with stopwords
+          if len(self.data["terms"]) > 0:
+              self.data["start_or_end_stopwords"] = (
+                  self.data["terms"][0].stopword or self.data["terms"][-1].stopword
+              )
+          else:
+              self.data["start_or_end_stopwords"] = True
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `terms` (list): A list of term tuples in the format `(tag, word, term_obj)` where:
+  - `tag` (str): The part-of-speech tag for the word
+  - `word` (str): The actual word text
+  - `term_obj` (SingleWord): The term object representation
+
+**Example:**
+```python
+from yake.datarepresentation import ComposedWord
+
+# Create a composed word from term tuples
+terms = [('n', 'natural', term_obj1), ('n', 'language', term_obj2)]
+composed_word = ComposedWord(terms)
+
+# Create an invalid composed word
+invalid_composed = ComposedWord(None)
+```
+
+## Core Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="update_h">
+    <AccordionTrigger>
+      <code>update_h(features=None, is_virtual=False)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def update_h(self, features=None, is_virtual=False):
+          """Update the term's score based on its constituent terms."""
+          sum_h = 0.0
+          prod_h = 1.0
+
+          for t, term_base in enumerate(self.terms):
+              if not term_base.stopword:
+                  sum_h += term_base.h
+                  prod_h *= term_base.h
+
+              else:
+                  if STOPWORD_WEIGHT == "bi":
+                      prob_t1 = 0.0
+                      if t > 0 and term_base.g.has_edge(
+                          self.terms[t - 1].id, self.terms[t].id
+                      ):
+                          prob_t1 = (
+                              term_base.g[self.terms[t - 1].id][self.terms[t].id]["tf"]
+                              / self.terms[t - 1].tf
+                          )
+                      prob_t2 = 0.0
+                      if t < len(self.terms) - 1 and term_base.g.has_edge(
+                          self.terms[t].id, self.terms[t + 1].id
+                      ):
+                          prob_t2 = (
+                              term_base.g[self.terms[t].id][self.terms[t + 1].id]["tf"]
+                              / self.terms[t + 1].tf
+                          )
+
+                      prob = prob_t1 * prob_t2
+                      prod_h *= 1 + (1 - prob)
+                      sum_h -= 1 - prob
+                  elif STOPWORD_WEIGHT == "h":
+                      sum_h += term_base.h
+                      prod_h *= term_base.h
+                  elif STOPWORD_WEIGHT == "none":
+                      pass
+
+          tf_used = 1.0
+          if features is None or "KPF" in features:
+              tf_used = self.tf
+
+          if is_virtual:
+              tf_used = np.mean([term_obj.tf for term_obj in self.terms])
+
+          self.h = prod_h / ((sum_h + 1) * tf_used)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="is_valid">
+    <AccordionTrigger>
+      <code>is_valid()</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def is_valid(self):
+          """Check if this candidate is valid."""
+          is_valid = False
+          for tag in self.tags:
+              is_valid = is_valid or ("u" not in tag and "d" not in tag)
+          return is_valid and not self.start_or_end_stopwords
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="uptade_cand">
+    <AccordionTrigger>
+      <code>uptade_cand(cand)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def uptade_cand(self, cand):
+          """Update this candidate with data from another candidate."""
+          for tag in cand.tags:
+              self.tags.add(tag)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_composed_feature">
+    <AccordionTrigger>
+      <code>get_composed_feature(feature_name, discart_stopword=True)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_composed_feature(self, feature_name, discart_stopword=True):
+          """Get composed features from constituent terms."""
+          list_of_features = [
+              getattr(term, feature_name)
+              for term in self.terms
+              if (discart_stopword and not term.stopword) or not discart_stopword
+          ]
+          sum_f = sum(list_of_features)
+          prod_f = np.prod(list_of_features)
+          return (sum_f, prod_f, prod_f / (sum_f + 1))
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_features">
+    <AccordionTrigger>
+      <code>build_features(params)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_features(self, params):
+          """Build features for machine learning or evaluation."""
+          features = params.get(
+              "features", ["wfreq", "wrel", "tf", "wcase", "wpos", "wspread"]
+          )
+          _stopword = params.get("_stopword", [True, False])
+          if features is None:
+              features = ["wfreq", "wrel", "tf", "wcase", "wpos", "wspread"]
+          if _stopword is None:
+              _stopword = [True, False]
+          columns = []
+          features_cand = []
+          seen = set()
+          if params.get("doc_id") is not None:
+              columns.append("doc_id")
+              features_cand.append(params["doc_id"])
+
+          if params.get("keys") is not None:
+              if params.get("rel", True):
+                  columns.append("rel")
+                  if self.unique_kw in params["keys"] or params.get("is_virtual", False):
+                      features_cand.append(1)
+                      seen.add(self.unique_kw)
+                  else:
+                      features_cand.append(0)
+
+              if params.get("rel_approx", True):
+                  columns.append("rel_approx")
+                  max_gold_ = ("", 0.0)
+                  for gold_key in params["keys"]:
+                      dist = 1.0 - jellyfish.levenshtein_distance(
+                          gold_key,
+                          self.unique_kw,
+                      ) / max(len(gold_key), len(self.unique_kw))
+                      max_gold_ = (gold_key, dist)
+                  features_cand.append(max_gold_[1])
+                  features_cand.append(max_gold_[1])
+
+          columns.append("kw")
+          features_cand.append(self.unique_kw)
+          columns.append("h")
+          features_cand.append(self.h)
+          columns.append("tf")
+          features_cand.append(self.tf)
+          columns.append("size")
+          features_cand.append(self.size)
+          columns.append("is_virtual")
+          columns.append("is_virtual")
+          features_cand.append(int(params.get("is_virtual", False)))
+          for feature_name in features:
+              for discart_stopword in _stopword:
+                  (f_sum, f_prod, f_sum_prod) = self.get_composed_feature(
+                      feature_name, discart_stopword=discart_stopword
+                  )
+                  columns.append(
+                      f"{'n' if discart_stopword else ''}s_sum_K{feature_name}"
+                  )
+                  features_cand.append(f_sum)
+
+                  columns.append(
+                      f"{'n' if discart_stopword else ''}s_prod_K{feature_name}"
+                  )
+                  features_cand.append(f_prod)
+
+                  columns.append(
+                      f"{'n' if discart_stopword else ''}s_sum_prod_K{feature_name}"
+                  )
+                  features_cand.append(f_sum_prod)
+
+          return (features_cand, columns, seen)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+  
+  <AccordionItem value="update_h_old">
+    <AccordionTrigger>
+      <code>update_h_old(features=None, is_virtual=False)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def update_h_old(self, features=None, is_virtual=False):
+          """Legacy method for updating the term's score."""
+          sum_h = 0.0
+          prod_h = 1.0
+
+          for t, term_base in enumerate(self.terms):
+              if is_virtual and term_base.tf == 0:
+                  continue
+
+              if term_base.stopword:
+                  prob_t1 = 0.0
+                  if term_base.g.has_edge(self.terms[t - 1].id, self.terms[t].id):
+                      prob_t1 = (
+                          term_base.g[self.terms[t - 1].id][self.terms[t].id]["tf"]
+                          / self.terms[t - 1].tf
+                      )
+
+                  prob_t2 = 0.0
+                  if term_base.g.has_edge(self.terms[t].id, self.terms[t + 1].id):
+                      prob_t2 = (
+                          term_base.g[self.terms[t].id][self.terms[t + 1].id]["tf"]
+                          / self.terms[t + 1].tf
+                      )
+
+                  prob = prob_t1 * prob_t2
+                  prod_h *= 1 + (1 - prob)
+                  sum_h -= 1 - prob
+              else:
+                  sum_h += term_base.h
+                  prod_h *= term_base.h
+          tf_used = 1.0
+          if features is None or "KPF" in features:
+              tf_used = self.tf
+          if is_virtual:
+              tf_used = np.mean([term_obj.tf for term_obj in self.terms])
+          self.h = prod_h / ((sum_h + 1) * tf_used)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Property Accessors
+
+The `ComposedWord` class uses a dictionary-based property system with property accessors for backward compatibility:
+
+### Basic Properties
+
+- `tags`: Set of POS tag combinations for this candidate
+- `kw`: The original keyword text
+- `unique_kw`: Lowercase version of the keyword for uniqueness checks
+- `size`: Number of terms in this candidate
+- `terms`: List of term objects in this candidate
+- `start_or_end_stopwords`: Boolean indicating if the candidate starts or ends with stopwords
+
+```python
+# Examples
+pos_tags = composed_word.tags
+keyword = composed_word.kw
+unique_key = composed_word.unique_kw
+term_count = composed_word.size
+term_objects = composed_word.terms
+has_stopword_boundary = composed_word.start_or_end_stopwords
+```
+
+### Scoring Properties
+
+- `tf`: Term frequency of this candidate
+- `integrity`: Integrity score (default: 1.0)
+- `h`: YAKE score for this candidate (lower is better)
+
+```python
+# Examples
+term_frequency = composed_word.tf
+integrity_score = composed_word.integrity
+yake_score = composed_word.h
+
+# The tf property is settable
+composed_word.tf = 5.0
+
+# The h property is settable
+composed_word.h = 0.25
+```
+
+## Key Algorithms
+
+### Candidate Validation
+
+Candidates are considered valid if:
+1. They contain no undefined ("u") or discarded ("d") POS tags
+2. They do not start or end with stopwords
+
+```python
+def is_valid(self):
+    """Check if this candidate is valid."""
+    is_valid = False
+    for tag in self.tags:
+        is_valid = is_valid or ("u" not in tag and "d" not in tag)
+    return is_valid and not self.start_or_end_stopwords
+```
+
+### Feature Composition
+
+When analyzing multi-word terms, the `ComposedWord` class composes features from its constituent terms:
+
+```python
+def get_composed_feature(self, feature_name, discart_stopword=True):
+    """Get composed features from constituent terms."""
+    list_of_features = [
+        getattr(term, feature_name)
+        for term in self.terms
+        if (discart_stopword and not term.stopword) or not discart_stopword
+    ]
+    sum_f = sum(list_of_features)
+    prod_f = np.prod(list_of_features)
+    return (sum_f, prod_f, prod_f / (sum_f + 1))
+```
+
+### Score Calculation
+
+The YAKE score for a multi-word term is calculated using:
+
+```python
+self.h = prod_h / ((sum_h + 1) * tf_used)
+```
+
+Where:
+- `prod_h`: Product of the h-scores of all terms
+- `sum_h`: Sum of the h-scores of all terms
+- `tf_used`: Term frequency (or average term frequency for virtual terms)
+
+Lower scores indicate better keyword candidates.
+
+## Stopword Handling
+
+The `ComposedWord` class handles stopwords differently based on the `STOPWORD_WEIGHT` configuration:
+
+- `"bi"`: Uses co-occurrence probabilities to weight stopwords
+- `"h"`: Uses stopword h-scores directly
+- `"none"`: Ignores stopwords in scoring
+
+## Complete Usage Example
+
+```python
+from yake.datarepresentation import DataCore, ComposedWord
+from yake.stopwordremover import StopwordRemover
+
+# Initialize stopwords
+stopword_remover = StopwordRemover("en")
+stopword_set = stopword_remover.get_stopword_set()
+
+# Create DataCore instance
+text = "Natural language processing is a field of artificial intelligence."
+data = DataCore(text, stopword_set)
+
+# Get a candidate from the DataCore
+candidate_string = "natural language processing"
+composed_word = data.build_candidate(candidate_string)
+
+# Update the candidate's score
+composed_word.update_h()
+
+# Check if the candidate is valid
+if composed_word.is_valid():
+    print(f"Candidate: {composed_word.kw}")
+    print(f"Score: {composed_word.h:.4f}")
+    print(f"Size: {composed_word.size}")
+    print(f"Term Frequency: {composed_word.tf}")
+```
+
+## Dependencies
+
+The `ComposedWord` class relies on:
+
+- `numpy`: For statistical calculations
+- `jellyfish`: For string similarity measurement
+- Internal utility module:
+  - `utils`: For stopword weighting constants
+
+## Integration with YAKE
+
+`ComposedWord` works closely with the `DataCore` class:
+
+1. `DataCore` generates candidate `ComposedWord` instances
+2. Features are built for individual terms via `build_single_terms_features()`
+3. Features for multi-word terms are built via `build_mult_terms_features()`
+4. Candidates are scored using the `update_h()` method
+5. Lower scores indicate better keyword candidates
