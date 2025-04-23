@@ -1,0 +1,284 @@
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# KeywordExtractor
+
+The `KeywordExtractor` class is the main entry point for YAKE (Yet Another Keyword Extractor), providing a simple API to extract meaningful keywords from textual content.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Module Overview
+
+```python
+"""Module for keyword extraction from text documents."""
+
+import os
+import jellyfish
+from yake.data import DataCore
+from .Levenshtein import Levenshtein
+```
+
+The `KeywordExtractor` class provides an interface to extract and process keywords from text documents using statistical features and deduplication.
+
+## Class Definition
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="constructor">
+    <AccordionTrigger>
+      <code>__init__(**kwargs)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __init__(self, **kwargs):
+          """Initialize the KeywordExtractor with configuration parameters."""
+          self.config = {
+              "lan": kwargs.get("lan", "en"),
+              "n": kwargs.get("n", 3),
+              "dedup_lim": kwargs.get("dedup_lim", 0.9),
+              "dedup_func": kwargs.get("dedup_func", "seqm"),
+              "window_size": kwargs.get("window_size", 1),
+              "top": kwargs.get("top", 20),
+              "features": kwargs.get("features", None),
+          }
+
+          self.stopword_set = self._load_stopwords(kwargs.get("stopwords"))
+          self.dedup_function = self._get_dedup_function(self.config["dedup_func"])
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `lan` (str, optional): Language for stopwords (default: "en")
+- `n` (int, optional): Maximum n-gram size (default: 3)
+- `dedup_lim` (float, optional): Deduplication similarity threshold (default: 0.9)
+- `dedup_func` (str, optional): Deduplication function to use (default: "seqm")
+- `window_size` (int, optional): Window size for co-occurrence (default: 1)
+- `top` (int, optional): Maximum number of keywords to return (default: 20)
+- `features` (dict, optional): Custom features for keyword scoring (default: None)
+- `stopwords` (set, optional): Custom stopwords set (default: None, loads from language file)
+
+## Core Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="extract_keywords">
+    <AccordionTrigger>
+      <code>extract_keywords(text)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def extract_keywords(self, text):
+          """Extract keywords from text."""
+          if not text:
+              return []
+
+          text = text.replace("\n", " ")
+
+          # Create a config dictionary for DataCore
+          core_config = {
+              "windows_size": self.config["window_size"],
+              "n": self.config["n"],
+          }
+
+          dc = DataCore(text=text, stopword_set=self.stopword_set, config=core_config)
+
+          dc.build_single_terms_features(features=self.config["features"])
+          dc.build_mult_terms_features(features=self.config["features"])
+
+          result_set = []
+          candidates_sorted = sorted(
+              [cc for cc in dc.candidates.values() if cc.is_valid()], key=lambda c: c.h
+          )
+
+          if self.config["dedup_lim"] >= 1.0:
+              return [(cand.unique_kw, cand.h) for cand in candidates_sorted][
+                  : self.config["top"]
+              ]
+
+          for cand in candidates_sorted:
+              should_add = True
+              for h, cand_result in result_set:
+                  if (
+                      self.dedup_function(cand.unique_kw, cand_result.unique_kw)
+                      > self.config["dedup_lim"]
+                  ):
+                      should_add = False
+                      break
+
+              if should_add:
+                  result_set.append((cand.h, cand))
+              if len(result_set) == self.config["top"]:
+                  break
+
+          return [(cand.kw, h) for (h, cand) in result_set]
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `text` (str): The text to extract keywords from
+
+**Returns:**
+- list: A list of tuples containing (keyword, score) pairs, sorted by relevance
+
+## Helper Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="load_stopwords">
+    <AccordionTrigger>
+      <code>_load_stopwords(stopwords)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _load_stopwords(self, stopwords):
+          """Load stopwords from file or use provided set."""
+          if stopwords is not None:
+              return set(stopwords)
+
+          dir_path = os.path.dirname(os.path.realpath(__file__))
+          local_path = os.path.join(
+              "StopwordsList", f"stopwords_{self.config['lan'][:2].lower()}.txt"
+          )
+
+          if not os.path.exists(os.path.join(dir_path, local_path)):
+              local_path = os.path.join("StopwordsList", "stopwords_noLang.txt")
+
+          resource_path = os.path.join(dir_path, local_path)
+
+          try:
+              with open(resource_path, encoding="utf-8") as stop_file:
+                  return set(stop_file.read().lower().split("\n"))
+          except UnicodeDecodeError:
+              print("Warning: reading stopword list as ISO-8859-1")
+              with open(resource_path, encoding="ISO-8859-1") as stop_file:
+                  return set(stop_file.read().lower().split("\n"))
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_dedup_function">
+    <AccordionTrigger>
+      <code>_get_dedup_function(func_name)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _get_dedup_function(self, func_name):
+          """Retrieve the appropriate deduplication function."""
+          return {
+              "jaro_winkler": self.jaro,
+              "jaro": self.jaro,
+              "sequencematcher": self.seqm,
+              "seqm": self.seqm,
+          }.get(func_name.lower(), self.levs)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Similarity Functions
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="jaro">
+    <AccordionTrigger>
+      <code>jaro(cand1, cand2)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def jaro(self, cand1, cand2):
+          return jellyfish.jaro(cand1, cand2)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="levs">
+    <AccordionTrigger>
+      <code>levs(cand1, cand2)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def levs(self, cand1, cand2):
+          return 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2))
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="seqm">
+    <AccordionTrigger>
+      <code>seqm(cand1, cand2)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def seqm(self, cand1, cand2):
+          return Levenshtein.ratio(cand1, cand2)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Usage Examples
+
+### Basic Usage
+
+```python
+from yake import KeywordExtractor
+
+text = """
+Natural language processing (NLP) is a subfield of linguistics, computer science, and artificial intelligence
+concerned with the interactions between computers and human language, in particular how to program computers
+to process and analyze large amounts of natural language data.
+"""
+
+# Simple example with default parameters
+kw_extractor = KeywordExtractor()
+keywords = kw_extractor.extract_keywords(text)
+
+# Print the keywords and their scores
+for kw, score in keywords:
+    print(f"{kw}: {score:.4f}")
+```
+
+### Customized Usage
+
+```python
+from yake import KeywordExtractor
+
+# Create a custom stopwords set
+custom_stopwords = {"the", "a", "an", "in", "on", "at", "of", "for", "with"}
+
+# Initialize with custom parameters
+kw_extractor = KeywordExtractor(
+    lan="en",               # Language
+    n=2,                   # Maximum n-gram size
+    dedup_lim=0.8,         # Deduplication threshold
+    dedup_func="jaro",     # Deduplication function
+    window_size=2,         # Window size
+    top=10,                # Number of keywords to extract
+    stopwords=custom_stopwords
+)
+
+text = "Machine learning is the study of computer algorithms that improve automatically through experience."
+keywords = kw_extractor.extract_keywords(text)
+
+# Print the top 10 keywords
+for kw, score in keywords:
+    print(f"{kw}: {score:.4f}")
+```
+
+## Deduplication Functions
+
+The `KeywordExtractor` supports multiple string similarity algorithms for deduplication:
+
+1. **Jaro-Winkler** ("jaro", "jaro_winkler"): Based on character matches with higher weights for prefix matches
+   
+2. **Levenshtein Ratio** ("levs"): Based on Levenshtein edit distance normalized by string length
+   
+3. **SequenceMatcher** ("seqm", "sequencematcher"): Based on Python's difflib sequence matching algorithm
+
+## Dependencies
+
+The module relies on:
+- `os`: For file operations and path handling
+- `jellyfish`: For Jaro-Winkler string similarity
+- `yake.data.DataCore`: For core data representation
+- `.Levenshtein`: For Levenshtein distance and ratio calculations
