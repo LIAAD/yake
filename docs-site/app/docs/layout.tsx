@@ -1,12 +1,27 @@
-import { DocsLayout } from 'fumadocs-ui/layouts/docs';
-import type { ReactNode } from 'react';
-import { baseOptions } from '@/app/layout.config';
-import { source } from '@/lib/source';
+import { Metadata } from 'next';
+import { basePath } from '../config';
+import './global.css';
 
-export default function Layout({ children }: { children: ReactNode }) {
+export const metadata: Metadata = {
+  title: {
+    template: '%s | YAKE!',
+    default: 'YAKE! Documentation',
+  },
+  description: 'Documentation for YAKE!',
+  // Ajuste para caminhos absolutos que respeitam o basePath
+  icons: {
+    icon: `${basePath}/favicon.ico`,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <DocsLayout tree={source.pageTree} {...baseOptions}>
-      {children}
-    </DocsLayout>
+    <html lang="en">
+      <body>{children}</body>
+    </html>
   );
 }

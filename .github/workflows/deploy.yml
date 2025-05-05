@@ -19,16 +19,20 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd docs-site 
-          npm ci        
+          cd docs-site  # Ajuste conforme necessário
+          npm ci
 
       - name: Build
         run: |
-          cd docs-site  
+          cd docs-site  # Ajuste conforme necessário
           npm run build
+
+      - name: Create .nojekyll file
+        run: |
+          touch docs-site/out/.nojekyll  # Ajuste conforme necessário
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs-site/out  # pasta gerada pela build do Next.js dentro do diretório docs-site
-          branch: gh-pages       # branch onde será publicado
+          folder: docs-site/out  # Ajuste conforme necessário
+          branch: gh-pages
