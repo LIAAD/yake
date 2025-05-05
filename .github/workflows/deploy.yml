@@ -1,0 +1,30 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - core-seperation  # ou master, dependendo da sua branch principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # ou a versão que você usa
+
+      - name: Install dependencies
+        run: npm ci  # ou yarn install --frozen-lockfile
+
+      - name: Build
+        run: npm run build  # ou yarn build
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: out  # pasta gerada pela build do Next.js
+          branch: gh-pages  # branch onde será publicado
