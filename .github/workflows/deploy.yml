@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - core-seperation  # ou master, dependendo da sua branch principal
+      - main  # ou master, dependendo da sua branch principal
 
 jobs:
   build-and-deploy:
@@ -18,13 +18,17 @@ jobs:
           node-version: '18'  # ou a versão que você usa
 
       - name: Install dependencies
-        run: npm ci  # ou yarn install --frozen-lockfile
+        run: |
+          cd docs-site 
+          npm ci        
 
       - name: Build
-        run: npm run build  # ou yarn build
+        run: |
+          cd docs-site  
+          npm run build
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: out  # pasta gerada pela build do Next.js
-          branch: gh-pages  # branch onde será publicado
+          folder: docs-site/out  # pasta gerada pela build do Next.js dentro do diretório docs-site
+          branch: gh-pages       # branch onde será publicado
