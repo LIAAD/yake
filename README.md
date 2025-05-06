@@ -77,7 +77,7 @@ custom_th = TextHighlighter(
 ## Where to Find YAKE!
 
 - 🌐 Online demo: [http://yake.inesctec.pt](http://yake.inesctec.pt)
-- 🔌 Documentation site: [Documentation](http://github.io/yakerf/docs/)
+- 🔌 Documentation site: [Documentation](https://tiagolv.github.io/yakerf/docs)
 - 📦 Python package: [GitHub](https://github.com/LIAAD/yake_demo)
 
 ## Citation
@@ -89,12 +89,14 @@ Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and 
 YAKE! Keyword Extraction from Single Documents using Multiple Local Features.
 Information Sciences Journal. Elsevier, Vol 509, pp 257-289.
 ```
+[pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
 
 ```
 Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018).
 A Text Feature Based Automatic Keyword Extraction Method for Single Documents.
 ECIR 2018. Lecture Notes in Computer Science, vol 10772, pp. 684-691.
 ```
+[pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
 
 ## Awards
 
