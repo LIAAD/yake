@@ -1,1 +1,6 @@
+# Dependency directories
 node_modules/
+.npm
+# Don't ignore these files
+!.next/
+!out/
