@@ -14,7 +14,7 @@ export const baseOptions: BaseLayoutProps = {
     title: (
       <>
         <Image
-          src={`${basePath}/public/yakelogo.png`}
+          src={`${basePath}/yakelogo.png`}
           width={24}
           height={24}
           alt="YAKE Logo"

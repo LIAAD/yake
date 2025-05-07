@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { basePath } from './config';
 import './global.css';
 
 import { RootProvider } from 'fumadocs-ui/provider';
@@ -15,8 +16,8 @@ export const metadata: Metadata = {
   },
   description: 'Documentation for YAKE!',
   icons: {
-    icon: `<docs-site />yakelogo.png`,
-    shortcut: `<docs-site />yakelogo.png`,
+    icon: `${basePath}/yakelogo.png`,
+    shortcut: `${basePath}/yakelogo.png`,
   },
 };
 
