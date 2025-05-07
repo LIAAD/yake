@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prebuild": "node scripts/generate-search-index.js",
     "build": "next build",
     "dev": "next dev --turbopack",
     "start": "next start",
