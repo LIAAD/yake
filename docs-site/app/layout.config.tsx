@@ -13,10 +13,10 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <>
-        <Image
+        <img
           src={`${basePath}/yakelogo.png`}
-          width={24}
-          height={24}
+          width="24"
+          height="24"
           alt="YAKE Logo"
           style={{ marginRight: '8px' }}
         />
