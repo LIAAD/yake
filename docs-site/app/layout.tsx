@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { basePath } from './config';
 import './global.css';
 
 import { RootProvider } from 'fumadocs-ui/provider';
