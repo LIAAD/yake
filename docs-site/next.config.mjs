@@ -2,7 +2,7 @@ import { createMDX } from 'fumadocs-mdx/next';
 
 const withMDX = createMDX();
 
-const REPO_NAME = 'yakerf'; // Substitua pelo nome exato do seu repositório
+const REPO_NAME = 'yakerf'; 
 
 /** @type {import('next').NextConfig} */
 const config = {

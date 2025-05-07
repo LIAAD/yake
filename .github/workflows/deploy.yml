@@ -15,24 +15,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # ou a versão que você usa
+          node-version: '18'  
 
       - name: Install dependencies
         run: |
-          cd docs-site  # Ajuste conforme necessário
+          cd docs-site  
           npm ci
 
       - name: Build
         run: |
-          cd docs-site  # Ajuste conforme necessário
+          cd docs-site  
           npm run build
 
       - name: Create .nojekyll file
         run: |
-          touch docs-site/out/.nojekyll  # Ajuste conforme necessário
+          touch docs-site/out/.nojekyll  
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs-site/out  # Ajuste conforme necessário
+          folder: docs-site/out  
           branch: gh-pages

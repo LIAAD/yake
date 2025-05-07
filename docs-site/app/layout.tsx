@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   },
   description: 'Documentation for YAKE!',
   icons: {
-    icon: `${basePath}/favicon.ico`,
+    icon: `<docs-site />yakelogo.png`,
+    shortcut: `<docs-site />yakelogo.png`,
   },
 };
 
