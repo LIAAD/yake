@@ -1,8 +1,11 @@
 # Yet Another Keyword Extractor (YAKE!)
 
 **Unsupervised, corpus-independent keyword extraction from single documents.**
+---
 
 YAKE! (Yet Another Keyword Extractor) is a lightweight, unsupervised automatic keyword extraction system. It uses statistical text features from **single documents** — without relying on external corpora, dictionaries, or domain-specific knowledge — to extract the most relevant keywords.
+
+---
 
 ## Key Features
 
@@ -12,6 +15,8 @@ YAKE! is designed to be:
 - 📄 **Single-document based** – no need for a reference corpus
 - ⚡ **Efficient** – lightweight and fast
 
+---
+
 ## Why YAKE!?
 
 In an era where data is abundant and multilingual content is common, keyword extraction must be fast, adaptable, and reliable. YAKE! is built to handle:
@@ -20,6 +25,8 @@ In an era where data is abundant and multilingual content is common, keyword ext
 - Environments with limited or no training data
 
 Unlike traditional approaches, YAKE! doesn't depend on NLP pipelines or annotated datasets. It instead uses a combination of text features like word frequency, position, and casing to compute keyword relevance scores.
+
+---
 
 ## Quick Start
 
@@ -56,6 +63,8 @@ th = TextHighlighter(max_ngram_size=3)
 highlighted = th.highlight(text, keywords)
 ```
 
+---
+
 ## How It Works
 
 YAKE! assigns relevance scores to keywords based on multiple features:
@@ -66,6 +75,8 @@ YAKE! assigns relevance scores to keywords based on multiple features:
 - Contextual diversity
 
 The lower the score, the more relevant the keyword.
+
+---
 
 ## Command Line Usage
 
@@ -85,6 +96,8 @@ Options:
   -v, --verbose                   Gets detailed information (such as the score)
   --help                          Show this message and exit
 ```
+
+---
 
 ## Keyword Deduplication Methods
 
@@ -140,9 +153,13 @@ where `M` is the number of matching characters, and `T` is the total number of c
 
 **Recommendation:** For general use with a good balance of speed and accuracy, `seqm` is a solid default (and it is YAKE's default). For stricter lexical similarity, choose `levs`. For names or when letter swaps are common, go with `jaro`.
 
+---
+
 ## Benchmarks
 
 YAKE! has been evaluated against 10+ state-of-the-art methods across 20+ datasets. See our paper in Information Sciences Journal for details.
+
+---
 
 ## References
 
