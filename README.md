@@ -2,6 +2,8 @@
 
 [![ECIR'18 Best Short Paper](https://img.shields.io/badge/ECIR'18-Best%20Short%20Paper-brightgreen.svg)](http://ecir2018.org)
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/LIAAD/yake/blob/gh-pages/notebooks/YAKE_tutorial.ipynb)
+
 YAKE! is a lightweight unsupervised automatic keyword extraction method that uses text statistical features to select the most important keywords from a document. It requires no training, external corpus, or dictionaries, and works across multiple languages and domains regardless of text size.
 
 ## Features
@@ -37,7 +39,7 @@ Options:
 	  -i, --input_file TEXT           Input file
 	  -l, --language TEXT             Language
 	  -n, --ngram-size INTEGER        Max size of the ngram.
-	  -df, --dedup-func [leve|jaro|seqm]
+	  -df, --dedup-func [leve|jaro|seqm] *
 									  Deduplication function.
 	  -dl, --dedup-lim FLOAT          Deduplication limiar.
 	  -ws, --window-size INTEGER      Window size.
@@ -45,6 +47,8 @@ Options:
 	  -v, --verbose                   Gets detailed information (such as the score)
 	  --help                          Show this message and exit.
 ```
+
+Dont know which Deduplication function to use, see more here ()
 
 #### Usage (Python)
 
