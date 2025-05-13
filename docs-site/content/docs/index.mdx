@@ -4,6 +4,8 @@
 
 YAKE! (Yet Another Keyword Extractor) is a lightweight, unsupervised automatic keyword extraction system. It uses statistical text features from **single documents** — without relying on external corpora, dictionaries, or domain-specific knowledge — to extract the most relevant keywords.
 
+## Key Features
+
 YAKE! is designed to be:
 - 🧠 **Unsupervised** – no training data required
 - 🌍 **Language & domain independent** – works across domains and languages
@@ -19,19 +21,39 @@ In an era where data is abundant and multilingual content is common, keyword ext
 
 Unlike traditional approaches, YAKE! doesn't depend on NLP pipelines or annotated datasets. It instead uses a combination of text features like word frequency, position, and casing to compute keyword relevance scores.
 
-## Try It Out
+## Quick Start
+
+### Try It Out
 
 - 🧪 [Online Demo](http://yake.inesctec.pt)
 - 🐍 [GitHub Repository](https://github.com/LIAAD/yake)
 
-## Install YAKE!
-
-You can use YAKE! via:
-
-### ▶️ Python Package
+### Installation
 
 ```bash
 pip install git+https://github.com/LIAAD/yake
+```
+
+### Basic Usage
+
+```python
+import yake
+
+text = "Google is acquiring Kaggle, a platform for machine learning competitions..."
+kw_extractor = yake.KeywordExtractor()
+keywords = kw_extractor.extract_keywords(text)
+
+for kw in keywords:
+    print(kw)
+```
+
+### Highlighting Keywords
+
+```python
+from yake.highlight import TextHighlighter
+
+th = TextHighlighter(max_ngram_size=3)
+highlighted = th.highlight(text, keywords)
 ```
 
 ## How It Works
@@ -45,98 +67,70 @@ YAKE! assigns relevance scores to keywords based on multiple features:
 
 The lower the score, the more relevant the keyword.
 
-## Example (Python)
+## Command Line Usage
 
-```python
-import yake
-
-text = "Google is acquiring Kaggle, a platform for machine learning competitions..."
-kw_extractor = yake.KeywordExtractor()
-keywords = kw_extractor.extract_keywords(text)
-
-for kw in keywords:
-    print(kw)
-```
-
-#### Usage (Command line)
-
-How to use it on your favorite command line
-
-``` bash
+```bash
 Usage: yake [OPTIONS]
 
 Options:
-	  -ti, --text_input TEXT          Input text, SURROUNDED by single quotes (')
-	  -i, --input_file TEXT           Input file
-	  -l, --language TEXT             Language
-	  -n, --ngram-size INTEGER        Max size of the ngram.
-	  -df, --dedup-func [leve|jaro|seqm] *
-									  Deduplication function.
-	  -dl, --dedup-lim FLOAT          Deduplication limiar.
-	  -ws, --window-size INTEGER      Window size.
-	  -t, --top INTEGER               Number of keyphrases to extract
-	  -v, --verbose                   Gets detailed information (such as the score)
-	  --help                          Show this message and exit.
+  -ti, --text_input TEXT          Input text, SURROUNDED by single quotes (')
+  -i, --input_file TEXT           Input file
+  -l, --language TEXT             Language
+  -n, --ngram-size INTEGER        Max size of the ngram
+  -df, --dedup-func [leve|jaro|seqm]
+                                  Deduplication function
+  -dl, --dedup-lim FLOAT          Deduplication limiar
+  -ws, --window-size INTEGER      Window size
+  -t, --top INTEGER               Number of keyphrases to extract
+  -v, --verbose                   Gets detailed information (such as the score)
+  --help                          Show this message and exit
 ```
 
-##### Keyword Deduplication Methods in YAKE
+## Keyword Deduplication Methods
 
-In YAKE (Yet Another Keyword Extractor), the methods `levs`, `jaro`, and `seqm` are used to compute **string similarity** during the **keyword deduplication** process — that is, removing keywords that are too similar to each other. Here's what distinguishes each of these methods:
+YAKE uses three methods to compute string similarity during keyword deduplication:
 
-###### 🔤 1. `levs` — **Levenshtein Similarity**
+### 1. `levs` — Levenshtein Similarity
 
-* **What it is:** Measures the edit distance between two strings — i.e., how many operations (insertions, deletions, substitutions) are needed to turn one string into another.
-* **How it's used here:** The distance is **normalized** by the length of the longer string, then converted to a **similarity score**.
+* **What it is:** Measures the edit distance between two strings — how many operations (insertions, deletions, substitutions) are needed to turn one string into another.
 * **Formula used:**
 
 ```python
 similarity = 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2))
 ```
 
-* **Advantages:**
-   * Very accurate for small changes (e.g., "house" vs "horse").
-   * Considers **character positions**.
-* **Disadvantage:**
-   * **Slower** than other methods, due to calculating edit operations.
+* **Best for:** Very accurate for small changes (e.g., "house" vs "horse")
+* **Performance:** Medium speed
 
-###### 2. `jaro` — **Jaro Similarity**
+### 2. `jaro` — Jaro Similarity
 
-* **What it is:** Measures similarity based on matching characters and their relative positions.
-* **Note:** YAKE uses the `jellyfish` library implementation.
-* **How it works:** Gives more weight to **nearby matching characters** and penalizes character misalignments.
-* **Score:** Ranges from 0.0 (completely different) to 1.0 (identical).
-* **Advantages:**
-   * More **tolerant of transpositions** (e.g., "maria" vs "maira").
-   * Faster than Levenshtein.
-* **Disadvantage:**
-   * May be less accurate for strings with big length differences.
+* **What it is:** Measures similarity based on matching characters and their relative positions
+* **Implementation:** Uses the `jellyfish` library
+* **Best for:** More tolerant of transpositions (e.g., "maria" vs "maira")
+* **Performance:** Fast
 
-###### 3. `seqm` — **SequenceMatcher Ratio**
+### 3. `seqm` — SequenceMatcher Ratio
 
-* **What it is:** Uses Python's built-in `difflib.SequenceMatcher`, which measures similarity based on **common subsequences**.
-* **How it works:** Detects matching blocks and computes a ratio:
+* **What it is:** Uses Python's built-in `difflib.SequenceMatcher`
+* **Formula:**
 
 ```python
 ratio = 2 * M / T
 ```
-
 where `M` is the number of matching characters, and `T` is the total number of characters in both strings.
 
-* **Advantages:**
-   * Good for detecting shared blocks in longer strings.
-   * Reasonably fast.
-* **Disadvantage:**
-   * Can be **too sensitive** to small changes in short strings.
+* **Best for:** Good for detecting shared blocks in longer strings
+* **Performance:** Fast
 
-######  Which one to use?
+### Comparison Table
 
-| Name | Based on | Best for... | Performance |
-|------|----------|-------------|------------|
+| Method | Based on | Best for | Performance |
+|--------|----------|----------|-------------|
 | `levs` | Edit operations | Typos and small changes | Medium |
-| `jaro` | Matching character positions | Names and short strings with swaps | Fast |
+| `jaro` | Matching positions | Names and short strings with swaps | Fast |
 | `seqm` | Common subsequences | General phrase similarity | Fast |
 
-######  Practical Example:
+### Practical Examples
 
 | Compared Strings | `levs` | `jaro` | `seqm` |
 |------------------|--------|--------|--------|
@@ -145,28 +139,21 @@ where `M` is the number of matching characters, and `T` is the total number of c
 | "apple" vs "a pple" | 0.8 | 0.93 | 0.9 |
 
 **Recommendation:** For general use with a good balance of speed and accuracy, `seqm` is a solid default (and it is YAKE's default). For stricter lexical similarity, choose `levs`. For names or when letter swaps are common, go with `jaro`.
-###### Highlighting Keywords
-
-```python
-from yake.highlight import TextHighlighter
-
-th = TextHighlighter(max_ngram_size=3)
-highlighted = th.highlight(text, keywords)
-```
 
 ## Benchmarks
 
 YAKE! has been evaluated against 10+ state-of-the-art methods across 20+ datasets. See our paper in Information Sciences Journal for details.
 
 ## References
-Please best cite suited work when using YAKE
 
-<b>In-depth journal paper at Information Sciences Journal</b>
+Please cite the appropriate work when using YAKE:
 
-Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). YAKE! Keyword Extraction from Single Documents using Multiple Local Features. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289. [pdf](https://doi.org/10.1016/j.ins.2019.09.013)
+### In-depth Journal Publication
 
-<b>ECIR'18 Best Short Paper</b>
+Campos, R., Mangaravite, V., Pasquali, A., Jatowt, A., Jorge, A., Nunes, C. and Jatowt, A. (2020). **YAKE! Keyword Extraction from Single Documents using Multiple Local Features**. In Information Sciences Journal. Elsevier, Vol 509, pp 257-289. [PDF](https://doi.org/10.1016/j.ins.2019.09.013)
 
-Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). A Text Feature Based Automatic Keyword Extraction Method for Single Documents. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
+### ECIR'18 Best Short Paper
 
-Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). YAKE! Collection-independent Automatic Keyword Extractor. In: Pasi G., Piwowarski B., Azzopardi L., Hanbury A. (eds). Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [pdf](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
+Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). **A Text Feature Based Automatic Keyword Extraction Method for Single Documents**. In: Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 684 - 691. [PDF](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_63)
+
+Campos R., Mangaravite V., Pasquali A., Jorge A.M., Nunes C., and Jatowt A. (2018). **YAKE! Collection-independent Automatic Keyword Extractor**. In: Advances in Information Retrieval. ECIR 2018 (Grenoble, France. March 26 – 29). Lecture Notes in Computer Science, vol 10772, pp. 806 - 810. [PDF](https://link.springer.com/chapter/10.1007/978-3-319-76941-7_80)
