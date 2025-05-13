@@ -79,11 +79,11 @@ Options:
 	  --help                          Show this message and exit.
 ```
 
-# Keyword Deduplication Methods in YAKE
+##### Keyword Deduplication Methods in YAKE
 
 In YAKE (Yet Another Keyword Extractor), the methods `levs`, `jaro`, and `seqm` are used to compute **string similarity** during the **keyword deduplication** process — that is, removing keywords that are too similar to each other. Here's what distinguishes each of these methods:
 
-## 🔤 1. `levs` — **Levenshtein Similarity**
+###### 🔤 1. `levs` — **Levenshtein Similarity**
 
 * **What it is:** Measures the edit distance between two strings — i.e., how many operations (insertions, deletions, substitutions) are needed to turn one string into another.
 * **How it's used here:** The distance is **normalized** by the length of the longer string, then converted to a **similarity score**.
@@ -99,7 +99,7 @@ similarity = 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2)
 * **Disadvantage:**
    * **Slower** than other methods, due to calculating edit operations.
 
-## 🔤 2. `jaro` — **Jaro Similarity**
+###### 2. `jaro` — **Jaro Similarity**
 
 * **What it is:** Measures similarity based on matching characters and their relative positions.
 * **Note:** YAKE uses the `jellyfish` library implementation.
@@ -111,7 +111,7 @@ similarity = 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2)
 * **Disadvantage:**
    * May be less accurate for strings with big length differences.
 
-## 🔤 3. `seqm` — **SequenceMatcher Ratio**
+###### 3. `seqm` — **SequenceMatcher Ratio**
 
 * **What it is:** Uses Python's built-in `difflib.SequenceMatcher`, which measures similarity based on **common subsequences**.
 * **How it works:** Detects matching blocks and computes a ratio:
@@ -128,7 +128,7 @@ where `M` is the number of matching characters, and `T` is the total number of c
 * **Disadvantage:**
    * Can be **too sensitive** to small changes in short strings.
 
-## 🧠 Which one to use?
+######  Which one to use?
 
 | Name | Based on | Best for... | Performance |
 |------|----------|-------------|------------|
@@ -136,7 +136,7 @@ where `M` is the number of matching characters, and `T` is the total number of c
 | `jaro` | Matching character positions | Names and short strings with swaps | Fast |
 | `seqm` | Common subsequences | General phrase similarity | Fast |
 
-## ✅ Practical Example:
+######  Practical Example:
 
 | Compared Strings | `levs` | `jaro` | `seqm` |
 |------------------|--------|--------|--------|
@@ -145,7 +145,7 @@ where `M` is the number of matching characters, and `T` is the total number of c
 | "apple" vs "a pple" | 0.8 | 0.93 | 0.9 |
 
 **Recommendation:** For general use with a good balance of speed and accuracy, `seqm` is a solid default (and it is YAKE's default). For stricter lexical similarity, choose `levs`. For names or when letter swaps are common, go with `jaro`.
-## Highlighting Keywords
+###### Highlighting Keywords
 
 ```python
 from yake.highlight import TextHighlighter
