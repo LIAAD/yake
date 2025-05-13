@@ -7,7 +7,7 @@
 from click.testing import CliRunner
 
 import yake
-from yake.highlight import TextHighlighter
+from yake.core.highlight import TextHighlighter
 
 def test_phraseless_example():
     text_content = "- not yet"
