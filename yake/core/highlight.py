@@ -1,6 +1,9 @@
 """
 Module for highlighting text based on keywords.
-Provides functionality to highlight specific keywords in text.
+
+This module provides functionality to highlight specific keywords within text documents.
+It handles both single word (one-gram) and multi-word (n-gram) keyword highlighting,
+allowing for flexible text markup based on keyword extraction results.
 """
 
 import re
@@ -14,7 +17,16 @@ DEFAULT_HIGHLIGHT_POST = "</kw>"
 
 @dataclass
 class NgramData:
-    """Data structure to hold n-gram processing results."""
+    """
+    Data structure to hold n-gram processing results.
+    
+    This class stores the results of n-gram identification for highlighting,
+    including the list of words and how they are split within keywords.
+    
+    Attributes:
+        word_list: List of words that form the n-gram
+        split_kw_list: List of lists containing the split keywords
+    """
 
     word_list: List[str]
     split_kw_list: List[List[str]]
@@ -23,9 +35,14 @@ class NgramData:
 class TextHighlighter:
     """
     Class for highlighting keywords in text.
-
+    
     This class provides functionality to highlight keywords in text
-    using pre-defined markers. It supports one-gram and n-gram highlighting.
+    using pre-defined markers. It supports one-gram and n-gram highlighting,
+    handling various text patterns and maintaining proper context while
+    applying highlights.
+    
+    Attributes:
+        See property accessors below for available attributes.
     """
 
     def __init__(
@@ -49,6 +66,9 @@ class TextHighlighter:
     def highlight(self, text, keywords):
         """
         Highlights keywords in the given text.
+        
+        This is the main entry point for text highlighting. It processes the text
+        and adds highlight markers around identified keywords.
 
         Args:
             text: The original text to be processed.
@@ -73,6 +93,9 @@ class TextHighlighter:
     def format_one_gram_text(self, text, relevant_words_array):
         """
         Formats text for one-gram highlighting.
+        
+        Processes text to highlight individual words that match the keywords,
+        handling punctuation and maintaining the original text structure.
 
         Args:
             text: The text to process
@@ -97,6 +120,9 @@ class TextHighlighter:
     def format_n_gram_text(self, text, relevant_words_array):
         """
         Formats text for n-gram highlighting.
+        
+        Processes text to highlight multi-word phrases that match keywords,
+        maintaining proper context and handling overlapping keywords.
 
         Args:
             text: The text to process
@@ -137,6 +163,9 @@ class TextHighlighter:
     def find_relevant_ngrams(self, position, text_tokens, relevant_words_array):
         """
         Finds relevant n-grams in the text.
+        
+        Identifies potential keywords at the current position by looking ahead
+        for matches with the provided keywords.
 
         Args:
             position: Current position in text tokens
@@ -156,6 +185,9 @@ class TextHighlighter:
     def _find_more_relevant_helper(self, position, text_tokens, relevant_words_array):
         """
         Helper method for finding relevant n-gram words.
+        
+        Checks all possible n-grams starting at the current position and
+        identifies matches with the provided keywords.
 
         Args:
             position: Current position in text tokens
@@ -193,6 +225,9 @@ class TextHighlighter:
     def process_ngrams(self, text_tokens, position, n_gram_word_list, context):
         """
         Processes n-grams and updates the final text.
+        
+        Handles the replacing of n-grams with their highlighted versions,
+        distinguishing between single-word and multi-word keywords.
 
         Args:
             text_tokens: List of tokens from the text
@@ -230,9 +265,11 @@ class TextHighlighter:
     ):
         """
         Creates a context object for n-gram processing.
+        
+        Bundles all the necessary information for processing multi-word
+        ngrams into a single context dictionary.
 
         Args:
-            position: Current position in text tokens
             n_gram_word_list: List of n-gram words
             splited_n_gram_kw_list: List of split n-gram keywords
             relevant_words_array: Keywords to highlight
@@ -251,6 +288,9 @@ class TextHighlighter:
     def _process_multi_word_ngrams_helper(self, text_tokens, position, ctx):
         """
         Helper method for processing multi-word n-grams.
+        
+        Handles the complex logic of identifying and highlighting
+        multi-word phrases in the text.
 
         Args:
             text_tokens: List of tokens from the text
@@ -308,6 +348,9 @@ class TextHighlighter:
     def _update_kw_list(self, position, text_tokens, relevant_words_array, kw_dict):
         """
         Updates the keyword list and split n-gram keyword list.
+        
+        Identifies relevant keywords at a given position and updates
+        the provided lists with the findings.
 
         Args:
             position: Current position in text tokens
@@ -326,6 +369,9 @@ class TextHighlighter:
     def _process_relevant_terms_helper(self, text_tokens, position, ctx):
         """
         Helper method for processing relevant terms.
+        
+        Handles the complex logic of determining which terms to highlight
+        when multiple options are available.
 
         Args:
             text_tokens: List of tokens from the text
@@ -377,6 +423,9 @@ class TextHighlighter:
     def _handle_temporal_keyword(self, text_tokens, position, ctx):
         """
         Helper method for handling temporal keywords.
+        
+        Determines how to highlight keywords that may span across
+        multiple tokens or have temporal relationships.
 
         Args:
             text_tokens: List of tokens from the text
@@ -420,6 +469,9 @@ class TextHighlighter:
     def _handle_nonrelevant_temporal_keyword(self, text_tokens, position, ctx):
         """
         Helper method for handling non-relevant temporal keywords.
+        
+        Processes keywords that are part of larger phrases but not
+        relevant on their own.
 
         Args:
             text_tokens: List of tokens from the text
@@ -446,6 +498,9 @@ class TextHighlighter:
     def replace_token(self, text_tokens, position, n_gram_word_list):
         """
         Replaces tokens in text with highlighted versions.
+        
+        Performs the actual replacement of keywords with their highlighted
+        versions, handling punctuation and maintaining text structure.
 
         Args:
             text_tokens: List of tokens from the text
