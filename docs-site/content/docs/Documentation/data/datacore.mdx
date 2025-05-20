@@ -10,8 +10,14 @@ The `DataCore` class is the foundation of YAKE (Yet Another Keyword Extractor), 
 
 ```python
 class DataCore:
-    def __init__(self, text, stopword_set, config=None):
-        # Initialize the data core with text and configuration
+    """
+    Core data representation for document analysis and keyword extraction.
+    
+    This class processes text documents to identify potential keywords based on 
+    statistical features and contextual relationships between terms. It maintains 
+    the document's structure, processes individual terms, and generates candidate 
+    keywords.
+    """
 ```
 
 The `DataCore` class processes text documents to identify potential keywords based on statistical features and contextual relationships.
@@ -98,8 +104,13 @@ The `DataCore` class processes text documents to identify potential keywords bas
 
 **Example:**
 ```python
-from yake.datarepresentation import DataCore
+from yake.data import DataCore
 import string
+from yake.stopword_remover import StopwordRemover
+
+# Get stopwords
+stopword_remover = StopwordRemover("en")
+stopword_set = stopword_remover.get_stopword_set()
 
 # Initialize with default configuration
 data = DataCore("Sample text for analysis", stopword_set)
@@ -668,8 +679,8 @@ ngram_frequencies = data.freq_ns
 ## Complete Usage Example
 
 ```python
-from yake.datarepresentation import DataCore
-from yake.stopwordremover import StopwordRemover
+from yake.data import DataCore
+from yake.stopword_remover import StopwordRemover
 
 # Initialize stopwords
 stopword_remover = StopwordRemover("en")
