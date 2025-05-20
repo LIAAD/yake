@@ -1,5 +1,5 @@
 export const docsMetadata = {
-  pages: [
+  docs: [
     'home',
     'getting-started',
     'related-projects',
@@ -8,7 +8,5 @@ export const docsMetadata = {
       title: 'Documentation',
       type: 'separator'
     },
-    'core',
-    'data'
   ]
 };
