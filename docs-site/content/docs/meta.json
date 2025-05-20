@@ -3,7 +3,7 @@
     "pages": [
         {
             "title": "Home",
-            "path": "/",
+            "path": "/home",
             "description": "Welcome to the documentation site for our project. Here you will find all the information you need to get started and make the most of our tools."
         },
         {
@@ -18,7 +18,7 @@
         },
         {
             "title": "Related Projects",
-            "path": "/relatedprojects",
+            "path": "/related-projects",
             "description": "Explore other projects that are related to this one."
         }
 
