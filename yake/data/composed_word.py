@@ -169,16 +169,22 @@ class ComposedWord:
 
     def get_composed_feature(self, feature_name, discart_stopword=True):
         """
-        Get composed features from constituent terms.
-        
-        Calculates combined metrics for the phrase based on individual term metrics.
-        
+               Get composed feature values for the n-gram.
+
+        This function aggregates a specific feature across all terms in the n-gram.
+        It computes the sum, product, and ratio of the feature values, optionally 
+        excluding stopwords from the calculation.
+
         Args:
-            feature_name (str): Name of the feature to extract (e.g. "wfreq", "tf")
-            discart_stopword (bool): Whether to ignore stopwords in calculation
-            
+            feature_name: Name of feature to get (must be an attribute of the term objects)
+            discard_stopword: Whether to exclude stopwords from calculation (True by default)
+
         Returns:
-            tuple: (sum, prod, prod_over_sum) of the feature values
+            Tuple of (sum, product, ratio) for the feature where:
+            - sum: Sum of the feature values across all relevant terms
+            - product: Product of the feature values across all relevant terms
+            - ratio: Product divided by (sum + 1), a measure of feature consistency
+        
         """
         # Get feature values from each term, filtering stopwords if requested
         list_of_features = [

@@ -168,20 +168,33 @@ class KeywordExtractor:
 
     def extract_keywords(self, text):
         """
-        Extract keywords from text.
+        Extract keywords from the given text.
         
-        This method implements the complete YAKE keyword extraction pipeline:
-        1. Text preprocessing
-        2. Term extraction and feature computation
-        3. Candidate keyword generation
-        4. Scoring and deduplication
-        5. Ranking and selection of top keywords
+        This function implements the complete YAKE keyword extraction pipeline:
         
+        1. Preprocesses the input text by normalizing whitespace
+        2. Builds a data representation using DataCore, which:
+           - Tokenizes the text into sentences and words
+           - Identifies candidate n-grams (1 to n words)
+           - Creates a graph of term co-occurrences
+        3. Extracts statistical features for single terms and n-grams
+           - For single terms: frequency, position, case, etc.
+           - For n-grams: combines features from constituent terms
+        4. Filters candidates based on validity criteria (e.g., no stopwords at boundaries)
+        5. Sorts candidates by their importance score (H), where lower is better
+        6. Performs deduplication to remove similar candidates based on string similarity
+        7. Returns the top k keywords with their scores
+        
+        The algorithm favors keywords that are statistically important but not common
+        stopwords, with scores reflecting their estimated relevance to the document.
+        Lower scores indicate more important keywords.
+
         Args:
-            text (str): The input text to extract keywords from
-            
+            text: Input text
+
         Returns:
-            list: A list of tuples (keyword, score) sorted by score (lower is better)
+            List of (keyword, score) tuples sorted by score (lower is better)
+        
         """
         # Handle empty input
         if not text:

@@ -1,21 +1,21 @@
 install:
-	pip install --upgrade pip &&\
-		pip install -r requirements.txt
-		# uv pip install -r requirements.txt
+    uv pip install --upgrade pip
+    uv pip install .
 
 test:
-	# python -m pytest --nbval *.ipynb
-	python -m pytest -vv --cov= test_*.
-
+    uv pip install pytest
+    uv pip run pytest -vv --cov= test_*. 
 
 format:	
-	black .
+    uv pip install black
+    uv pip run black .
 
 lint:
-	ruff check --fix .
-	ruff check .
+    uv pip install ruff
+    uv pip run ruff check --fix .
+    uv pip run ruff check .
 
 deploy:
-	# no rules for now
-		
+    # no rules for now
+        
 all: install lint test format

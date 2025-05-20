@@ -18,18 +18,27 @@ from segtok.tokenizer import web_tokenizer, split_contractions
 STOPWORD_WEIGHT = "bi"
 
 def pre_filter(text):
-    """
-    Normalize text by standardizing line breaks and spacing.
+    """Pre-filter text before processing.
     
-    This function preprocesses raw text to ensure consistent handling of 
-    paragraphs, line breaks, and whitespace. It preserves paragraph structure
-    by detecting capitalized line beginnings while normalizing other whitespace.
+    This function prepares raw text for keyword extraction by normalizing its format.
+    It performs several transformations:
     
+    1. Splits the text into parts based on newline characters
+    2. Detects if a part starts with a capital letter (potentially a new paragraph)
+    3. Adds appropriate spacing between parts:
+       - Double newlines for parts starting with capital letters (likely new paragraphs)
+       - Single spaces for other parts (likely continuing text)
+    4. Replaces all tab characters with spaces for consistent formatting
+    
+    This preprocessing helps maintain paragraph structure while normalizing
+    whitespace, which improves the accuracy of subsequent text analysis steps
+    like sentence boundary detection and keyword extraction.
+
     Args:
-        text (str): The raw input text to be normalized
-        
+        text: Raw input text to be pre-filtered
+
     Returns:
-        str: The normalized text with standardized whitespace and line breaks
+        Normalized text with consistent spacing and paragraph structure
     """
     # Regular expression to detect lines starting with capital letters
     prog = re.compile("^(\\s*([A-Z]))")

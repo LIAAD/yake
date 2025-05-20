@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "yake"
+version = "0.6.0"
+description = "Keyword extraction Python package"
+readme = "README.md"
+requires-python = ">=3.8"  # Changed from >=3.7 to >=3.8
+license = {text = "LGPLv3"}
+authors = [
+    {name = "Tiago Vaente", email = "tiago.leando.valente@ubi.com"},
+]
+dependencies = [
+    "tabulate",
+    "segtok",
+    "networkx",
+    "numpy>=1.23.5",  # This version requires Python >=3.8
+    "click>=6.0",
+    "jellyfish",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    # Remove Python 3.5, 3.6, 3.7 classifiers
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Text Processing",
+    "Topic :: Text Processing :: Linguistic",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "flake8",
+    "pytest-runner",  # Added from setup_requirements
+]
+
+[project.urls]
+Documentation = "https://tiagolv.github.io/yakerf/docs/--home"
+Source = "https://github.com/LIAAD/yake"
+
+[project.scripts]
+yake = "yake.cli:keywords"  
+
+[tool.hatch.build.targets.wheel]
+packages = ["yake", "StopwordsList"]  # Explicitly include these packages

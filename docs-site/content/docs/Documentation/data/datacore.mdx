@@ -17,6 +17,9 @@ class DataCore:
     statistical features and contextual relationships between terms. It maintains 
     the document's structure, processes individual terms, and generates candidate 
     keywords.
+    
+    Attributes:
+        See property accessors below for available attributes.
     """
 ```
 
@@ -402,8 +405,9 @@ data = DataCore("Sample text for analysis", stopword_set, config)
         """
         Build a candidate ComposedWord from a string.
         
-        This method allows creating candidate keywords from external input
-        strings rather than from the document's own text.
+        This function processes a candidate string by tokenizing it, tagging each word,
+        and creating a ComposedWord object from the resulting terms. It's used to
+        convert external strings into the internal candidate representation.
         
         Args:
             candidate_string (str): String to convert to a keyword candidate
@@ -451,10 +455,10 @@ data = DataCore("Sample text for analysis", stopword_set, config)
       ```python
       def build_single_terms_features(self, features=None):
         """
-        Build statistical features for single terms.
-        
-        Calculates term frequency statistics and updates the scoring metrics
-        for each individual term.
+        Calculates and updates statistical features for all single terms in the text.
+        This includes term frequency statistics and other features specified in the
+        features parameter. Only non-stopword terms are considered for statistics
+        calculation.
         
         Args:
             features (list, optional): Specific features to calculate
@@ -496,10 +500,11 @@ data = DataCore("Sample text for analysis", stopword_set, config)
         """
         Build features for multi-word terms.
         
-        Updates the scoring metrics for valid candidate keywords.
+        Updates the features for all valid multi-word candidate terms (n-grams).
+        Only candidates that pass the validity check will have their features updated.
         
         Args:
-            features (list, optional): Specific features to calculate
+            features (list, optional): List of features to build. If None, all available features will be built.
         """
         # Update only valid candidates (filter then apply update_h)
         list(
@@ -582,7 +587,9 @@ data = DataCore("Sample text for analysis", stopword_set, config)
         """
         Add a co-occurrence relationship between two terms.
         
-        Creates or updates an edge in the co-occurrence graph between terms.
+        Updates the co-occurrence graph by adding or incrementing an edge between
+        two terms. This information is used to calculate term relatedness and
+        importance in the text.
         
         Args:
             left_term (SingleWord): Source term in the relationship
@@ -609,10 +616,12 @@ data = DataCore("Sample text for analysis", stopword_set, config)
         """
         Add or update a composed word in the candidates collection.
         
-        Handles the registration and frequency counting of keyword candidates.
+        Adds a new candidate composed word (n-gram) to the candidates dictionary
+        or updates an existing one by incrementing its frequency. This is used to
+        track potential keyphrases in the text.
         
         Args:
-            cand (ComposedWord): The candidate keyword to add or update
+            cand (ComposedWord): ComposedWord instance to add or update in the candidates dictionary
         """
         # Check if this candidate already exists
         if cand.unique_kw not in self.candidates:
