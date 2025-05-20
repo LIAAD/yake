@@ -46,7 +46,7 @@ Options:
 	  --help                          Show this message and exit.
 ```
 
-Dont know which Deduplication function to use, see more [here](https://tiagolv.github.io/yakerf/docs/gettingstarted#keyword-deduplication-methods)
+Dont know which Deduplication function to use, see more [here](https://tiagolv.github.io/yakerf/docs/-getting-started#keyword-deduplication-methods)
 
 #### Usage (Python)
 
@@ -122,7 +122,7 @@ custom_th = TextHighlighter(
 ## Where to Find YAKE!
 
 - 🌐 Online demo: [http://yake.inesctec.pt](http://yake.inesctec.pt)
-- 🔌 Documentation site: [https://tiagolv.github.io/yakerf/docs](https://tiagolv.github.io/yakerf/docs/home)
+- 🔌 Documentation site: [https://tiagolv.github.io/yakerf/docs](https://tiagolv.github.io/yakerf/docs/--home)
 - 📦 Python package: [https://github.com/LIAAD/yake_demo](https://github.com/LIAAD/yake_demo)
 - 💻 Pypi: [https://pypi.org/project/yake/](https://pypi.org/project/yake/)
 
