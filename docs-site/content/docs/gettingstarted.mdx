@@ -2,6 +2,8 @@
 title: Getting Started
 ---
 
+---
+
 # Quick Start
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/LIAAD/yake/blob/gh-pages/notebooks/YAKE_tutorial.ipynb)
@@ -13,7 +15,7 @@ Installing Yake using pip:
 ``` bash
 pip install git+https://github.com/LIAAD/yake
 ```
-
+---
 ## Usage (Command line)
 
 How to use it on your using the command line:
@@ -35,11 +37,11 @@ Options:
 	--help                          Show this message and exit.
 ```
 
-## Keyword Deduplication Methods
+### Keyword Deduplication Methods
 
 YAKE uses three methods to compute string similarity during keyword deduplication:
 
-### 1. `levs` — Levenshtein Similarity
+#### 1. `levs` — Levenshtein Similarity
 
 * **What it is:** Measures the edit distance between two strings — how many operations (insertions, deletions, substitutions) are needed to turn one string into another.
 * **Formula used:**
@@ -51,14 +53,14 @@ similarity = 1 - Levenshtein.distance(cand1, cand2) / max(len(cand1), len(cand2)
 * **Best for:** Very accurate for small changes (e.g., "house" vs "horse")
 * **Performance:** Medium speed
 
-### 2. `jaro` — Jaro Similarity
+#### 2. `jaro` — Jaro Similarity
 
 * **What it is:** Measures similarity based on matching characters and their relative positions
 * **Implementation:** Uses the `jellyfish` library
 * **Best for:** More tolerant of transpositions (e.g., "maria" vs "maira")
 * **Performance:** Fast
 
-### 3. `seqm` — SequenceMatcher Ratio
+#### 3. `seqm` — SequenceMatcher Ratio
 
 * **What it is:** Uses Python's built-in `difflib.SequenceMatcher`
 * **Formula:**
@@ -71,7 +73,7 @@ where `M` is the number of matching characters, and `T` is the total number of c
 * **Best for:** Good for detecting shared blocks in longer strings
 * **Performance:** Fast
 
-### Comparison Table
+#### Comparison Table
 
 | Method | Based on | Best for | Performance |
 |--------|----------|----------|-------------|
@@ -79,7 +81,7 @@ where `M` is the number of matching characters, and `T` is the total number of c
 | `jaro` | Matching positions | Names and short strings with swaps | Fast |
 | `seqm` | Common subsequences | General phrase similarity | Fast |
 
-### Practical Examples
+#### Practical Examples
 
 | Compared Strings | `levs` | `jaro` | `seqm` |
 |------------------|--------|--------|--------|
