@@ -46,7 +46,7 @@ Options:
 	  --help                          Show this message and exit.
 ```
 
-Dont know which Deduplication function to use, see more [here](https://tiagolv.github.io/yakerf/docs/-getting-started#keyword-deduplication-methods)
+Don't know which Deduplication function to use, see more [here](https://tiagolv.github.io/yakerf/docs/-getting-started#keyword-deduplication-methods)
 
 #### Usage (Python)
 
