@@ -14,13 +14,13 @@ YAKE! is a lightweight unsupervised automatic keyword extraction method that use
 ## Quick Installation
 
 ```bash
-pip install git+https://github.com/LIAAD/yake
+uv pip install git+https://github.com/LIAAD/yake
 ```
 
 or
 
 ```bash
-pip install yake
+uv pip install yake
 ```
 
 ## Basic Usage

@@ -1,21 +1,36 @@
 install:
-    uv pip install --upgrade pip
-    uv pip install .
+	uv pip install --upgrade pip
+	uv pip install -e .
+
+install-dev:
+	uv pip install --upgrade pip
+	uv pip install -e ".[dev]"
 
 test:
-    uv pip install pytest
-    uv pip run pytest -vv --cov= test_*. 
+	uv run pytest -vv --cov=yake test_*.py
 
-format:	
-    uv pip install black
-    uv pip run black .
+format:
+	uv run black .
 
 lint:
-    uv pip install ruff
-    uv pip run ruff check --fix .
-    uv pip run ruff check .
+	uv run ruff check --fix .
+	uv run ruff check .
+	uv run flake8 yake/
+
+clean:
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info/
+	find . -type d -name __pycache__ -delete
+	find . -type f -name "*.pyc" -delete
+
+build:
+	uv build
 
 deploy:
-    # no rules for now
-        
-all: install lint test format
+	uv build
+	uv publish
+
+all: install-dev lint test format
+
+.PHONY: install install-dev test format lint clean build deploy all
