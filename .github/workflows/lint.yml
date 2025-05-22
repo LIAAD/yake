@@ -20,7 +20,9 @@ jobs:
         - name: Create virtual environment
           run: uv venv
         - name: Install dependencies
-          run: uv pip install -e ".[dev]"
+          run: |
+            uv pip install -e ".[dev]"
+            uv pip install ruff flake8
         - name: lint
           run: |
             uv run ruff check --fix .

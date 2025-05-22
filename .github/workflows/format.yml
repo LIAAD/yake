@@ -21,6 +21,8 @@ jobs:
         - name: Create virtual environment
           run: uv venv
         - name: Install dependencies
-          run: uv pip install -e ".[dev]"
+          run: |
+            uv pip install -e ".[dev]"
+            uv pip install black
         - name: format
-          run: uv run black .
+          run: uv run black --check .
