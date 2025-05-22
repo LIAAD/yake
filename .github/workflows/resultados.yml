@@ -17,23 +17,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install uv
-        run: pip install uv
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
+      - name: Install uv
+        run: pip install uv
+
       - name: Install dependencies
         run: |
-          uv pip install .
+          uv pip install -e ".[dev]"
           uv pip install pytest
 
       - name: Run tests
         id: run-tests
         run: |
-          uv pip run pytest -v tests/test_yake.py | tee test_output.log
+          uv run pytest -v tests/test_yake.py | tee test_output.log
 
       - name: Verify test results
         run: |
