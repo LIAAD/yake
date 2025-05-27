@@ -1,6 +1,6 @@
 # YAKE! (Yet Another Keyword Extractor)
 
-[![ECIR'18 Best Short Paper](https://img.shields.io/badge/ECIR'18-Best%20Short%20Paper-brightgreen.svg)](http://ecir2018.org) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tiagolv/yakerf/blob/gh-pages/1YAKE.ipynb)
+[![ECIR'18 Best Short Paper](https://img.shields.io/badge/ECIR'18-Best%20Short%20Paper-brightgreen.svg)](http://ecir2018.org) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tiagolv/yakerf/blob/gh-pages/1YAKE.ipynb) [![PyPI Downloads](https://static.pepy.tech/badge/yake)](https://pepy.tech/projects/yake)
 
 YAKE! is a lightweight unsupervised automatic keyword extraction method that uses text statistical features to select the most important keywords from a document. It requires no training, external corpus, or dictionaries, and works across multiple languages and domains regardless of text size.
 
