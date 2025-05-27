@@ -4,6 +4,7 @@
   },
   "dependencies": {
     "@types/mdx": "^2.0.13",
+    "fumadocs": "^0.0.0",
     "fumadocs-mdx": "^11.6.4"
   }
 }
