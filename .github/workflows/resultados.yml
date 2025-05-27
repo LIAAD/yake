@@ -1,0 +1,56 @@
+name: Run YAKE Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install uv
+        run: pip install uv
+        
+      - name: Create virtual environment
+        run: uv venv
+
+      - name: Install dependencies
+        run: |
+          uv pip install -e ".[dev]"
+          uv pip install pytest
+
+      - name: Run tests
+        id: run-tests
+        run: |
+          uv run pytest -v tests/test_yake.py | tee test_output.log
+
+      - name: Verify test results
+        run: |
+          if grep -q '6 passed' test_output.log; then
+            echo "✅ Todos os testes passaram com sucesso!"
+            exit 0
+          else
+            echo "❌ Alguns testes falharam! Verifique o log para mais detalhes."
+            exit 1
+          fi
+
+      - name: Upload test results (em caso de falha)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: test_output.log

@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "dependencies": {
+    "@types/mdx": "^2.0.13",
+    "fumadocs-mdx": "^11.6.4"
+  }
+}

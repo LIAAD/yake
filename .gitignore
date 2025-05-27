@@ -1,0 +1,41 @@
+# Dependency directories
+node_modules/
+.npm
+# Don't ignore these files
+!.next/
+!out/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# Hatch/uv/pytest
+.uv/
+.uv.lock
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+dist/
+build/
+*.egg-info/
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

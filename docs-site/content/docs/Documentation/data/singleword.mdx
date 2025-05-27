@@ -1,0 +1,521 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# SingleWord
+
+The `SingleWord` class represents individual terms in YAKE (Yet Another Keyword Extractor), providing the statistical features and measurements used in keyword extraction.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Module Overview
+
+```python
+"""
+Single word term representation module for YAKE keyword extraction.
+
+This module contains the SingleWord class which represents individual terms
+in a document for keyword extraction. It tracks statistical features like
+term frequency, position, and relationships with other terms to calculate
+a relevance score for each word.
+"""
+
+import math
+import numpy as np
+```
+
+The `SingleWord` class stores and calculates statistical features for individual terms, including frequency, position, spread, and relationship metrics. These features are used to calculate a relevance score that indicates the word's importance in the document.
+
+## Constructor
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="init">
+    <AccordionTrigger>
+      <code>__init__(unique, idx, graph)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __init__(self, unique, idx, graph):
+          """
+          Initialize a SingleWord term object.
+          
+          Args:
+              unique (str): The unique normalized term this object represents
+              idx (int): Unique identifier for the term in the document
+              graph (networkx.DiGraph): Word co-occurrence graph from the document
+          """
+          self.id = idx  # Fast access needed as it's used in graph operations
+          self.g = graph  # Fast access needed for network calculations
+
+          self.data = {
+              # Basic information
+              "unique_term": unique,
+              "stopword": False,
+              "h": 0.0,  # Final Score
+              # Term frequency statistics
+              "tf": 0.0,      # Term frequency
+              "tf_a": 0.0,    # Term Frequency for uppercase words
+              "tf_n": 0.0,    # Term Frequency for proper nouns
+              # Word characteristic metrics
+              "wfreq": 0.0,   # Word frequency
+              "wcase": 0.0,   # Word case metric
+              "wrel": 1.0,    # Word relevance metric
+              "wpos": 1.0,    # Word position metric
+              "wspread": 0.0, # Word spread across document
+              "pl": 0.0,      # Probability left
+              "pr": 0.0,      # Probability right
+              "pagerank": 1.0, # PageRank score
+              # Ocurrence tracking
+              "occurs": {},  # Sentence Occurrences
+          }
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `unique` (str): The unique normalized term this object represents
+- `idx` (int): Unique identifier for the term in the document
+- `graph` (networkx.DiGraph): Word co-occurrence graph from the document
+
+**Example:**
+```python
+import networkx as nx
+from yake.data import SingleWord
+
+# Create a graph
+g = nx.DiGraph()
+
+# Initialize a single word
+term = SingleWord("algorithm", 1, g)
+```
+
+## Dictionary-Style Access
+
+The `SingleWord` class provides dictionary-style attribute access for flexibility:
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="getitem">
+    <AccordionTrigger>
+      <code>__getitem__(key)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __getitem__(self, key):
+          """
+          Access attributes dictionary-style with obj['key'].
+          
+          Args:
+              key (str): The attribute key to access
+              
+          Returns:
+              Any: The value associated with the key
+          """
+          return self.data[key]
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="setitem">
+    <AccordionTrigger>
+      <code>__setitem__(key, value)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __setitem__(self, key, value):
+          """
+          Set attributes dictionary-style with obj['key'] = value.
+          
+          Args:
+              key (str): The attribute key to set
+              value (Any): The value to associate with the key
+          """
+          self.data[key] = value
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get">
+    <AccordionTrigger>
+      <code>get(key, default=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get(self, key, default=None):
+          """
+          Get with default, mimicking dict.get().
+          
+          Args:
+              key (str): The attribute key to access
+              default (Any, optional): The default value if key doesn't exist
+              
+          Returns:
+              Any: The value associated with the key or the default value
+          """
+          return self.data.get(key, default)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Example:**
+```python
+# Dictionary-style access
+term["wfreq"] = 2.5
+score = term["h"]
+position = term.get("wpos", 1.0)
+```
+
+## Core Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="add_occur">
+    <AccordionTrigger>
+      <code>add_occur(tag, sent_id, pos_sent, pos_text)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def add_occur(self, tag, sent_id, pos_sent, pos_text):
+          """
+          Add occurrence information for this term.
+          
+          Records where in the document this term appears, tracking sentence ID,
+          position within sentence, global position in text, and updates term
+          frequency counters.
+          
+          Args:
+              tag (str): Part-of-speech tag for this occurrence ('a' for acronym, 'n' for proper noun, etc.)
+              sent_id (int): Sentence ID where the term appears
+              pos_sent (int): Position within the sentence
+              pos_text (int): Global position in the entire text
+          """
+          # Create empty list for this sentence if it's the first occurrence
+          if sent_id not in self.occurs:
+              self.occurs[sent_id] = []
+
+          # Record position information for this occurrence
+          self.occurs[sent_id].append((pos_sent, pos_text))
+          self.data["tf"] += 1.0
+
+          # Update special counters for acronyms and proper nouns
+          if tag == "a":
+              self.data["tf_a"] += 1.0
+          if tag == "n":
+              self.data["tf_n"] += 1.0
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_metric">
+    <AccordionTrigger>
+      <code>get_metric(name)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_metric(self, name):
+          """
+          Get the value of any word metric.
+          
+          Args:
+              name (str): The name of the metric to retrieve
+              
+          Returns:
+              float: The value of the requested metric
+          """
+          return self.data.get(name, 0.0)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="set_metric">
+    <AccordionTrigger>
+      <code>set_metric(name, value)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def set_metric(self, name, value):
+          """
+          Set the value of any word metric.
+          
+          Args:
+              name (str): The name of the metric to set
+              value (float): The new value for the metric
+          """
+          self.data[name] = value
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_graph_metrics">
+    <AccordionTrigger>
+      <code>get_graph_metrics()</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_graph_metrics(self):
+          """
+          Calculate all graph-based metrics at once.
+          
+          Analyzes the term's connections in the co-occurrence graph to compute
+          various relationship metrics that measure its contextual importance.
+          
+          Returns:
+              dict: Dictionary containing the calculated graph metrics:
+                  - wdr: Word different right (number of outgoing edges)
+                  - wir: Word importance right (sum of outgoing edge weights)
+                  - pwr: Probability weight right (wdr/wir)
+                  - wdl: Word different left (number of incoming edges)
+                  - wil: Word importance left (sum of incoming edge weights)
+                  - pwl: Probability weight left (wdl/wil)
+          """
+          # Out-edges metrics
+          wdr = len(self.g.out_edges(self.id))
+          wir = sum(d["tf"] for (_, _, d) in self.g.out_edges(self.id, data=True))
+          pwr = 0 if wir == 0 else wdr / wir
+
+          # In-edges metrics
+          wdl = len(self.g.in_edges(self.id))
+          wil = sum(d["tf"] for (_, _, d) in self.g.in_edges(self.id, data=True))
+          pwl = 0 if wil == 0 else wdl / wil
+
+          return {"wdr": wdr, "wir": wir, "pwr": pwr, "wdl": wdl, "wil": wil, "pwl": pwl}
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="update_h">
+    <AccordionTrigger>
+      <code>update_h(stats, features=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def update_h(self, stats, features=None):
+          """
+          Update the word's score based on statistics.
+          
+          Calculates all the statistical features that determine the word's
+          relevance score, using document-level statistics for normalization.
+          
+          Args:
+              stats (dict): Document statistics including:
+                  - max_tf (float): Maximum term frequency in the document
+                  - avg_tf (float): Average term frequency
+                  - std_tf (float): Standard deviation of term frequency
+                  - number_of_sentences (int): Total number of sentences
+              features (list, optional): Specific features to calculate, or None for all
+          """
+          max_tf = stats["max_tf"]
+          avg_tf = stats["avg_tf"]
+          std_tf = stats["std_tf"]
+          number_of_sentences = stats["number_of_sentences"]
+
+          # Get all graph metrics at once
+          graph_metrics = self.get_graph_metrics()
+
+          # Update metrics based on features
+          if features is None or "wrel" in features:
+              # Calculate relatedness metrics using graph connections
+              self.data["pl"] = graph_metrics["wdl"] / max_tf
+              self.data["pr"] = graph_metrics["wdr"] / max_tf
+              self.data["wrel"] = (0.5 + (graph_metrics["pwl"] * (self.tf / max_tf))) + (
+                  0.5 + (graph_metrics["pwr"] * (self.tf / max_tf))
+              )
+
+          if features is None or "wfreq" in features:
+              # Calculate frequency metric normalized by corpus statistics
+              self.data["wfreq"] = self.tf / (avg_tf + std_tf)
+
+          if features is None or "wspread" in features:
+              # Calculate spread as proportion of sentences containing the term
+              self.data["wspread"] = len(self.occurs) / number_of_sentences
+
+          if features is None or "wcase" in features:
+              # Calculate case feature from uppercase and proper noun occurrences
+              self.data["wcase"] = max(self.data["tf_a"], self.data["tf_n"]) / (
+                  1.0 + math.log(self.tf)
+              )
+
+          if features is None or "wpos" in features:
+              # Calculate position feature from median position of occurrences
+              self.data["wpos"] = math.log(
+                  math.log(3.0 + np.median(list(self.occurs.keys())))
+              )
+
+          # Calculate final score
+          self.data["h"] = (self.data["wpos"] * self.data["wrel"]) / (
+              self.data["wcase"]
+              + (self.data["wfreq"] / self.data["wrel"])
+              + (self.data["wspread"] / self.data["wrel"])
+          )
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Properties
+
+The `SingleWord` class provides property accessors for its main attributes:
+
+### Basic Properties
+
+- `unique_term`: The normalized form of the word
+- `stopword`: Boolean indicating if the term is a stopword
+- `h`: The final score of the term (lower is better in YAKE)
+- `tf`: Term frequency in the document
+- `occurs`: Dictionary of sentence occurrences
+
+```python
+# Examples
+word = term.unique_term
+is_stopword = term.stopword
+score = term.h
+frequency = term.tf
+occurrences = term.occurs
+
+# Setter examples
+term.stopword = True
+term.h = 0.25
+term.tf = 5.0
+```
+
+### Feature Properties
+
+- `wfreq`: Word frequency metric
+- `wcase`: Word case metric (uppercase/proper noun)
+- `wrel`: Word relevance metric (based on graph connections)
+- `wpos`: Word position metric
+- `wspread`: Word spread across document
+- `pl`: Probability left (graph-based)
+- `pr`: Probability right (graph-based)
+
+```python
+# Examples
+frequency_metric = term.wfreq
+case_metric = term.wcase
+relevance = term.wrel
+position_metric = term.wpos
+spread_metric = term.wspread
+left_probability = term.pl
+right_probability = term.pr
+
+# Setter examples
+term.wfreq = 0.75
+term.wcase = 0.5
+term.wrel = 1.2
+```
+
+## Feature Calculation Logic
+
+The `SingleWord` class calculates several features that contribute to keyword scoring:
+
+### Word Frequency (`wfreq`)
+
+Measures how frequent the term is compared to the average document term frequency. 
+
+```python
+# Normalized term frequency compared to document statistics
+wfreq = term_frequency / (average_term_frequency + standard_deviation)
+```
+
+Higher values indicate more frequent terms relative to the document average.
+
+### Word Case (`wcase`)
+
+Represents the significance of capitalization in determining proper nouns and acronyms.
+
+```python
+# Case significance: higher values for acronyms and proper nouns
+wcase = max(uppercase_freq, proper_noun_freq) / (1.0 + log(term_frequency))
+```
+
+Higher values indicate terms more likely to be acronyms or proper nouns.
+
+### Word Relevance (`wrel`)
+
+Evaluates the term's importance based on its co-occurrence relationships.
+
+```python
+# Relevance based on graph connection probabilities and term frequency
+wrel = (0.5 + (graph_metrics["pwl"] * (tf / max_tf))) + 
+       (0.5 + (graph_metrics["pwr"] * (tf / max_tf)))
+```
+
+Higher values indicate terms with more meaningful contextual relationships.
+
+### Word Position (`wpos`)
+
+Considers the typical position of the word in sentences, with the intuition that important terms appear earlier.
+
+```python
+# Position score based on median sentence position
+wpos = math.log(math.log(3.0 + median_position_in_sentences))
+```
+
+Lower values indicate terms that tend to appear earlier in sentences.
+
+### Word Spread (`wspread`)
+
+Measures how widely the term is distributed across the document's sentences.
+
+```python
+# Document coverage: proportion of sentences containing the term
+wspread = number_of_sentences_with_term / total_number_of_sentences
+```
+
+Higher values indicate terms that appear throughout the document.
+
+## Final Score Calculation
+
+The final score (`h`) combines all metrics in a formula designed to rank candidate keywords:
+
+```python
+# Lower scores indicate better keyword candidates
+h = (wpos * wrel) / (wcase + (wfreq / wrel) + (wspread / wrel))
+```
+
+The formula balances:
+- Term position (earlier is better)
+- Term relevance (more connections is better)
+- Term case (proper nouns and acronyms preferred)
+- Term frequency (higher is better)
+- Term spread (wider distribution is better)
+
+Lower scores indicate better keyword candidates in YAKE's ranking system.
+
+## Usage Example
+
+```python
+import networkx as nx
+import numpy as np
+from yake.data import SingleWord
+
+# Create a graph for co-occurrence
+g = nx.DiGraph()
+g.add_node(1)
+
+# Initialize a word
+term = SingleWord("algorithm", 1, g)
+
+# Add occurrences
+term.add_occur("n", 0, 5, 5)  # In sentence 0, position 5
+term.add_occur("n", 1, 2, 15) # In sentence 1, position 2
+term.add_occur("n", 2, 8, 35) # In sentence 2, position 8
+
+# Update the score with statistics
+stats = {
+    "max_tf": 10.0,
+    "avg_tf": 3.0,
+    "std_tf": 2.0,
+    "number_of_sentences": 5
+}
+term.update_h(stats)
+
+# Get the final score
+print(f"Keyword score for 'algorithm': {term.h:.4f}")
+```
+
+## Dependencies
+
+The `SingleWord` class relies on:
+
+- `math`: For logarithmic calculations
+- `numpy`: For statistical operations (median)
+- `networkx`: Implicitly through the provided graph parameter

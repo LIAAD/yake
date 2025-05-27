@@ -1,0 +1,726 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# DataCore
+
+The `DataCore` class is the foundation of YAKE (Yet Another Keyword Extractor), providing the core data representation for document analysis and keyword extraction.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Class Overview
+
+```python
+class DataCore:
+    """
+    Core data representation for document analysis and keyword extraction.
+    
+    This class processes text documents to identify potential keywords based on 
+    statistical features and contextual relationships between terms. It maintains 
+    the document's structure, processes individual terms, and generates candidate 
+    keywords.
+    
+    Attributes:
+        See property accessors below for available attributes.
+    """
+```
+
+The `DataCore` class processes text documents to identify potential keywords based on statistical features and contextual relationships.
+
+## Constructor
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="init">
+    <AccordionTrigger>
+      <code>__init__(text, stopword_set, config=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def __init__(self, text, stopword_set, config=None):
+        """
+        Initialize the data core with text and configuration.
+        
+        Args:
+            text (str): The input text to analyze for keyword extraction
+            stopword_set (set): A set of stopwords to filter out non-content words
+            config (dict, optional): Configuration options including:
+                - windows_size (int): Size of word window for co-occurrence (default: 2)
+                - n (int): Maximum length of keyword phrases (default: 3)
+                - tags_to_discard (set): POS tags to ignore (default: {"u", "d"})
+                - exclude (set): Characters to exclude (default: string.punctuation)
+        """
+        # Initialize default configuration if none provided
+        if config is None:
+            config = {}
+
+        # Extract configuration values with appropriate defaults
+        windows_size = config.get("windows_size", 2)
+        n = config.get("n", 3)
+        tags_to_discard = config.get("tags_to_discard", set(["u", "d"]))
+        exclude = config.get("exclude", set(string.punctuation))
+
+        # Initialize the state dictionary containing all component data structures
+        self._state = {
+            # Configuration settings
+            "config": {
+                "exclude": exclude,                # Punctuation and other characters to exclude
+                "tags_to_discard": tags_to_discard,  # POS tags to ignore during analysis
+                "stopword_set": stopword_set       # Set of stopwords for filtering
+            },
+
+            # Text corpus statistics
+            "text_stats": {
+                "number_of_sentences": 0,  # Total count of sentences
+                "number_of_words": 0       # Total count of processed words
+            },
+
+            # Core data collections for analysis
+            "collections": {
+                "terms": {},            # Dictionary mapping terms to SingleWord objects
+                "candidates": {},       # Dictionary mapping unique keywords to ComposedWord objects
+                "sentences_obj": [],    # Nested list of processed sentence objects
+                "sentences_str": [],    # List of raw sentence strings
+                "freq_ns": {}           # Frequency distribution of n-grams by length
+            },
+
+            # Graph for term co-occurrence analysis
+            "g": nx.DiGraph()  # Directed graph where nodes are terms and edges represent co-occurrences
+        }
+
+        # Initialize n-gram frequencies with zero counts for each length 1 to n
+        for i in range(n):
+            self._state["collections"]["freq_ns"][i + 1] = 0.0
+
+        # Process the text and build all data structures
+        self._build(text, windows_size, n)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+**Parameters:**
+- `text` (str): The input text to analyze for keyword extraction
+- `stopword_set` (set): A set of stopwords to filter out non-content words
+- `config` (dict, optional): Configuration options including:
+  - `windows_size` (int): Size of word window for co-occurrence (default: 2)
+  - `n` (int): Maximum length of keyword phrases (default: 3)
+  - `tags_to_discard` (set): POS tags to ignore (default: {"u", "d"})
+  - `exclude` (set): Characters to exclude (default: string.punctuation)
+
+**Example:**
+```python
+from yake.data import DataCore
+import string
+from yake.stopword_remover import StopwordRemover
+
+# Get stopwords
+stopword_remover = StopwordRemover("en")
+stopword_set = stopword_remover.get_stopword_set()
+
+# Initialize with default configuration
+data = DataCore("Sample text for analysis", stopword_set)
+
+# Initialize with custom configuration
+config = {
+    "windows_size": 3,
+    "n": 4,
+    "tags_to_discard": {"u", "d", "p"},
+    "exclude": set(string.punctuation)
+}
+data = DataCore("Sample text for analysis", stopword_set, config)
+```
+
+## Core Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="build">
+    <AccordionTrigger>
+      <code>_build(text, windows_size, n)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _build(self, text, windows_size, n):
+        """
+        Build the core data structures from the input text.
+        
+        This method handles the initial processing of text, including 
+        pre-filtering, sentence segmentation, and word tokenization.
+        
+        Args:
+            text (str): The input text to process
+            windows_size (int): Size of word window for co-occurrence analysis
+            n (int): Maximum n-gram length to consider for keyword candidates
+        """
+        # Pre-process text for normalization
+        text = pre_filter(text)
+
+        # Split text into sentences and tokenize
+        self.sentences_str = tokenize_sentences(text)
+        self.number_of_sentences = len(self.sentences_str)
+
+        # Initialize position counter for global word positions
+        pos_text = 0
+
+        # Create a processing context dictionary to pass fewer arguments
+        context = {"windows_size": windows_size, "n": n}
+
+        # Process each sentence individually
+        for sentence_id, sentence in enumerate(self.sentences_str):
+            pos_text = self._process_sentence(sentence, sentence_id, pos_text, context)
+
+        # Store the total number of processed words
+        self.number_of_words = pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="process_sentence">
+    <AccordionTrigger>
+      <code>_process_sentence(sentence, sentence_id, pos_text, context)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _process_sentence(self, sentence, sentence_id, pos_text, context):
+        """
+        Process a single sentence from the document.
+        
+        Handles the tokenization of a sentence, identifies words and punctuation,
+        and processes each meaningful word.
+        
+        Args:
+            sentence (list): List of word tokens in the sentence
+            sentence_id (int): Unique identifier for this sentence
+            pos_text (int): Current global position in the text
+            context (dict): Processing context with configuration parameters
+            
+        Returns:
+            int: Updated global position counter
+        """
+        # Initialize lists to store processed sentence components
+        sentence_obj_aux = []  # Blocks of words within the sentence
+        block_of_word_obj = []  # Current block of continuous words (separated by punctuation)
+
+        # Extend the context with sentence information for word processing
+        processing_context = context.copy()
+        processing_context["sentence_id"] = sentence_id
+
+        # Process each word in the sentence
+        for pos_sent, word in enumerate(sentence):
+            # Check if the word is just punctuation (all characters are excluded)
+            if len([c for c in word if c in self.exclude]) == len(word):
+                # If we have a block of words, save it and start a new block
+                if len(block_of_word_obj) > 0:
+                    sentence_obj_aux.append(block_of_word_obj)
+                    block_of_word_obj = []
+            else:
+                # Process meaningful words
+                word_context = {
+                    "pos_sent": pos_sent,  # Position within the sentence
+                    "block_of_word_obj": block_of_word_obj,  # Current word block
+                }
+                # Process this word and update position counter
+                pos_text = self._process_word(
+                    word, pos_text, processing_context, word_context
+                )
+
+        # Save any remaining word block
+        if len(block_of_word_obj) > 0:
+            sentence_obj_aux.append(block_of_word_obj)
+
+        # Add processed sentence to collection if not empty
+        if len(sentence_obj_aux) > 0:
+            self.sentences_obj.append(sentence_obj_aux)
+
+        return pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="process_word">
+    <AccordionTrigger>
+      <code>_process_word(word, pos_text, context, word_context)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _process_word(self, word, pos_text, context, word_context):
+        """
+        Process a single word within a sentence.
+        
+        Creates or retrieves the term object, updates its occurrences,
+        analyzes co-occurrences with nearby words, and generates candidate keywords.
+        
+        Args:
+            word (str): The word to process
+            pos_text (int): Current global position in the text
+            context (dict): Processing context with configuration parameters
+            word_context (dict): Word-specific context information
+            
+        Returns:
+            int: Updated global position counter
+        """
+        # Extract necessary context variables
+        sentence_id = context["sentence_id"]
+        windows_size = context["windows_size"]
+        n = context["n"]
+        pos_sent = word_context["pos_sent"]
+        block_of_word_obj = word_context["block_of_word_obj"]
+
+        # Get the part-of-speech tag for this word
+        tag = self.get_tag(word, pos_sent)
+
+        # Get or create the term object for this word
+        term_obj = self.get_term(word)
+
+        # Add this occurrence to the term's record
+        term_obj.add_occur(tag, sentence_id, pos_sent, pos_text)
+
+        # Increment global position counter
+        pos_text += 1
+
+        # Update co-occurrence information for valid tags
+        if tag not in self.tags_to_discard:
+            self._update_cooccurrence(block_of_word_obj, term_obj, windows_size)
+
+        # Generate keyword candidates involving this term
+        self._generate_candidates((tag, word), term_obj, block_of_word_obj, n)
+
+        # Add this word to the current block
+        block_of_word_obj.append((tag, word, term_obj))
+
+        return pos_text
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="update_cooccurrence">
+    <AccordionTrigger>
+      <code>_update_cooccurrence(block_of_word_obj, term_obj, windows_size)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _update_cooccurrence(self, block_of_word_obj, term_obj, windows_size):
+        """
+        Update co-occurrence information between terms.
+        
+        Records relationships between the current term and previous terms
+        within the specified window size.
+        
+        Args:
+            block_of_word_obj (list): Current block of words
+            term_obj (SingleWord): Term object for the current word
+            windows_size (int): Size of co-occurrence window to consider
+        """
+        # Calculate the window of previous words to consider for co-occurrence
+        word_windows = list(
+            range(max(0, len(block_of_word_obj) - windows_size), len(block_of_word_obj))
+        )
+
+        # For each word in the window, update co-occurrence if it's a valid term
+        for w in word_windows:
+            if block_of_word_obj[w][0] not in self.tags_to_discard:
+                # Add co-occurrence edge from previous term to current term
+                self.add_cooccur(block_of_word_obj[w][2], term_obj)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="generate_candidates">
+    <AccordionTrigger>
+      <code>_generate_candidates(term, term_obj, block_of_word_obj, n)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def _generate_candidates(self, term, term_obj, block_of_word_obj, n):
+        """
+        Generate keyword candidates from terms.
+        
+        Creates single-term candidates and multi-term candidates up to length n,
+        combining the current term with previous terms.
+        
+        Args:
+            term (tuple): Current term as (tag, word) tuple
+            term_obj (SingleWord): Term object for the current word
+            block_of_word_obj (list): Current block of words
+            n (int): Maximum candidate length to generate
+        """
+        # Create single-term candidate
+        candidate = [term + (term_obj,)]
+        cand = ComposedWord(candidate)
+        self.add_or_update_composedword(cand)
+
+        # Calculate window of previous words to consider for multi-term candidates
+        word_windows = list(
+            range(max(0, len(block_of_word_obj) - (n - 1)), len(block_of_word_obj))
+        )[::-1]  # Reverse to build phrases from right to left
+
+        # Generate multi-term candidates with increasing length
+        for w in word_windows:
+            # Add previous term to candidate
+            candidate.append(block_of_word_obj[w])
+
+            # Update frequency count for this n-gram length
+            self.freq_ns[len(candidate)] += 1.0
+
+            # Create and register the composed word candidate
+            # (reverse to maintain correct word order)
+            cand = ComposedWord(candidate[::-1])
+            self.add_or_update_composedword(cand)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Public API Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="get_tag">
+    <AccordionTrigger>
+      <code>get_tag(word, i)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_tag(self, word, i):
+        """
+        Get the part-of-speech tag for a word.
+        
+        Args:
+            word (str): The word to tag
+            i (int): Position of the word in its sentence
+            
+        Returns:
+            str: Single character tag representing the word type
+                 ("d" for digit, "u" for unusual, "a" for acronym,
+                  "n" for proper noun, "p" for plain word)
+        """
+        return get_tag(word, i, self.exclude)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_candidate">
+    <AccordionTrigger>
+      <code>build_candidate(candidate_string)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_candidate(self, candidate_string):
+        """
+        Build a candidate ComposedWord from a string.
+        
+        This function processes a candidate string by tokenizing it, tagging each word,
+        and creating a ComposedWord object from the resulting terms. It's used to
+        convert external strings into the internal candidate representation.
+        
+        Args:
+            candidate_string (str): String to convert to a keyword candidate
+            
+        Returns:
+            ComposedWord: A composed word object representing the candidate
+        """
+
+        # Tokenize the candidate string
+        tokenized_words = [
+            w
+            for w in split_contractions(web_tokenizer(candidate_string.lower()))
+            if not (w.startswith("'") and len(w) > 1) and len(w) > 0
+        ]
+
+        # Process each word in the candidate
+        candidate_terms = []
+        for index, word in enumerate(tokenized_words):
+            # Get the tag and term object
+            tag = self.get_tag(word, index)
+            term_obj = self.get_term(word, save_non_seen=False)
+
+            # Skip terms with zero term frequency (not in the original document)
+            if term_obj.tf == 0:
+                term_obj = None
+
+            candidate_terms.append((tag, word, term_obj))
+
+        # Check if the candidate has any valid terms
+        if not any(term[2] for term in candidate_terms):
+            # Return an invalid composed word if no valid terms
+            return ComposedWord(None)
+
+        # Create and return the composed word
+        return ComposedWord(candidate_terms)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_single_terms_features">
+    <AccordionTrigger>
+      <code>build_single_terms_features(features=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_single_terms_features(self, features=None):
+        """
+        Calculates and updates statistical features for all single terms in the text.
+        This includes term frequency statistics and other features specified in the
+        features parameter. Only non-stopword terms are considered for statistics
+        calculation.
+        
+        Args:
+            features (list, optional): Specific features to calculate
+        """
+        # Filter to valid terms (non-stopwords)
+        valid_terms = [term for term in self.terms.values() if not term.stopword]
+        valid_tfs = np.array([x.tf for x in valid_terms])
+
+        # Skip if no valid terms
+        if len(valid_tfs) == 0:
+            return
+
+        # Calculate frequency statistics
+        avg_tf = valid_tfs.mean()
+        std_tf = valid_tfs.std()
+        max_tf = max(x.tf for x in self.terms.values())
+
+        # Prepare statistics dictionary for updating terms
+        stats = {
+            "max_tf": max_tf,
+            "avg_tf": avg_tf,
+            "std_tf": std_tf,
+            "number_of_sentences": self.number_of_sentences,
+        }
+
+        # Update all terms with the calculated statistics
+        list(map(lambda x: x.update_h(stats, features=features), self.terms.values()))
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="build_mult_terms_features">
+    <AccordionTrigger>
+      <code>build_mult_terms_features(features=None)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def build_mult_terms_features(self, features=None):
+        """
+        Build features for multi-word terms.
+        
+        Updates the features for all valid multi-word candidate terms (n-grams).
+        Only candidates that pass the validity check will have their features updated.
+        
+        Args:
+            features (list, optional): List of features to build. If None, all available features will be built.
+        """
+        # Update only valid candidates (filter then apply update_h)
+        list(
+            map(
+                lambda x: x.update_h(features=features),
+                [cand for cand in self.candidates.values() if cand.is_valid()],
+            )
+        )
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="get_term">
+    <AccordionTrigger>
+      <code>get_term(str_word, save_non_seen=True)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def get_term(self, str_word, save_non_seen=True):
+        """
+        Get or create a term object for a word.
+        
+        Handles word normalization, stopword checking, and term object creation.
+        
+        Args:
+            str_word (str): The word to get a term object for
+            save_non_seen (bool, optional): Whether to save new terms to the collection
+            
+        Returns:
+            SingleWord: Term object representing this word
+        """
+        # Normalize the term (convert to lowercase)
+        unique_term = str_word.lower()
+
+        # Check if it's a stopword in original form
+        simples_sto = unique_term in self.stopword_set
+
+        # Handle plural forms by removing trailing 's'
+        if unique_term.endswith("s") and len(unique_term) > 3:
+            unique_term = unique_term[:-1]
+
+        # Return existing term if already processed
+        if unique_term in self.terms:
+            return self.terms[unique_term]
+
+        # Remove punctuation for further analysis
+        simples_unique_term = unique_term
+        for pontuation in self.exclude:
+            simples_unique_term = simples_unique_term.replace(pontuation, "")
+
+        # Determine if this is a stopword (original form, normalized form, or too short)
+        isstopword = (
+            simples_sto
+            or unique_term in self.stopword_set
+            or len(simples_unique_term) < 3
+        )
+
+        # Create the term object
+        term_id = len(self.terms)
+        term_obj = SingleWord(unique_term, term_id, self.g)
+        term_obj.stopword = isstopword
+
+        # Save the term to the collection if requested
+        if save_non_seen:
+            self.g.add_node(term_id)
+            self.terms[unique_term] = term_obj
+
+        return term_obj
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="add_cooccur">
+    <AccordionTrigger>
+      <code>add_cooccur(left_term, right_term)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def add_cooccur(self, left_term, right_term):
+        """
+        Add a co-occurrence relationship between two terms.
+        
+        Updates the co-occurrence graph by adding or incrementing an edge between
+        two terms. This information is used to calculate term relatedness and
+        importance in the text.
+        
+        Args:
+            left_term (SingleWord): Source term in the relationship
+            right_term (SingleWord): Target term in the relationship
+        """
+        # Check if the edge already exists
+        if right_term.id not in self.g[left_term.id]:
+            # Create a new edge with initial weight
+            self.g.add_edge(left_term.id, right_term.id, tf=0.0)
+
+        # Increment the co-occurrence frequency
+        self.g[left_term.id][right_term.id]["tf"] += 1.0
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="add_or_update_composedword">
+    <AccordionTrigger>
+      <code>add_or_update_composedword(cand)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      def add_or_update_composedword(self, cand):
+        """
+        Add or update a composed word in the candidates collection.
+        
+        Adds a new candidate composed word (n-gram) to the candidates dictionary
+        or updates an existing one by incrementing its frequency. This is used to
+        track potential keyphrases in the text.
+        
+        Args:
+            cand (ComposedWord): ComposedWord instance to add or update in the candidates dictionary
+        """
+        # Check if this candidate already exists
+        if cand.unique_kw not in self.candidates:
+            # Add new candidate
+            self.candidates[cand.unique_kw] = cand
+        else:
+            # Update existing candidate with new information
+            self.candidates[cand.unique_kw].uptade_cand(cand)
+
+        # Increment the frequency counter for this candidate
+        self.candidates[cand.unique_kw].tf += 1.0
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Property Accessors
+
+The `DataCore` class includes various property accessors for backward compatibility:
+
+### Configuration Properties
+
+- `exclude`: Characters to exclude from processing
+- `tags_to_discard`: Part-of-speech tags to ignore during analysis
+- `stopword_set`: Set of stopwords to filter out
+- `g`: DirectedGraph representing term co-occurrences
+
+```python
+# Examples
+excluded_chars = data.exclude
+ignored_tags = data.tags_to_discard
+stopwords = data.stopword_set
+graph = data.g
+```
+
+### Text Statistics Properties
+
+- `number_of_sentences`: Count of sentences in the processed text
+- `number_of_words`: Total number of words processed
+
+```python
+# Examples
+sentence_count = data.number_of_sentences
+word_count = data.number_of_words
+```
+
+### Collection Properties
+
+- `terms`: Dictionary of `SingleWord` objects representing individual terms
+- `candidates`: Dictionary of `ComposedWord` objects representing keyword candidates
+- `sentences_obj`: Processed sentence objects
+- `sentences_str`: Raw sentence strings from the original text
+- `freq_ns`: Frequency of n-grams by length
+
+```python
+# Examples
+all_terms = data.terms
+all_candidates = data.candidates
+processed_sentences = data.sentences_obj
+raw_sentences = data.sentences_str
+ngram_frequencies = data.freq_ns
+```
+
+## Complete Usage Example
+
+```python
+from yake.data import DataCore
+from yake.stopword_remover import StopwordRemover
+
+# Initialize stopwords
+stopword_remover = StopwordRemover("en")
+stopword_set = stopword_remover.get_stopword_set()
+
+# Create DataCore instance
+text = "Natural language processing is a field of artificial intelligence that focuses on the interaction between computers and humans using natural language."
+data = DataCore(text, stopword_set)
+
+# Build features for keyword extraction
+data.build_single_terms_features()
+data.build_mult_terms_features()
+
+# Extract top candidates
+candidates = [(cand.unique_kw, cand.h) for cand in data.candidates.values() if cand.is_valid()]
+candidates.sort(key=lambda x: x[1])  # Sort by score (lower is better in YAKE)
+
+# Print top 5 keywords
+for keyword, score in candidates[:5]:
+    print(f"{keyword}: {score:.4f}")
+```
+
+## Dependencies
+
+The `DataCore` class relies on:
+
+- `string`: For punctuation constants
+- `networkx`: For graph representation (co-occurrences)
+- `numpy`: For statistical calculations
+- `segtok`: For tokenization
+- Internal utility modules:
+  - `utils`: For pre-filtering and tokenization
+  - `single_word`: For representing individual terms
+  - `composed_word`: For representing multi-word candidates

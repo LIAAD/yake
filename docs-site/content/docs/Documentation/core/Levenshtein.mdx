@@ -1,0 +1,240 @@
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+
+# Levenshtein
+
+The `Levenshtein` class provides utilities for calculating edit distances and similarity ratios between strings using the Levenshtein algorithm.
+
+> **Info:** This documentation provides interactive code views for each method. Click on a function name to view its implementation.
+
+## Class Overview
+
+```python
+class Levenshtein:
+    """
+    Class for computing Levenshtein distance and similarity ratio.
+    
+    This class provides static methods to calculate the edit distance between
+    strings (how many insertions, deletions, or substitutions are needed to
+    transform one string into another) and to determine a normalized similarity
+    ratio between them.
+    
+    These metrics are widely used in fuzzy string matching, spell checking,
+    and approximate text similarity measurements.
+    """
+```
+
+The `Levenshtein` class offers methods to measure the difference between two strings and calculate their similarity.
+
+## Static Methods
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="ratio-private">
+    <AccordionTrigger>
+      <code>__ratio(distance, str_length)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      @staticmethod
+      def __ratio(distance: float, str_length: int) -> float:
+          """
+          Calculate the similarity ratio based on distance and string length.
+          
+          This method normalizes the Levenshtein distance into a similarity ratio
+          between 0 and 1, where 1 represents identical strings and 0 represents
+          completely different strings.
+          
+          Args:
+              distance (float): The Levenshtein distance between two strings.
+              str_length (int): The length of the longer string.
+
+          Returns:
+              float: The similarity ratio, where higher values indicate greater similarity.
+                  The range is [0.0, 1.0] where 1.0 means identical strings.
+          """
+          return 1 - float(distance) / float(str_length)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="ratio">
+    <AccordionTrigger>
+      <code>ratio(seq1, seq2)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      @staticmethod
+      def ratio(seq1: str, seq2: str) -> float:
+          """
+          Compute the similarity ratio between two strings.
+          
+          This is the main method for determining string similarity. It calculates
+          the Levenshtein distance and then converts it to a ratio representing
+          how similar the strings are.
+          
+          Args:
+              seq1 (str): The first string to compare.
+              seq2 (str): The second string to compare.
+
+          Returns:
+              float: The similarity ratio between the two strings, ranging from 0.0
+                  (completely different) to 1.0 (identical).
+          """
+          str_distance = Levenshtein.distance(seq1, seq2)
+          str_length = max(len(seq1), len(seq2))
+          return Levenshtein.__ratio(str_distance, str_length)
+      ```
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="distance">
+    <AccordionTrigger>
+      <code>distance(seq1, seq2)</code>
+    </AccordionTrigger>
+    <AccordionContent>
+      ```python
+      @staticmethod
+      def distance(seq1: str, seq2: str) -> int:
+          """
+          Calculate the Levenshtein distance between two strings.
+          
+          This method implements the core Levenshtein algorithm, which calculates
+          the minimum number of single-character edits (insertions, deletions, or
+          substitutions) required to change one string into another.
+          
+          The algorithm uses dynamic programming with a matrix approach to efficiently
+          compute the minimum edit distance.
+
+          Args:
+              seq1 (str): The first string to compare.
+              seq2 (str): The second string to compare.
+
+          Returns:
+              int: The Levenshtein distance - the minimum number of edit operations
+                   required to transform seq1 into seq2.
+          """
+          # Create a matrix of size (len(seq1)+1) x (len(seq2)+1)
+          size_x = len(seq1) + 1
+          size_y = len(seq2) + 1
+          matrix = np.zeros((size_x, size_y))
+
+          # Initialize the first row and column of the matrix
+          for x in range(size_x):
+              matrix[x, 0] = x  # Cost of deleting characters from seq1
+          for y in range(size_y):
+              matrix[0, y] = y  # Cost of inserting characters from seq2
+
+          # Fill the matrix using dynamic programming approach
+          for x in range(1, size_x):
+              for y in range(1, size_y):
+                  # Check if the characters at current positions match
+                  if seq1[x - 1] == seq2[y - 1]:
+                      cost = 0  # No cost for matching characters
+                  else:
+                      cost = 1  # Cost of 1 for substitution
+
+                  # Calculate minimum cost among deletion, insertion, and substitution
+                  matrix[x, y] = min(
+                      matrix[x - 1, y] + 1,      # Deletion (remove from seq1)
+                      matrix[x, y - 1] + 1,      # Insertion (add from seq2)
+                      matrix[x - 1, y - 1] + cost,  # Substitution or match
+                  )
+
+          # Return the bottom-right value of the matrix as the final distance
+          return int(matrix[size_x - 1, size_y - 1])
+      ```
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+## Usage Guide
+
+### Distance Calculation
+
+The Levenshtein distance measures the minimum number of single-character edits (insertions, deletions, or substitutions) required to change one string into another.
+
+**Example:**
+```python
+from levenshtein import Levenshtein
+
+# Calculate the edit distance between two strings
+distance = Levenshtein.distance("kitten", "sitting")
+print(f"Levenshtein distance: {distance}")  # Output: 3
+```
+
+### Similarity Ratio
+
+The similarity ratio is a normalized measure between 0 and 1, where 1 means the strings are identical and 0 means they are completely different.
+
+**Example:**
+```python
+from levenshtein import Levenshtein
+
+# Calculate the similarity ratio between two strings
+similarity = Levenshtein.ratio("kitten", "sitting")
+print(f"Similarity ratio: {similarity:.4f}")  # Output: 0.5714
+```
+
+## Algorithm Explanation
+
+The Levenshtein distance algorithm uses dynamic programming to calculate the minimum edit distance between two strings:
+
+1. Initialize a matrix of size `(len(seq1)+1) × (len(seq2)+1)`
+2. Fill the first row and column with increasing integers (0, 1, 2, ...)
+3. For each cell in the matrix:
+   - If the corresponding characters match, the cost is 0; otherwise, it's 1
+   - Calculate the minimum cost from three possible operations:
+     - Deletion: Value from the cell above + 1
+     - Insertion: Value from the cell to the left + 1
+     - Substitution: Value from the diagonal cell + cost
+4. The bottom-right cell contains the final Levenshtein distance
+
+## Complete Usage Example
+
+```python
+import numpy as np
+from levenshtein import Levenshtein
+
+# Test strings
+string1 = "natural language processing"
+string2 = "neural language processing"
+
+# Calculate distance and similarity
+distance = Levenshtein.distance(string1, string2)
+similarity = Levenshtein.ratio(string1, string2)
+
+print(f"Strings:\n1: '{string1}'\n2: '{string2}'")
+print(f"Levenshtein distance: {distance}")
+print(f"Similarity ratio: {similarity:.4f}")
+
+# Example output:
+# Strings:
+# 1: 'natural language processing'
+# 2: 'neural language processing'
+# Levenshtein distance: 3
+# Similarity ratio: 0.8889
+```
+
+## Performance Considerations
+
+- Time Complexity: O(m×n) where m and n are the lengths of the input strings
+- Space Complexity: O(m×n) due to the matrix storage
+- For very long strings, consider using optimized variants or approximate algorithms
+
+## Dependencies
+
+The `Levenshtein` class relies on:
+
+- `numpy`: For efficient matrix operations
+
+
+## Applications
+
+Levenshtein distance is commonly used in:
+
+- Spell checking and correction
+- DNA sequence alignment
+- Plagiarism detection
+- Fuzzy string matching
+- Natural language processing
+- Record linkage and data deduplication
+

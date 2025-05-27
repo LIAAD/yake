@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - core-seperation  # ou master, dependendo da sua branch principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  
+
+      - name: Install dependencies
+        run: |
+          cd docs-site  
+          npm ci
+
+      - name: Build
+        run: |
+          cd docs-site  
+          npm run build
+
+      - name: Create .nojekyll file
+        run: |
+          touch docs-site/out/.nojekyll  
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs-site/out  
+          branch: gh-pages

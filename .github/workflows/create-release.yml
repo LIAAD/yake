@@ -1,0 +1,104 @@
+name: Create Release on PR Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master  # Change to your default branch if different (e.g., master)
+  workflow_dispatch:
+
+jobs:
+  create_release:
+    # Only run when PR is merged (not when just closed)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed for creating releases
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for proper versioning and commit messages
+      
+      - name: Get latest release version
+        id: get_version
+        run: |
+          # Get latest tag or set to v0.0.0 if none exists
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
+          
+          # Extract version numbers
+          MAJOR=$(echo $LATEST_TAG | sed 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/')
+          MINOR=$(echo $LATEST_TAG | sed 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/')
+          PATCH=$(echo $LATEST_TAG | sed 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/')
+          
+          # Check PR labels to determine which version to increment
+          if [[ "${{ contains(github.event.pull_request.labels.*.name, 'major') }}" == "true" ]]; then
+            echo "Incrementing MAJOR version due to 'major' label"
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+          elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'minor') }}" == "true" ]]; then
+            echo "Incrementing MINOR version due to 'minor' label"
+            MINOR=$((MINOR + 1))
+            PATCH=0
+          else
+            echo "Incrementing PATCH version (default)"
+            PATCH=$((PATCH + 1))
+          fi
+          
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
+          echo "Bumping version from $LATEST_TAG to $NEW_TAG"
+          echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
+
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Get commits since last tag
+          echo "Generating commit list since $LATEST_TAG"
+          COMMITS=$(git log --pretty=format:"- %s (%h)" ${{ env.LATEST_TAG }}..HEAD)
+          
+          # Extract PR details
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_USER="${{ github.event.pull_request.merged_by.login }}"
+          
+          # Save release notes to environment variable
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "## Release ${{ env.NEW_TAG }}" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "### 🔄 Pull Request" >> $GITHUB_ENV
+          echo "- #$PR_NUMBER: $PR_TITLE" >> $GITHUB_ENV
+          echo "- Merged by @$PR_USER" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          
+          if [[ -n "$PR_BODY" ]]; then
+            echo "### 📝 Description" >> $GITHUB_ENV
+            echo "$PR_BODY" >> $GITHUB_ENV
+            echo "" >> $GITHUB_ENV
+          fi
+          
+          echo "### 📦 Changes" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+          name: Release ${{ env.NEW_TAG }}
+          body: ${{ env.RELEASE_NOTES }}
+          draft: false  # Set to true if you want to review before publishing
+          prerelease: false  # Set to true for pre-releases
+          # If you have build artifacts to include, uncomment and modify this:
+          # files: |
+          #   dist/*.zip
+          #   dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output Results
+        run: |
+          echo "::notice::🎉 Created release ${{ env.NEW_TAG }} from PR #${{ github.event.pull_request.number }}"

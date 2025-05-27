@@ -1,0 +1,30 @@
+name: Lint
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.10'
+        - name: Install uv
+          run: pip install uv
+        - name: Create virtual environment
+          run: uv venv
+        - name: Install dependencies
+          run: |
+            uv pip install -e ".[dev]"
+            uv pip install ruff flake8
+        - name: lint
+          run: |
+            uv run ruff check --fix .
+            uv run ruff check .
+            uv run flake8 yake/

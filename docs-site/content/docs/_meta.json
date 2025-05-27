@@ -1,0 +1,24 @@
+{
+  "home": {
+    "title": "Home"
+  },
+  "getting-started": {
+    "title": "Getting Started"
+  },
+  "related-projects": {
+    "title": "Related Projects"
+  },
+  "about": {
+    "title": "About"
+  },
+  "--": {
+    "title": "Documentation",
+    "type": "separator"
+  },
+  "core": {
+    "title": "Core"
+  },
+  "data": {
+    "title": "Data"
+  }
+}
