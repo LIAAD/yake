@@ -11,15 +11,16 @@ import numpy as np
 import jellyfish
 from .utils import STOPWORD_WEIGHT
 
+
 class ComposedWord:
     """
     Representation of a multi-word term in the document.
-    
+
     This class stores and aggregates information about multi-word keyword candidates,
     calculating combined scores from the properties of their constituent terms.
     It tracks statistics like term frequency, integrity, and provides methods to
     validate whether a phrase is likely to be a good keyword.
-    
+
     Attributes:
         See property accessors below for available attributes.
     """
@@ -27,7 +28,7 @@ class ComposedWord:
     def __init__(self, terms):
         """
         Initialize a ComposedWord object representing a multi-word term.
-        
+
         Args:
             terms (list): List of tuples (tag, word, term_obj) representing
                           the individual words in this phrase. Can be None to
@@ -104,7 +105,7 @@ class ComposedWord:
     def tf(self, value):
         """
         Set the term frequency value.
-        
+
         Args:
             value (float): The new term frequency value
         """
@@ -124,7 +125,7 @@ class ComposedWord:
     def h(self, value):
         """
         Set the final relevance score of this phrase.
-        
+
         Args:
             value (float): The new score value
         """
@@ -138,10 +139,10 @@ class ComposedWord:
     def uptade_cand(self, cand):
         """
         Update this candidate with data from another candidate.
-        
+
         Merges tag information from another candidate representing
         the same keyword phrase.
-        
+
         Args:
             cand (ComposedWord): Another instance of the same keyword to merge with
         """
@@ -152,10 +153,10 @@ class ComposedWord:
     def is_valid(self):
         """
         Check if this candidate is a valid keyword phrase.
-        
+
         A valid keyword phrase doesn't contain unusual characters or digits,
         and doesn't start or end with stopwords.
-        
+
         Returns:
             bool: True if this is a valid keyword candidate, False otherwise
         """
@@ -172,7 +173,7 @@ class ComposedWord:
                Get composed feature values for the n-gram.
 
         This function aggregates a specific feature across all terms in the n-gram.
-        It computes the sum, product, and ratio of the feature values, optionally 
+        It computes the sum, product, and ratio of the feature values, optionally
         excluding stopwords from the calculation.
 
         Args:
@@ -184,7 +185,7 @@ class ComposedWord:
             - sum: Sum of the feature values across all relevant terms
             - product: Product of the feature values across all relevant terms
             - ratio: Product divided by (sum + 1), a measure of feature consistency
-        
+
         """
         # Get feature values from each term, filtering stopwords if requested
         list_of_features = [
@@ -203,10 +204,10 @@ class ComposedWord:
     def build_features(self, params):
         """
         Build features for machine learning or evaluation.
-        
+
         Generates feature vectors that can be used for model training,
         evaluation, or visualization of keyword properties.
-        
+
         Args:
             params (dict): Parameters for feature generation including:
                 - features (list): Features to include
@@ -216,7 +217,7 @@ class ComposedWord:
                 - rel (bool): Whether to include relevance feature
                 - rel_approx (bool): Whether to include approximate relevance
                 - is_virtual (bool): Whether this is a virtual candidate
-                
+
         Returns:
             tuple: (features_list, column_names, matched_gold_standards)
         """
@@ -311,11 +312,11 @@ class ComposedWord:
     def update_h(self, features=None, is_virtual=False):
         """
         Update the term's score based on its constituent terms.
-        
+
         Calculates a combined relevance score for the multi-word term by
         aggregating scores of its constituent words, with special handling for
         stopwords to improve keyword quality.
-        
+
         Args:
             features (list, optional): Specific features to use for scoring
             is_virtual (bool): Whether this is a virtual candidate not in text
@@ -381,10 +382,10 @@ class ComposedWord:
     def update_h_old(self, features=None, is_virtual=False):
         """
         Legacy method for updating the term's score.
-        
+
         Preserved for backward compatibility but uses a slightly different
         approach to calculate scores.
-        
+
         Args:
             features (list, optional): Specific features to use for scoring
             is_virtual (bool): Whether this is a virtual candidate not in text

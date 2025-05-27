@@ -16,12 +16,12 @@ from .Levenshtein import Levenshtein
 class KeywordExtractor:
     """
     Main entry point for YAKE keyword extraction.
-    
+
     This class handles the configuration, preprocessing, and extraction of keywords
     from text documents using statistical features without relying on dictionaries
     or external corpora. It integrates components for text processing, candidate
     generation, feature extraction, and keyword ranking.
-    
+
     Attributes:
         See initialization parameters for configurable attributes.
     """
@@ -29,7 +29,7 @@ class KeywordExtractor:
     def __init__(self, **kwargs):
         """
         Initialize the KeywordExtractor with configuration parameters.
-        
+
         Args:
             **kwargs: Configuration parameters including:
                 lan (str): Language for stopwords (default: "en")
@@ -59,14 +59,14 @@ class KeywordExtractor:
     def _load_stopwords(self, stopwords):
         """
         Load stopwords from file or use provided set.
-        
+
         This method handles the loading of language-specific stopwords from
         the appropriate resource file, falling back to a language-agnostic
         list if the specific language is not available.
-        
+
         Args:
             stopwords (set, optional): Custom set of stopwords to use
-            
+
         Returns:
             set: A set of stopwords for filtering non-content words
         """
@@ -99,13 +99,13 @@ class KeywordExtractor:
     def _get_dedup_function(self, func_name):
         """
         Retrieve the appropriate deduplication function.
-        
+
         Maps the requested string similarity function name to the corresponding
         method implementation for keyword deduplication.
-        
+
         Args:
             func_name (str): Name of the deduplication function to use
-            
+
         Returns:
             function: Reference to the selected string similarity function
         """
@@ -120,14 +120,14 @@ class KeywordExtractor:
     def jaro(self, cand1, cand2):
         """
         Calculate Jaro similarity between two strings.
-        
+
         A string metric measuring edit distance between two sequences,
         with higher values indicating greater similarity.
-        
+
         Args:
             cand1 (str): First string to compare
             cand2 (str): Second string to compare
-            
+
         Returns:
             float: Similarity score between 0.0 (different) and 1.0 (identical)
         """
@@ -136,14 +136,14 @@ class KeywordExtractor:
     def levs(self, cand1, cand2):
         """
         Calculate normalized Levenshtein similarity between two strings.
-        
+
         Computes the Levenshtein distance and normalizes it by the length
         of the longer string, returning a similarity score.
-        
+
         Args:
             cand1 (str): First string to compare
             cand2 (str): Second string to compare
-            
+
         Returns:
             float: Similarity score between 0.0 (different) and 1.0 (identical)
         """
@@ -152,15 +152,15 @@ class KeywordExtractor:
     def seqm(self, cand1, cand2):
         """
         Calculate sequence matcher ratio between two strings.
-        
+
         Uses the Levenshtein ratio which measures the similarity between
         two strings based on the minimum number of operations required
         to transform one string into the other.
-        
+
         Args:
             cand1 (str): First string to compare
             cand2 (str): Second string to compare
-            
+
         Returns:
             float: Similarity score between 0.0 (different) and 1.0 (identical)
         """
@@ -169,9 +169,9 @@ class KeywordExtractor:
     def extract_keywords(self, text):
         """
         Extract keywords from the given text.
-        
+
         This function implements the complete YAKE keyword extraction pipeline:
-        
+
         1. Preprocesses the input text by normalizing whitespace
         2. Builds a data representation using DataCore, which:
            - Tokenizes the text into sentences and words
@@ -184,7 +184,7 @@ class KeywordExtractor:
         5. Sorts candidates by their importance score (H), where lower is better
         6. Performs deduplication to remove similar candidates based on string similarity
         7. Returns the top k keywords with their scores
-        
+
         The algorithm favors keywords that are statistically important but not common
         stopwords, with scores reflecting their estimated relevance to the document.
         Lower scores indicate more important keywords.
@@ -194,7 +194,7 @@ class KeywordExtractor:
 
         Returns:
             List of (keyword, score) tuples sorted by score (lower is better)
-        
+
         """
         # Handle empty input
         if not text:

@@ -17,19 +17,20 @@ from segtok.tokenizer import web_tokenizer, split_contractions
 # - "none": Ignore stopwords completely
 STOPWORD_WEIGHT = "bi"
 
+
 def pre_filter(text):
     """Pre-filter text before processing.
-    
+
     This function prepares raw text for keyword extraction by normalizing its format.
     It performs several transformations:
-    
+
     1. Splits the text into parts based on newline characters
     2. Detects if a part starts with a capital letter (potentially a new paragraph)
     3. Adds appropriate spacing between parts:
        - Double newlines for parts starting with capital letters (likely new paragraphs)
        - Single spaces for other parts (likely continuing text)
     4. Replaces all tab characters with spaces for consistent formatting
-    
+
     This preprocessing helps maintain paragraph structure while normalizing
     whitespace, which improves the accuracy of subsequent text analysis steps
     like sentence boundary detection and keyword extraction.
@@ -59,18 +60,19 @@ def pre_filter(text):
 
     return buffer
 
+
 def tokenize_sentences(text):
     """
     Split text into sentences and tokenize into words.
-    
+
     This function performs two-level tokenization: first dividing the text into
     sentences using segtok's sentence segmenter, then tokenizing each sentence
     into individual words. It also handles contractions and filters out empty
     or invalid tokens.
-    
+
     Args:
         text (str): The input text to be tokenized
-        
+
     Returns:
         list: A nested list structure where each inner list contains the tokens
               for a single sentence in the original text
@@ -89,20 +91,21 @@ def tokenize_sentences(text):
         if len(s.strip()) > 0
     ]
 
+
 def get_tag(word, i, exclude):
     """
     Determine the linguistic tag of a word based on its characteristics.
-    
-    This function categorizes words into different types based on their 
+
+    This function categorizes words into different types based on their
     orthographic features (capitalization, digits, special characters).
-    These tags are used to identify proper nouns, acronyms, numbers, and 
+    These tags are used to identify proper nouns, acronyms, numbers, and
     unusual token patterns, which affect keyword scoring and filtering.
-    
+
     Args:
         word (str): The word to classify
         i (int): Position of the word within its sentence (0 = first word)
         exclude (set): Set of characters to consider as punctuation/special chars
-        
+
     Returns:
         str: A single character tag representing the word type:
             - "d": Digit or numeric value
@@ -112,7 +115,10 @@ def get_tag(word, i, exclude):
             - "p": Plain word (default)
     """
     # Check if word is numeric (with possible commas and a decimal point)
-    if word.replace(",", "").isdigit() or word.replace(",", "").replace(".", "", 1).isdigit():
+    if (
+        word.replace(",", "").isdigit()
+        or word.replace(",", "").replace(".", "", 1).isdigit()
+    ):
         return "d"
 
     # Count character types for classification

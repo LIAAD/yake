@@ -13,12 +13,12 @@ import numpy as np
 class Levenshtein:
     """
     Class for computing Levenshtein distance and similarity ratio.
-    
+
     This class provides static methods to calculate the edit distance between
     strings (how many insertions, deletions, or substitutions are needed to
     transform one string into another) and to determine a normalized similarity
     ratio between them.
-    
+
     These metrics are widely used in fuzzy string matching, spell checking,
     and approximate text similarity measurements.
     """
@@ -27,11 +27,11 @@ class Levenshtein:
     def __ratio(distance: float, str_length: int) -> float:
         """
         Calculate the similarity ratio based on distance and string length.
-        
+
         This method normalizes the Levenshtein distance into a similarity ratio
         between 0 and 1, where 1 represents identical strings and 0 represents
         completely different strings.
-        
+
         Args:
             distance (float): The Levenshtein distance between two strings.
             str_length (int): The length of the longer string.
@@ -46,11 +46,11 @@ class Levenshtein:
     def ratio(seq1: str, seq2: str) -> float:
         """
         Compute the similarity ratio between two strings.
-        
+
         This is the main method for determining string similarity. It calculates
         the Levenshtein distance and then converts it to a ratio representing
         how similar the strings are.
-        
+
         Args:
             seq1 (str): The first string to compare.
             seq2 (str): The second string to compare.
@@ -67,11 +67,11 @@ class Levenshtein:
     def distance(seq1: str, seq2: str) -> int:
         """
         Calculate the Levenshtein distance between two strings.
-        
+
         This method implements the core Levenshtein algorithm, which calculates
         the minimum number of single-character edits (insertions, deletions, or
         substitutions) required to change one string into another.
-        
+
         The algorithm uses dynamic programming with a matrix approach to efficiently
         compute the minimum edit distance.
 
@@ -105,8 +105,8 @@ class Levenshtein:
 
                 # Calculate minimum cost among deletion, insertion, and substitution
                 matrix[x, y] = min(
-                    matrix[x - 1, y] + 1,      # Deletion (remove from seq1)
-                    matrix[x, y - 1] + 1,      # Insertion (add from seq2)
+                    matrix[x - 1, y] + 1,  # Deletion (remove from seq1)
+                    matrix[x, y - 1] + 1,  # Insertion (add from seq2)
                     matrix[x - 1, y - 1] + cost,  # Substitution or match
                 )
 

@@ -7,4 +7,3 @@ __email__ = "vitordouzi@gmail.com"
 __version__ = "0.4.8"
 
 from yake.core.yake import KeywordExtractor as KeywordExtractor
-
