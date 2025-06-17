@@ -64,11 +64,11 @@ Ready to contribute? Here's how to set up `yake` for local development.
 
     $ git clone git@github.com:your_name_here/yake.git
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper and poetry installed, this is how you set up your fork for local development::
 
     $ mkvirtualenv yake
     $ cd yake/
-    $ python setup.py develop
+    $ poetry install
 
 4. Create a branch for local development::
 
