@@ -1,5 +1,7 @@
 name: Test
+
 on:
+  workflow_call:  # Adiciona suporte para workflow reutilizável
   push:
     branches: [ "master" ]
   pull_request:
@@ -7,21 +9,23 @@ on:
   workflow_dispatch:
 
 jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - name: Set up Python
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.10'
-        - name: Install uv
-          run: pip install uv
-        - name: Create virtual environment
-          run: uv venv
-        - name: Install dependencies
-          run: |
-            uv pip install -e ".[dev]"
-            uv pip install pytest pytest-cov
-        - name: test
-          run: uv run pytest -vv --cov=yake tests/
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5 
+        with:
+          python-version: '3.10'
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4  
+      
+      - name: Install dependencies
+        run: |
+          uv sync --dev  
+          uv pip install pytest pytest-cov 
+      
+      - name: Run tests
+        run: uv run pytest -vv --cov=yake tests/
