@@ -1,7 +1,7 @@
 name: Test
 
 on:
-  workflow_call:
+  workflow_call:  # Adiciona suporte para workflow reutilizável
   push:
     branches: [ "master" ]
   pull_request:
@@ -15,17 +15,17 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Set up Python
-        uses: actions/setup-python@v5 
+        uses: actions/setup-python@v5  # Atualizado para v5
         with:
           python-version: '3.10'
       
       - name: Install uv
-        uses: astral-sh/setup-uv@v4  
+        uses: astral-sh/setup-uv@v4  # Usando a action oficial do uv
       
       - name: Install dependencies
         run: |
-          uv sync --dev  
-          uv pip install pytest pytest-cov 
+          uv sync --dev
+          uv add --group dev pytest pytest-cov  
       
       - name: Run tests
-        run: uv run pytest -vv --cov=yake tests/
+        run: uv run python -m pytest -vv --cov=yake tests/
