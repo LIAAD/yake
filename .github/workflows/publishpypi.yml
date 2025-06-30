@@ -2,8 +2,13 @@ name: release
 
 on:
   push:
-    branches: 
-      - master
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+a[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+  release:
+    types: [published]
 
 env:
   PACKAGE_NAME: "yake"
@@ -11,7 +16,26 @@ env:
 
 jobs:
   unit-test:
-    uses: LIAAD/yake/.github/workflows/test.yml@master
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Run tests
+        run: uv run pytest
 
   details:
     runs-on: ubuntu-latest
@@ -21,19 +45,33 @@ jobs:
       suffix: ${{ steps.release.outputs.suffix }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Check Ref Type
-        if: github.ref_type != 'tag'
-        run: echo "This is not a tag; exiting"; exit 1
+      - name: Check Ref Type and Debug
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Ref type: ${{ github.ref_type }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "SHA: ${{ github.sha }}"
+          if [[ "${{ github.ref_type }}" != "tag" ]]; then
+            echo "This is not a tag; exiting"
+            exit 1
+          fi
+          echo "This is a tag - proceeding"
 
       - name: Extract tag and Details
         id: release
         run: |
-          TAG_NAME=${GITHUB_REF#refs/tags/}
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            TAG_NAME="${{ github.event.release.tag_name }}"
+          else
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+          fi
           NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
           SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
           echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
-          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "Processing tag: $TAG_NAME"
+          echo "Version: $NEW_VERSION"
 
       - name: Debug Outputs
         if: env.RUNNER_DEBUG
