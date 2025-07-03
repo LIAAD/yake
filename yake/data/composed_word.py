@@ -323,9 +323,11 @@ class ComposedWord:
         """
         sum_h = 0.0
         prod_h = 1.0
+        t = 0
 
         # Process each term in the phrase
-        for t, term_base in enumerate(self.terms):
+        while t < len(self.terms):
+            term_base = self.terms[t]
             # Handle non-stopwords directly
             if not term_base.stopword:
                 sum_h += term_base.h
@@ -335,30 +337,42 @@ class ComposedWord:
             else:
                 if STOPWORD_WEIGHT == "bi":
                     # BiWeight: use probabilities of adjacent term connections
+
+                    # If multiple stopwords in a row, treat as a group
+                    stop_group_start = t
+                    stop_group_end = t
+
+                    while stop_group_end + 1 < len(self.terms) and self.terms[stop_group_end + 1].stopword:
+                        stop_group_end += 1
+
+                    # Adjacent probability of first stopword to previous term
                     prob_t1 = 0.0
                     # Check connection with previous term
-                    if t > 0 and term_base.g.has_edge(
-                        self.terms[t - 1].id, self.terms[t].id
+                    if stop_group_start > 0 and term_base.g.has_edge(
+                            self.terms[stop_group_start - 1].id, self.terms[stop_group_start].id
                     ):
                         prob_t1 = (
-                            term_base.g[self.terms[t - 1].id][self.terms[t].id]["tf"]
-                            / self.terms[t - 1].tf
+                                term_base.g[self.terms[stop_group_start - 1].id][self.terms[stop_group_start].id]["tf"]
+                                / self.terms[stop_group_start - 1].tf
                         )
 
+                    # Adjacent probability of last stopword to next term
                     prob_t2 = 0.0
                     # Check connection with next term
-                    if t < len(self.terms) - 1 and term_base.g.has_edge(
-                        self.terms[t].id, self.terms[t + 1].id
+                    if stop_group_end < len(self.terms) - 1 and term_base.g.has_edge(
+                            self.terms[stop_group_end].id, self.terms[stop_group_end + 1].id
                     ):
                         prob_t2 = (
-                            term_base.g[self.terms[t].id][self.terms[t + 1].id]["tf"]
-                            / self.terms[t + 1].tf
+                                term_base.g[self.terms[stop_group_end].id][self.terms[stop_group_end + 1].id]["tf"]
+                                / self.terms[stop_group_end + 1].tf
                         )
 
                     # Calculate combined probability and update scores
                     prob = prob_t1 * prob_t2
                     prod_h *= 1 + (1 - prob)
                     sum_h -= 1 - prob
+
+                    t = stop_group_end
                 elif STOPWORD_WEIGHT == "h":
                     # HWeight: treat stopwords like normal words
                     sum_h += term_base.h
@@ -366,6 +380,8 @@ class ComposedWord:
                 elif STOPWORD_WEIGHT == "none":
                     # None: ignore stopwords entirely
                     pass
+
+            t += 1
 
         # Determine term frequency to use in scoring
         tf_used = 1.0

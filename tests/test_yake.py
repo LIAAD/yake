@@ -70,6 +70,45 @@ def test_n3_EN():
         == "<kw>Google</kw> is acquiring <kw>data science</kw> community <kw>Kaggle</kw>. Sources tell us that <kw>Google</kw> is acquiring <kw>Kaggle</kw>, a <kw>platform</kw> that hosts <kw>data science</kw> and <kw>machine learning</kw>   competitions. Details about the transaction remain somewhat vague , but given that <kw>Google</kw> is hosting   its Cloud Next conference in <kw>San Francisco</kw> this week, the official announcement could come as early   as tomorrow.  Reached by phone, <kw>Kaggle</kw> co-founder <kw>CEO Anthony Goldbloom</kw> declined to deny that the   acquisition is happening. <kw>Google</kw> itself declined 'to comment on rumors'.   <kw>Kaggle</kw>, which has about half a million <kw>data</kw> scientists on its <kw>platform</kw>, was founded by Goldbloom   and Ben Hamner in 2010. The <kw>service</kw> got an early start and even though it has a few competitors   like DrivenData, TopCoder and HackerRank, it has managed to stay well ahead of them by focusing on its   specific niche. The <kw>service</kw> is basically the de facto home for running <kw>data science</kw>  and <kw>machine learning</kw>   competitions.  With <kw>Kaggle</kw>, <kw>Google</kw> is buying one of the largest and most active communities for   <kw>data</kw> scientists - and with that, it will get increased mindshare in this community, too   (though it already has plenty of that thanks to Tensorflow and other projects).   <kw>Kaggle</kw> has a bit of a history with <kw>Google</kw>, too, but that's pretty recent. Earlier this month,   <kw>Google</kw> and <kw>Kaggle</kw> teamed up to host a $100,000 <kw>machine learning</kw> competition around classifying   YouTube videos. That competition had some deep integrations with the <kw>Google</kw> Cloud <kw>Platform</kw>, too.   Our understanding is that <kw>Google</kw> will keep the <kw>service</kw> running - likely under its current name.   While the acquisition is probably more about Kaggle's community than technology, <kw>Kaggle</kw> did build   some interesting tools for hosting its competition and 'kernels', too. On <kw>Kaggle</kw>, kernels are   basically the source code for analyzing <kw>data</kw> sets and developers can share this code on the   <kw>platform</kw> (the company previously called them 'scripts').  Like similar competition-centric sites,   <kw>Kaggle</kw> also runs a job board, too. It's unclear what <kw>Google</kw> will do with that part of the <kw>service</kw>.   According to Crunchbase, <kw>Kaggle</kw> raised $12.5 million (though PitchBook says it's $12.75) since its   launch in 2010. Investors in <kw>Kaggle</kw> include Index Ventures, SV Angel, Max Levchin, Naval Ravikant,   <kw>Google</kw> chief economist Hal Varian, Khosla Ventures and Yuri Milner"
     )
 
+def test_n4_EN():
+    text_content = "Given a sound clip of a person or people speaking, determine the textual representation of the speech. This is the opposite of text to speech and is one of the extremely difficult problems colloquially termed AI-complete. In natural speech there are hardly any pauses between successive words, and thus speech segmentation is a necessary subtask of speech recognition. In most spoken languages, the sounds representing successive letters blend into each other in a process termed coarticulation, so the conversion of the analog signal to discrete characters can be a very difficult process. Also, given that words in the same language are spoken by people with different accents, the speech recognition software must be able to recognize the wide variety of input as being identical to each other in terms of its textual equivalent."
+    
+    pyake = yake.KeywordExtractor(lan="en", n=4)
+    result = pyake.extract_keywords(text_content)
+
+    res = [
+        ('person or people speaking', 0.02371235675412416),
+        ('determine the textual representation', 0.023712356754124163),
+        ('clip of a person', 0.029892130838734352),
+        ('speech', 0.05171467792955825),
+        ('problems colloquially termed AI-complete', 0.05774635365736056),
+        ('people speaking', 0.06491457949781286),
+        ('difficult problems colloquially termed', 0.06622675127498744),
+        ('extremely difficult problems colloquially', 0.06668784569227526),
+        ('sound clip', 0.0687424852965288),
+        ('textual representation', 0.07592882807384618),
+        ('speech recognition', 0.07650182723598535),
+        ('colloquially termed AI-complete', 0.10009206386398749),
+        ('extremely difficult problems', 0.11478755562776954),
+        ('difficult problems colloquially', 0.11478755562776954),
+        ('problems colloquially termed', 0.11478755562776954),
+        ('determine the textual', 0.13265911255112645),
+        ('speech recognition software', 0.13385106547208153),
+        ('speaking', 0.14715902096033903),
+        ('determine', 0.14715902096033903),
+        ('person or people', 0.15420935992103177),
+    ]
+
+    assert result == res
+
+    keywords = [kw[0] for kw in result]
+    th = TextHighlighter(max_ngram_size=4)
+    textHighlighted = th.highlight(text_content, keywords)
+    print(textHighlighted)
+    assert (
+            textHighlighted
+            == "Given a sound clip of a <kw>person or people speaking</kw>, <kw>determine the textual representation</kw> of the <kw>speech</kw>. This is the opposite of text to <kw>speech</kw> and is one of the extremely difficult <kw>problems colloquially termed AI-complete</kw>. In natural <kw>speech</kw> there are hardly any pauses between successive words, and thus <kw>speech</kw> segmentation is a necessary subtask of <kw>speech</kw> recognition. In most spoken languages, the sounds representing successive letters blend into each other in a process termed coarticulation, so the conversion of the analog signal to discrete characters can be a very difficult process. Also, given that words in the same language are spoken by people with different accents, the <kw>speech</kw> recognition software must be able to recognize the wide variety of input as being identical to each other in terms of its textual equivalent."
+    )
 
 def test_n3_PT():
     text_content = """
